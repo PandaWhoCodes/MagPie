@@ -1,8 +1,72 @@
 import streamlit as st
 import re
 import pandas as pd
-import os
 from datetime import datetime
+import gspread
+from google.oauth2.service_account import Credentials
+
+# Set up Google Sheets credentials
+SCOPES = [
+    "https://www.googleapis.com/auth/spreadsheets",
+    "https://www.googleapis.com/auth/drive",
+]
+
+
+@st.cache_resource
+def get_google_sheet():
+    try:
+        # Load credentials from streamlit secrets
+        credentials = {
+            "type": st.secrets["gcp_service_account"]["type"],
+            "project_id": st.secrets["gcp_service_account"]["project_id"],
+            "private_key_id": st.secrets["gcp_service_account"]["private_key_id"],
+            "private_key": st.secrets["gcp_service_account"]["private_key"],
+            "client_email": st.secrets["gcp_service_account"]["client_email"],
+            "client_id": st.secrets["gcp_service_account"]["client_id"],
+            "auth_uri": st.secrets["gcp_service_account"]["auth_uri"],
+            "token_uri": st.secrets["gcp_service_account"]["token_uri"],
+            "auth_provider_x509_cert_url": st.secrets["gcp_service_account"][
+                "auth_provider_x509_cert_url"
+            ],
+            "client_x509_cert_url": st.secrets["gcp_service_account"][
+                "client_x509_cert_url"
+            ],
+        }
+
+        creds = Credentials.from_service_account_info(credentials, scopes=SCOPES)
+        client = gspread.authorize(creds)
+
+        # Open the Google Sheet (replace with your sheet ID)
+        sheet = client.open_by_key(st.secrets["gcp_service_account"]["sheet_id"]).sheet1
+
+        return sheet
+    except Exception as e:
+        st.error(f"Error connecting to Google Sheets: {str(e)}")
+        return None
+
+
+def save_to_sheets(data):
+    try:
+        sheet = get_google_sheet()
+        if sheet is None:
+            return False
+
+        # Add registration time
+        data["Registration Time"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        # If sheet is empty, add headers
+        if sheet.row_count == 0:
+            headers = list(data.keys())
+            sheet.append_row(headers)
+
+        # Add the new row
+        values = list(data.values())
+        sheet.append_row(values)
+        return True
+
+    except Exception as e:
+        st.error(f"Error saving to Google Sheets: {str(e)}")
+        return False
 
 
 def is_valid_email(email):
@@ -42,11 +106,17 @@ def save_to_csv(data):
 
 def display_technology_summary():
     try:
-        df = pd.read_csv("build2learn_registrations.csv")
+        sheet = get_google_sheet()
+        if sheet is None:
+            return
+
+        # Get all data from sheet
+        data = sheet.get_all_records()
+        df = pd.DataFrame(data)
+        print(df)
         # Extract all technologies and clean them
         all_techs = []
         for tech_string in df["Technology"]:
-            # Split the string by common separators and clean each technology
             techs = [t.strip().lower() for t in re.split(r"[,\s]+", str(tech_string))]
             all_techs.extend(techs)
 
@@ -55,9 +125,8 @@ def display_technology_summary():
 
         st.sidebar.markdown("### Technology Distribution")
 
-        # Create a formatted display of technologies and their counts
         for tech, count in tech_counts.items():
-            if tech and tech != "nan":  # Avoid empty or NaN values
+            if tech and tech != "nan":
                 st.sidebar.write(f"- {tech}: {count}")
 
     except Exception as e:
@@ -87,7 +156,7 @@ def confirmation_dialog(registration_data):
 
     if st.button("Submit Confirmation"):
         if confirmation.lower() == "yes":
-            if save_to_csv(registration_data):
+            if save_to_sheets(registration_data):
                 st.session_state.registration_status = "success"
             else:
                 st.session_state.registration_status = "error"
