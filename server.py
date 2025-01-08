@@ -142,7 +142,7 @@ def confirmation_dialog(registration_data):
 
     Our little panda friend here gets sad when people register but don't come 🥺
     ### 📅 Event Details
-    - **Date**: February 24, 2024 (Saturday)
+    - **Date**: January 24, 2024 (Saturday)
     - **Time**: 9:30 AM
     - **Venue**: IBM INDIA PRIVATE LIMITED
       - 5th Floor, Unit 3, Pinnacle Building
@@ -193,7 +193,7 @@ def main():
     At build2learn, we believe that magic happens when engineers come together to do what they love - BUILD! 🛠
 
     ### 📅 Event Details
-    - **Date**: February 24, 2024 (Saturday)
+    - **Date**: January 24, 2024 (Saturday)
     - **Time**: 9:30 AM
     - **Venue**: IBM INDIA PRIVATE LIMITED
     - 5th Floor, Unit 3, Pinnacle Building
@@ -271,7 +271,7 @@ def main():
         🌟 We're so excited to have you join our community of builders and innovators!
         
         📅 Event Details:
-        - Date: February 24, 2024 (Saturday)
+        - Date: January 24, 2024 (Saturday)
         - Time: 9:30 AM
         - Venue: IBM INDIA PRIVATE LIMITED
         5th Floor, Unit 3, Pinnacle Building
