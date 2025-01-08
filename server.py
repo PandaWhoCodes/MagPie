@@ -264,7 +264,7 @@ def main():
                 elif not is_valid_github(github_link):
                     st.error("Please enter a valid GitHub URL")
                 else:
-                    registration_data = {
+                    st.session_state.registration_data = {
                         "Name": name,
                         "Email": email,
                         "Phone": phone,
@@ -276,35 +276,47 @@ def main():
                         "GitHub": github_link,
                         "Laptop Model": laptop_model,
                     }
-                    st.session_state.showing_confirmation = True
-                    st.session_state.temp_registration_data = registration_data
-                    st.rerun()
+                    st.session_state.show_dialog = True
 
-        if (
-            st.session_state.showing_confirmation
-            and st.session_state.temp_registration_data
-        ):
+        # Show confirmation dialog
+        if st.session_state.show_dialog:
             with st.dialog("Final Confirmation Required 🐼"):
+                st.image("https://i.imgur.com/silyfx7.jpeg", width=300)
                 st.markdown(
                     """
                 ### Before we make it official... 
-                [... rest of your confirmation dialog markdown ...]
+
+                Our little panda friend here gets sad when people register but don't come 🥺
+
+                ### 📅 Event Details
+                - **Date**: February 24, 2024 (Saturday)
+                - **Time**: 9:30 AM
+                - **Venue**: IBM INDIA PRIVATE LIMITED
+                  - 5th Floor, Unit 3, Pinnacle Building
+                  - Ascendas IT Park, CSIR Road
+                  - Taramani, Chennai – 600113
+
+                ⚠️ Take a moment to think:
+                - Can you really make it to the venue on time? 
+                - Are you excited to learn and build with us? 
+                - Ready to be part of our awesome community? 
+
+                If you're 100% committed to joining us for this amazing journey, 
+                please type 'yes' below to complete your registration! 🌟
                 """
                 )
 
                 confirmation = st.text_input("Type 'yes' to confirm your registration:")
-                if st.button("Submit Final Confirmation"):
+
+                if st.button("Submit Confirmation"):
                     if confirmation.lower() == "yes":
-                        if save_to_sheets(st.session_state.temp_registration_data):
+                        if save_to_sheets(st.session_state.registration_data):
                             st.session_state.registration_status = "success"
-                            st.session_state.registration_complete = True
                         else:
                             st.session_state.registration_status = "error"
                     else:
                         st.session_state.registration_status = "invalid"
-
-                    st.session_state.showing_confirmation = False
-                    st.session_state.temp_registration_data = None
+                    st.session_state.show_dialog = False
                     st.rerun()
 
         # Handle registration status
@@ -312,10 +324,24 @@ def main():
             st.balloons()
             st.success(
                 """
-            🎉 WOOHOO! You're officially part of Build2Learn! 🎉
-            [... rest of your success message ...]
-            """
+                🎉 WOOHOO! You're officially part of Build2Learn! 🎉
+                
+                🌟 We're so excited to have you join our community of builders and innovators!
+                
+                📅 Event Details:
+                - Date: February 24, 2024 (Saturday)
+                - Time: 9:30 AM
+                - Venue: IBM INDIA PRIVATE LIMITED
+                  5th Floor, Unit 3, Pinnacle Building
+                  Ascendas IT Park, CSIR Road
+                  Taramani, Chennai – 600113
+                
+                📍 Don't forget to save the location: [Google Maps](https://maps.app.goo.gl/Jy9Bz9eWoK4cBxpo8)
+                
+                💪 Time to turn those amazing ideas into reality!
+                """
             )
+            st.session_state.registration_complete = True
             st.session_state.registration_status = None
         elif st.session_state.registration_status == "error":
             st.error("There was an error saving your registration. Please try again.")
@@ -328,9 +354,9 @@ def main():
         st.success("You have already registered! 🎉")
         if st.button("Register Another Person"):
             st.session_state.registration_complete = False
-            st.session_state.showing_confirmation = False
-            st.session_state.temp_registration_data = None
             st.session_state.registration_status = None
+            st.session_state.show_dialog = False
+            st.session_state.registration_data = None
             st.rerun()
 
     # Show technology summary in sidebar
