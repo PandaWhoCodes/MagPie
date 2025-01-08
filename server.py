@@ -134,42 +134,52 @@ def display_technology_summary():
 
 
 @st.dialog("Final Confirmation Required 🐼")
-def confirmation_dialog(registration_data):
-    st.image("https://i.imgur.com/silyfx7.jpeg", width=300)
-    st.markdown(
+def handle_registration(registration_data):
+    if not st.session_state.get("showing_confirmation", False):
+        st.session_state.showing_confirmation = True
+        st.session_state.temp_registration_data = registration_data
+    else:
+        st.markdown(
+            """
+        ### Before we make it official... 
+
+        Our little panda friend here gets sad when people register but don't come 🥺
         """
-    ### Before we make it official... 
+        )
+        st.image("https://i.imgur.com/silyfx7.jpeg", width=300)
+        st.markdown(
+            """
+        ### 📅 Event Details
+        - **Date**: January 24, 2024 (Saturday)
+        - **Time**: 9:30 AM
+        - **Venue**: IBM INDIA PRIVATE LIMITED
+          - 5th Floor, Unit 3, Pinnacle Building
+          - Ascendas IT Park, CSIR Road
+          - Taramani, Chennai – 600113
 
-    Our little panda friend here gets sad when people register but don't come 🥺
-    ### 📅 Event Details
-    - **Date**: January 24, 2024 (Saturday)
-    - **Time**: 9:30 AM
-    - **Venue**: IBM INDIA PRIVATE LIMITED
-      - 5th Floor, Unit 3, Pinnacle Building
-      - Ascendas IT Park, CSIR Road
-      - Taramani, Chennai – 600113
+        ⚠️ Take a moment to think:
+        - Can you really make it? 
+        - Are you excited to learn and build with us? 
+        - Ready to be part of our awesome community? 
 
-    ⚠️ Take a moment to think:
-    - Can you really make it? 
-    - Are you excited to learn and build with us? 
-    - Ready to be part of our awesome community? 
+        If you're 100% committed to joining us for this amazing journey, 
+        please type 'yes' below to complete your registration! 🌟
+        """
+        )
 
-    If you're 100% committed to joining us for this amazing journey, 
-    please type 'yes' below to complete your registration! 🌟
-    """
-    )
-
-    confirmation = st.text_input("Type 'yes' to confirm your registration:")
-
-    if st.button("Submit Confirmation"):
-        if confirmation.lower() == "yes":
-            if save_to_sheets(registration_data):
-                st.session_state.registration_status = "success"
+        confirmation = st.text_input("Type 'yes' to confirm your registration:")
+        if st.button("Submit Final Confirmation"):
+            if confirmation.lower() == "yes":
+                if save_to_sheets(st.session_state.temp_registration_data):
+                    st.session_state.registration_status = "success"
+                    st.session_state.registration_complete = True
+                else:
+                    st.session_state.registration_status = "error"
             else:
-                st.session_state.registration_status = "error"
-        else:
-            st.session_state.registration_status = "invalid"
-        st.rerun()
+                st.session_state.registration_status = "invalid"
+
+            st.session_state.showing_confirmation = False
+            st.rerun()
 
 
 def main():
@@ -259,7 +269,7 @@ def main():
                         "GitHub": github_link,
                         "Laptop Model": laptop_model,
                     }
-                    confirmation_dialog(registration_data)
+                    handle_registration(registration_data)
 
         # Handle registration status after dialog closes
         if st.session_state.registration_status == "success":
