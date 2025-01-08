@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 import re
 import pandas as pd
@@ -188,6 +189,10 @@ def main():
     st.title("Build2Learn Registration Bot 🤖")
 
     # Initialize session states
+    if "showing_confirmation" not in st.session_state:
+        st.session_state.showing_confirmation = False
+    if "temp_registration_data" not in st.session_state:
+        st.session_state.temp_registration_data = None
     if "registration_complete" not in st.session_state:
         st.session_state.registration_complete = False
     if "registration_status" not in st.session_state:
