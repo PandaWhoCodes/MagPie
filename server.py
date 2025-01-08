@@ -135,51 +135,53 @@ def display_technology_summary():
 
 @st.dialog("Final Confirmation Required 🐼")
 def handle_registration(registration_data):
-    if not st.session_state.get("showing_confirmation", False):
+    if not st.session_state.showing_confirmation:
         st.session_state.showing_confirmation = True
         st.session_state.temp_registration_data = registration_data
-    else:
-        st.markdown(
-            """
-        ### Before we make it official... 
+        st.rerun()
 
-        Our little panda friend here gets sad when people register but don't come 🥺
+    st.markdown(
         """
-        )
-        st.image("https://i.imgur.com/silyfx7.jpeg", width=300)
-        st.markdown(
-            """
-        ### 📅 Event Details
-        - **Date**: January 24, 2024 (Saturday)
-        - **Time**: 9:30 AM
-        - **Venue**: IBM INDIA PRIVATE LIMITED
-          - 5th Floor, Unit 3, Pinnacle Building
-          - Ascendas IT Park, CSIR Road
-          - Taramani, Chennai – 600113
+    ### Before we make it official... 
 
-        ⚠️ Take a moment to think:
-        - Can you really make it? 
-        - Are you excited to learn and build with us? 
-        - Ready to be part of our awesome community? 
-
-        If you're 100% committed to joining us for this amazing journey, 
-        please type 'yes' below to complete your registration! 🌟
+    Our little panda friend here gets sad when people register but don't come 🥺
+    """
+    )
+    st.image("https://i.imgur.com/silyfx7.jpeg", width=300)
+    st.markdown(
         """
-        )
+    ### 📅 Event Details
+    - **Date**: January 24, 2024 (Saturday)
+    - **Time**: 9:30 AM
+    - **Venue**: IBM INDIA PRIVATE LIMITED
+      - 5th Floor, Unit 3, Pinnacle Building
+      - Ascendas IT Park, CSIR Road
+      - Taramani, Chennai – 600113
 
-        confirmation = st.text_input("Type 'yes' to confirm your registration:")
-        if st.button("Submit Final Confirmation"):
-            if confirmation.lower() == "yes":
-                if save_to_sheets(st.session_state.temp_registration_data):
-                    st.session_state.registration_status = "success"
-                    st.session_state.registration_complete = True
-                else:
-                    st.session_state.registration_status = "error"
+    ⚠️ Take a moment to think:
+    - Can you really make it? 
+    - Are you excited to learn and build with us? 
+    - Ready to be part of our awesome community? 
+
+    If you're 100% committed to joining us for this amazing journey, 
+    please type 'yes' below to complete your registration! 🌟
+    """
+    )
+
+    confirmation = st.text_input("Type 'yes' to confirm your registration:")
+    if st.button("Submit Final Confirmation"):
+        if confirmation.lower() == "yes":
+            if save_to_sheets(st.session_state.temp_registration_data):
+                st.session_state.registration_status = "success"
+                st.session_state.registration_complete = True
             else:
-                st.session_state.registration_status = "invalid"
+                st.session_state.registration_status = "error"
+        else:
+            st.session_state.registration_status = "invalid"
 
-            st.session_state.showing_confirmation = False
-            st.rerun()
+        st.session_state.showing_confirmation = False
+        st.session_state.temp_registration_data = None
+        st.rerun()
 
 
 def main():
@@ -214,7 +216,7 @@ def main():
     """
     )
 
-    if not st.session_state.registration_complete:
+    if not st.session_state.showing_confirmation:
         with st.form("registration_form"):
             name = st.text_input("Name *")
             email = st.text_input("Email *")
@@ -294,6 +296,8 @@ def main():
             )
             st.session_state.registration_complete = True
             st.session_state.registration_status = None
+        elif st.session_state.showing_confirmation:
+            handle_registration(st.session_state.temp_registration_data)
         elif st.session_state.registration_status == "error":
             st.error("There was an error saving your registration. Please try again.")
             st.session_state.registration_status = None
