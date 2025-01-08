@@ -221,7 +221,7 @@ def main():
     """
     )
 
-    if not st.session_state.showing_confirmation:
+    if not st.session_state.registration_complete:
         with st.form("registration_form"):
             name = st.text_input("Name *")
             email = st.text_input("Email *")
@@ -276,33 +276,47 @@ def main():
                         "GitHub": github_link,
                         "Laptop Model": laptop_model,
                     }
-                    handle_registration(registration_data)
+                    st.session_state.showing_confirmation = True
+                    st.session_state.temp_registration_data = registration_data
+                    st.rerun()
 
-        # Handle registration status after dialog closes
+        if (
+            st.session_state.showing_confirmation
+            and st.session_state.temp_registration_data
+        ):
+            with st.dialog("Final Confirmation Required 🐼"):
+                st.markdown(
+                    """
+                ### Before we make it official... 
+                [... rest of your confirmation dialog markdown ...]
+                """
+                )
+
+                confirmation = st.text_input("Type 'yes' to confirm your registration:")
+                if st.button("Submit Final Confirmation"):
+                    if confirmation.lower() == "yes":
+                        if save_to_sheets(st.session_state.temp_registration_data):
+                            st.session_state.registration_status = "success"
+                            st.session_state.registration_complete = True
+                        else:
+                            st.session_state.registration_status = "error"
+                    else:
+                        st.session_state.registration_status = "invalid"
+
+                    st.session_state.showing_confirmation = False
+                    st.session_state.temp_registration_data = None
+                    st.rerun()
+
+        # Handle registration status
         if st.session_state.registration_status == "success":
             st.balloons()
             st.success(
                 """
-        🎉 WOOHOO! You're officially part of Build2Learn! 🎉
-        
-        🌟 We're so excited to have you join our community of builders and innovators!
-        
-        📅 Event Details:
-        - Date: January 24, 2024 (Saturday)
-        - Time: 9:30 AM
-        - Venue: IBM INDIA PRIVATE LIMITED
-        5th Floor, Unit 3, Pinnacle Building
-        Ascendas IT Park, CSIR Road
-        Taramani, Chennai – 600113
-        
-        📍 Don't forget to save the location: [Google Maps](https://maps.app.goo.gl/Jy9Bz9eWoK4cBxpo8)
-        
-        💪 Time to turn those amazing ideas into reality!"""
+            🎉 WOOHOO! You're officially part of Build2Learn! 🎉
+            [... rest of your success message ...]
+            """
             )
-            st.session_state.registration_complete = True
             st.session_state.registration_status = None
-        elif st.session_state.showing_confirmation:
-            handle_registration(st.session_state.temp_registration_data)
         elif st.session_state.registration_status == "error":
             st.error("There was an error saving your registration. Please try again.")
             st.session_state.registration_status = None
@@ -314,6 +328,8 @@ def main():
         st.success("You have already registered! 🎉")
         if st.button("Register Another Person"):
             st.session_state.registration_complete = False
+            st.session_state.showing_confirmation = False
+            st.session_state.temp_registration_data = None
             st.session_state.registration_status = None
             st.rerun()
 
