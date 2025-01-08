@@ -141,6 +141,13 @@ def confirmation_dialog(registration_data):
     ### Before we make it official... 
 
     Our little panda friend here gets sad when people register but don't come 🥺
+    ### 📅 Event Details
+    - **Date**: February 24, 2024 (Saturday)
+    - **Time**: 9:30 AM
+    - **Venue**: IBM INDIA PRIVATE LIMITED
+      - 5th Floor, Unit 3, Pinnacle Building
+      - Ascendas IT Park, CSIR Road
+      - Taramani, Chennai – 600113
 
     ⚠️ Take a moment to think:
     - Can you really make it? 
@@ -179,11 +186,21 @@ def main():
     ### Welcome to build2learn - Where Innovation Meets Community! 
 
     Imagine a hackathon, but with a twist!🤔
-    
+
     It's not just about building incredible micro products; it's about forging lifelong connections 
     with like-minded individuals who share your passion for innovation! 🤝💡
-    
+
     At build2learn, we believe that magic happens when engineers come together to do what they love - BUILD! 🛠
+
+    ### 📅 Event Details
+    - **Date**: February 24, 2024 (Saturday)
+    - **Time**: 9:30 AM
+    - **Venue**: IBM INDIA PRIVATE LIMITED
+    - 5th Floor, Unit 3, Pinnacle Building
+    - Ascendas IT Park, CSIR Road
+    - Taramani, Chennai – 600113
+    
+    📍 [View on Google Maps](https://maps.app.goo.gl/Jy9Bz9eWoK4cBxpo8)
     """
     )
 
@@ -249,14 +266,21 @@ def main():
             st.balloons()
             st.success(
                 """
-            🎉 WOOHOO! You're officially part of Build2Learn! 🎉
-            
-            🌟 We're so excited to have you join our community of builders and innovators!
-            
-            📅 Save the date and get ready for an amazing experience!
-            
-            💪 Time to turn those amazing ideas into reality!
-            """
+        🎉 WOOHOO! You're officially part of Build2Learn! 🎉
+        
+        🌟 We're so excited to have you join our community of builders and innovators!
+        
+        📅 Event Details:
+        - Date: February 24, 2024 (Saturday)
+        - Time: 9:30 AM
+        - Venue: IBM INDIA PRIVATE LIMITED
+        5th Floor, Unit 3, Pinnacle Building
+        Ascendas IT Park, CSIR Road
+        Taramani, Chennai – 600113
+        
+        📍 Don't forget to save the location: [Google Maps](https://maps.app.goo.gl/Jy9Bz9eWoK4cBxpo8)
+        
+        💪 Time to turn those amazing ideas into reality!"""
             )
             st.session_state.registration_complete = True
             st.session_state.registration_status = None
