@@ -1,0 +1,32 @@
+services:
+  # Backend API
+  - type: web
+    name: b2l-registration-api
+    env: python
+    region: singapore
+    plan: free
+    buildCommand: cd backend && pip install -r requirements.txt
+    startCommand: cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: TURSO_DATABASE_URL
+        value: libsql://b2lregistration-pandawhocodes.aws-ap-south-1.turso.io
+      - key: TURSO_AUTH_TOKEN
+        sync: false
+      - key: FRONTEND_URL
+        value: https://b2l-registration.onrender.com
+
+  # Frontend
+  - type: web
+    name: b2l-registration-frontend
+    env: static
+    region: singapore
+    plan: free
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: ./frontend/dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+    envVars:
+      - key: VITE_API_URL
+        value: https://b2l-registration-api.onrender.com/api

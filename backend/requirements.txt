@@ -1,0 +1,9 @@
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+pydantic==2.9.2
+pydantic[email]==2.9.2
+pydantic-settings==2.5.2
+libsql
+python-dotenv==1.0.1
+qrcode[pil]==7.4.2
+python-multipart==0.0.12
