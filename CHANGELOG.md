@@ -12,6 +12,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `backend/app/core/schema_manager.py:140-152` - Added `test_migration` table definition with 4 columns and 1 index
   - Table includes: id (primary key), test_field, test_number, new_test_column, created_at
   - Index created on `test_field` column for performance testing
+- Footer component with Build2Learn branding
+  - `frontend/src/components/Footer.jsx` - New footer component with animated heart and link to build2learn.in
+  - Added footer to all pages: HomePage, ThankYouPage, CheckInPage, Dashboard, NoEventPage
+  - Features animated pulsing heart emoji and hover effect on Build2Learn link
 
 ### Changed
 - Improved schema migration error handling for WAL conflicts

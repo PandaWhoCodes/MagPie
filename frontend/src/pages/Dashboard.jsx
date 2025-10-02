@@ -18,6 +18,7 @@ import EventForm from '../components/EventForm';
 import RegistrationsList from '../components/RegistrationsList';
 import QRCodeModal from '../components/QRCodeModal';
 import BrandingSettings from '../components/BrandingSettings';
+import Footer from '../components/Footer';
 
 export default function Dashboard() {
   const queryClient = useQueryClient();
@@ -399,6 +400,7 @@ export default function Dashboard() {
           }}
         />
       )}
+      <Footer />
     </div>
   );
 }

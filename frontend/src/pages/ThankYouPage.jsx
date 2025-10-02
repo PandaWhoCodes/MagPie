@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, Calendar, Clock, MapPin, ExternalLink, Sparkles, PartyPopper, Heart } from 'lucide-react';
+import Footer from '../components/Footer';
 
 // Confetti particle component
 const ConfettiPiece = ({ delay = 0 }) => {
@@ -419,6 +420,7 @@ export default function ThankYouPage() {
           </motion.div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

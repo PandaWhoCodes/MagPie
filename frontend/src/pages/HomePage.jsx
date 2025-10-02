@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { eventsApi, registrationsApi, brandingApi } from '../services/api';
 import { Calendar, Clock, MapPin, ExternalLink, Sparkles, CheckCircle2 } from 'lucide-react';
 import StylizedText from '../components/StylizedText';
+import Footer from '../components/Footer';
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -553,6 +554,7 @@ export default function HomePage() {
           </motion.div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

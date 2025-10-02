@@ -6,6 +6,7 @@ import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { qrCodesApi, registrationsApi } from '../services/api';
 import { CheckCircle, Wifi, Link as LinkIcon, Sparkles, Zap } from 'lucide-react';
+import Footer from '../components/Footer';
 
 // Ripple effect component
 const RippleEffect = () => {
@@ -361,6 +362,7 @@ export default function CheckInPage() {
           </div>
         </motion.div>
       </div>
+      <Footer />
     </div>
   );
 }
