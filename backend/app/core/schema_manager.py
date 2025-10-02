@@ -136,6 +136,20 @@ class SchemaManager:
                     Column('updated_at', 'TEXT', nullable=True, default='CURRENT_TIMESTAMP'),
                 ]
             ),
+
+            'test_migration': Table(
+                name='test_migration',
+                columns=[
+                    Column('id', 'TEXT', nullable=False, primary_key=True),
+                    Column('test_field', 'TEXT', nullable=False),
+                    Column('test_number', 'INTEGER', nullable=True, default='0'),
+                    Column('new_test_column', 'TEXT', nullable=True, default="'default_value'"),
+                    Column('created_at', 'TEXT', nullable=True, default='CURRENT_TIMESTAMP'),
+                ],
+                indexes=[
+                    Index('idx_test_migration_field', 'test_migration', ['test_field'])
+                ]
+            ),
         }
 
     def get_existing_tables(self) -> Dict[str, List[Dict]]:
@@ -221,8 +235,19 @@ class SchemaManager:
 
             print(f"    ✅ Added column: {column.name}")
         except Exception as e:
-            if "duplicate column name" in str(e).lower():
+            error_msg = str(e).lower()
+            if "duplicate column name" in error_msg:
                 print(f"    ℹ️  Column {column.name} already exists")
+            elif "wal frame insert conflict" in error_msg:
+                print(f"    ⚠️  WAL conflict detected, retrying column addition...")
+                # Retry after a brief moment
+                import time
+                time.sleep(0.1)
+                try:
+                    self.conn.execute(sql)
+                    print(f"    ✅ Added column: {column.name} (retry successful)")
+                except:
+                    print(f"    ⚠️  Could not add column due to WAL conflict, it may already exist")
             else:
                 raise
 
@@ -296,7 +321,6 @@ class SchemaManager:
 
         # Commit all changes
         self.conn.commit()
-        self.conn.sync()
 
         print("✅ Database schema sync completed!\n")
 

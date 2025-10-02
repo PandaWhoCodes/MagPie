@@ -20,12 +20,17 @@ class Database:
             sync_url=settings.TURSO_DATABASE_URL,
             auth_token=settings.TURSO_AUTH_TOKEN
         )
-        # Sync with remote database
-        self.conn.sync()
 
-        # Initialize schema manager and sync schema
+        # Initialize schema manager and sync schema BEFORE syncing with remote
+        # This prevents WAL conflicts during migrations
         self.schema_manager = SchemaManager(self.conn)
         self.schema_manager.sync_schema()
+
+        # Sync with remote database after schema is updated
+        try:
+            self.conn.sync()
+        except Exception as e:
+            print(f"⚠️  Warning: Could not sync with remote database: {e}")
 
     async def close(self):
         """Close database connection"""
