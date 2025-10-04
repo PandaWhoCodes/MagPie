@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.1.0] - 2025-10-04
+
 ### Added
 - Test migration table to verify schema migration system
   - `backend/app/core/schema_manager.py:140-152` - Added `test_migration` table definition with 4 columns and 1 index
