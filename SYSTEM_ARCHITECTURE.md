@@ -44,6 +44,7 @@ FastAPI (Web Framework)
     ├── Uvicorn (ASGI Server)
     ├── libsql (Database Client)
     ├── qrcode + Pillow (QR Generation)
+    ├── Twilio (WhatsApp Messaging)
     └── Python 3.11+ (Runtime)
 ```
 
@@ -98,17 +99,17 @@ Render (Platform)
 │  ┌──────▼──────────────────▼──────────────────▼──────┐         │
 │  │              API Gateway (CORS)                    │         │
 │  ├────────────────────────────────────────────────────┤         │
-│  │  ┌──────────┐  ┌──────────┐  ┌──────────┐        │         │
-│  │  │  Events  │  │   Regs   │  │ QR Codes │  ...   │         │
-│  │  │ Router   │  │  Router  │  │  Router  │        │         │
-│  │  └────┬─────┘  └────┬─────┘  └────┬─────┘        │         │
+│  │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐  │  │
+│  │  │  Events  │  │   Regs   │  │ QR Codes │  │ WhatsApp │  │  │
+│  │  │ Router   │  │  Router  │  │  Router  │  │  Router  │  │  │
+│  │  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘  │  │
 │  └───────┼─────────────┼─────────────┼──────────────┘         │
 │  ┌───────▼─────────────▼─────────────▼──────────────┐         │
 │  │           Service Layer (Business Logic)          │         │
-│  │  ┌──────────┐  ┌──────────┐  ┌──────────┐       │         │
-│  │  │  Event   │  │   Reg    │  │  QRCode  │  ...  │         │
-│  │  │ Service  │  │ Service  │  │ Service  │       │         │
-│  │  └────┬─────┘  └────┬─────┘  └────┬─────┘       │         │
+│  │  ┌──────────┐  ┌──────────┐  ┌──────────┐  ┌──────────┐  │  │
+│  │  │  Event   │  │   Reg    │  │  QRCode  │  │ WhatsApp │  │  │
+│  │  │ Service  │  │ Service  │  │ Service  │  │ Service  │  │  │
+│  │  └────┬─────┘  └────┬─────┘  └────┬─────┘  └────┬─────┘  │  │
 │  └───────┼─────────────┼─────────────┼─────────────┘         │
 └──────────┼─────────────┼─────────────┼───────────────────────┘
            │             │             │
@@ -173,7 +174,8 @@ Render (Platform)
 │  │  Services (Business Logic)      │   │
 │  │  ├─ EventService                │   │
 │  │  ├─ RegistrationService         │   │
-│  │  └─ QRCodeService               │   │
+│  │  ├─ QRCodeService               │   │
+│  │  └─ WhatsAppService             │   │
 │  └──────────┬──────────────────────┘   │
 │  ┌──────────▼──────────────────────┐   │
 │  │  Database Manager               │   │
@@ -866,6 +868,54 @@ Admin Pages (Dashboard)
         Ripple animation plays
 ```
 
+### WhatsApp Bulk Messaging Flow
+
+```
+1. Admin clicks "Send WhatsApp" button
+        │
+        ▼
+   WhatsAppModal opens
+   Shows registrant count
+        │
+        ▼
+2. Admin types message
+        │
+        ▼
+3. Admin clicks "Send"
+        │
+        ▼
+┌──────────────────────────────────────┐
+│  POST /api/whatsapp/send-bulk/       │
+│  {                                   │
+│    event_id: "...",                  │
+│    message: "..."                    │
+│  }                                   │
+└───────────────┬──────────────────────┘
+                │
+                ▼
+┌──────────────────────────────────────┐
+│  WhatsAppService.send_bulk_messages  │
+│  1. Fetch all registrations          │
+│  2. Format phone numbers (+91)       │
+│  3. Send via Twilio API              │
+│  4. Track success/failure            │
+└───────────────┬──────────────────────┘
+                │
+                ▼
+        Response with statistics
+        {
+          success: true,
+          total: 50,
+          sent: 48,
+          failed: 2,
+          results: [...]
+        }
+                │
+                ▼
+   Display summary in modal
+   Show failed messages if any
+```
+
 ---
 
 ## API Design
@@ -886,6 +936,10 @@ POST   /api/events/{id}/toggle   # Action: Toggle active status
 POST   /api/events/{id}/clone    # Action: Clone event
 
 GET    /api/events/{id}/registrations/  # Sub-resource
+
+# WhatsApp API
+POST   /api/whatsapp/send-bulk/              # Send bulk messages
+GET    /api/whatsapp/registrants-count/{event_id}  # Get count
 ```
 
 ### Request/Response Patterns

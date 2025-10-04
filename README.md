@@ -14,6 +14,7 @@ Watch the demo video: [Build2Learn Registration System Demo](https://drive.googl
 - **Auto-fill Functionality** - Automatically fills forms based on user's previous registrations
 - **Event Activation** - Only one event can be active at a time
 - **QR Code Check-ins** - Generate QR codes for attendee check-ins
+- **WhatsApp Notifications** - Send bulk WhatsApp messages to all registrants ✨ NEW!
 - **Registration Analytics** - View all registrations with export to CSV
 - **Responsive Design** - Works perfectly on desktop and mobile
 
@@ -23,6 +24,7 @@ Access dashboard at `/dashboard_under` to:
 - Clone existing events
 - Activate/deactivate events
 - View all registrations for each event
+- **Send WhatsApp messages to all registrants** ✨ NEW!
 - Export registrations to CSV
 - Generate QR codes for check-ins with custom messages/URLs
 - Delete events
@@ -40,6 +42,7 @@ Access dashboard at `/dashboard_under` to:
 - **Turso** - Serverless SQLite database
 - **Pydantic** - Data validation
 - **qrcode** - QR code generation
+- **Twilio** - WhatsApp messaging API
 
 ### Frontend
 - **React** - UI library
@@ -79,11 +82,16 @@ pip install -r requirements.txt
 cp .env.example .env
 ```
 
-5. Update `.env` with your Turso credentials (already configured):
+5. Update `.env` with your credentials:
 ```
 TURSO_DATABASE_URL=libsql://b2lregistration-pandawhocodes.aws-ap-south-1.turso.io
 TURSO_AUTH_TOKEN=your_token_here
 FRONTEND_URL=http://localhost:3000
+
+# Optional: For WhatsApp feature (see docs/WHATSAPP_SETUP.md)
+TWILIO_ACCOUNT_SID=your_account_sid
+TWILIO_AUTH_TOKEN=your_auth_token
+TWILIO_WHATSAPP_NUMBER=whatsapp:+14155238886
 ```
 
 6. Run the backend:
@@ -161,6 +169,29 @@ Frontend will be available at `http://localhost:3000`
    - See check-in status
    - View detailed form responses
    - Export all data to CSV
+   - **Send WhatsApp messages to all registrants** ✨ NEW!
+
+### 📱 WhatsApp Notifications (NEW!)
+
+Send bulk WhatsApp messages to all event registrants with one click!
+
+**Features:**
+- 📤 Bulk messaging to all registrants
+- 📱 Automatic phone number formatting (+91 for India)
+- 📊 Real-time delivery tracking
+- ✅ Success/failure statistics
+- 💰 Cost-effective: FREE sandbox testing (50 msgs/day)
+
+**How to Setup:**
+1. See [WhatsApp Setup Guide](docs/WHATSAPP_SETUP.md) for complete instructions
+2. Sign up for Twilio account (FREE trial with $15-20 credit)
+3. Add Twilio credentials to `.env`
+4. Recipients join sandbox by sending `join <code>` to +1 415 523 8886
+5. Click "Send WhatsApp" button in registrations list
+
+**Pricing:**
+- **Sandbox**: FREE (50 messages/day on trial)
+- **Production**: ~₹0.75/message (~$0.009 USD)
 
 ### User Registration Flow
 
@@ -197,6 +228,10 @@ Frontend will be available at `http://localhost:3000`
 - `GET /api/qr-codes/{id}` - Get QR code
 - `GET /api/qr-codes/event/{event_id}` - Get event QR codes
 - `DELETE /api/qr-codes/{id}` - Delete QR code
+
+### WhatsApp
+- `POST /api/whatsapp/send-bulk/` - Send bulk WhatsApp messages
+- `GET /api/whatsapp/registrants-count/{event_id}` - Get registrants count
 
 ## Database Schema
 
@@ -253,6 +288,9 @@ npm run build
 - `TURSO_DATABASE_URL` - Turso database URL
 - `TURSO_AUTH_TOKEN` - Turso authentication token
 - `FRONTEND_URL` - Frontend URL for CORS
+- `TWILIO_ACCOUNT_SID` - Twilio account SID (optional, for WhatsApp)
+- `TWILIO_AUTH_TOKEN` - Twilio auth token (optional, for WhatsApp)
+- `TWILIO_WHATSAPP_NUMBER` - Twilio WhatsApp number (optional, for WhatsApp)
 
 ### Frontend
 - `VITE_API_URL` - Backend API URL
@@ -292,7 +330,14 @@ npm run build
    - Export to CSV
    - Check-in status tracking
 
-6. **User Experience**
+6. **WhatsApp Notifications** ✨ NEW!
+   - Send bulk WhatsApp messages to all registrants
+   - Automatic phone number formatting
+   - Real-time delivery tracking
+   - Success/failure statistics
+   - Twilio API integration
+
+7. **User Experience**
    - Clean, modern design
    - Responsive on all devices
    - Toast notifications

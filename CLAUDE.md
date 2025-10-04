@@ -154,7 +154,7 @@ b2l_registration/
 - **Send WhatsApp messages**: Use "Send WhatsApp" button in registrations list (dashboard)
 
 ## WhatsApp Integration Setup
-See [TWILIO_SETUP_GUIDE.md](backend/TWILIO_SETUP_GUIDE.md) for complete setup instructions.
+See [WHATSAPP_SETUP.md](docs/WHATSAPP_SETUP.md) for complete setup instructions.
 
 ### Quick Setup:
 1. Sign up at https://www.twilio.com/try-twilio
@@ -162,7 +162,7 @@ See [TWILIO_SETUP_GUIDE.md](backend/TWILIO_SETUP_GUIDE.md) for complete setup in
 3. Add credentials to `backend/.env`
 4. Activate WhatsApp Sandbox
 5. Recipients send `join <code>` to +1 415 523 8886
-6. Test with `python backend/test_twilio_whatsapp.py`
+6. Click "Send WhatsApp" button in dashboard registrations list
 
 ## Notes
 - Backend uses Turso database (SQLite-compatible)
