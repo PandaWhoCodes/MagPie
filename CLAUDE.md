@@ -164,6 +164,15 @@ See [WHATSAPP_SETUP.md](docs/WHATSAPP_SETUP.md) for complete setup instructions.
 5. Recipients send `join <code>` to +1 415 523 8886
 6. Click "Send WhatsApp" button in dashboard registrations list
 
+## Documentation
+
+Complete documentation is available in the `/docs` directory:
+- [Setup Guide](docs/SETUP.md) - Installation and configuration
+- [Features Guide](docs/FEATURES.md) - Detailed feature documentation
+- [API Reference](docs/API.md) - API endpoints and examples
+- [WhatsApp Setup](docs/WHATSAPP_SETUP.md) - WhatsApp integration guide
+- [Deployment Guide](docs/DEPLOYMENT.md) - Production deployment
+
 ## Notes
 - Backend uses Turso database (SQLite-compatible)
 - CORS configured to allow frontend communication
