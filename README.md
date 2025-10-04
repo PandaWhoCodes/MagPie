@@ -2,6 +2,10 @@
 
 A professional, production-ready event registration system for Build2Learn with a Luma-inspired design.
 
+## 🎥 Demo
+
+Watch the demo video: [Build2Learn Registration System Demo](https://drive.google.com/file/d/1LoGf9au5TWb-CxOKrGy-izX913Js2pK4/view?usp=sharing)
+
 ## Features
 
 ### 🎯 Core Features

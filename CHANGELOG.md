@@ -16,6 +16,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `frontend/src/components/Footer.jsx` - New footer component with animated heart and link to build2learn.in
   - Added footer to all pages: HomePage, ThankYouPage, CheckInPage, Dashboard, NoEventPage
   - Features animated pulsing heart emoji and hover effect on Build2Learn link
+- Demo video link to README
+  - `README.md:5-7` - Added demo video section with Google Drive link at the top of README
 
 ### Changed
 - Improved schema migration error handling for WAL conflicts
