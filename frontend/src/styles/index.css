@@ -4,24 +4,79 @@
 
 @layer base {
   body {
-    @apply bg-gray-50 text-gray-900;
+    @apply bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100 transition-colors duration-300;
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-primary text-white px-6 py-2 rounded-lg hover:bg-blue-600 transition-colors font-medium;
+    @apply bg-primary text-white px-6 py-2 rounded-lg hover:bg-blue-600 dark:hover:bg-blue-500 transition-all duration-200 font-medium dark:shadow-lg dark:hover:shadow-blue-500/25;
   }
 
   .btn-secondary {
-    @apply bg-gray-200 text-gray-800 px-6 py-2 rounded-lg hover:bg-gray-300 transition-colors font-medium;
+    @apply bg-gray-200 dark:bg-gray-800 text-gray-800 dark:text-gray-200 px-6 py-2 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-700 transition-all duration-200 font-medium;
   }
 
   .input-field {
-    @apply w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent outline-none;
+    @apply w-full px-4 py-2 border border-gray-300 dark:border-gray-700 rounded-lg focus:ring-2 focus:ring-primary dark:focus:ring-blue-500 focus:border-transparent outline-none bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-all duration-200;
   }
 
   .card {
-    @apply bg-white rounded-xl shadow-sm border border-gray-200 p-6;
+    @apply bg-white dark:bg-gray-800 rounded-xl shadow-sm dark:shadow-xl border border-gray-200 dark:border-gray-700 p-6 transition-all duration-200;
+  }
+
+  /* Dark mode glassmorphism effect */
+  .glassmorphism-dark {
+    @apply dark:bg-gray-900/60 dark:backdrop-blur-xl dark:border-gray-700/30;
+  }
+
+  /* Animated gradients for dark mode */
+  .gradient-dark {
+    @apply dark:from-purple-950 dark:via-blue-950 dark:to-pink-950;
+  }
+
+  /* Glow effects for dark mode */
+  .glow-purple {
+    @apply dark:shadow-purple-500/20 dark:hover:shadow-purple-500/40;
+  }
+
+  .glow-blue {
+    @apply dark:shadow-blue-500/20 dark:hover:shadow-blue-500/40;
+  }
+
+  /* Shimmer effect for buttons in dark mode */
+  .shimmer-dark {
+    background: linear-gradient(
+      105deg,
+      transparent 40%,
+      rgba(255, 255, 255, 0.1) 50%,
+      transparent 60%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 3s ease-out infinite;
+  }
+}
+
+/* Magic UI particle effects for dark mode */
+@layer utilities {
+  .magic-particles {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .magic-particles::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle at 20% 50%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                      radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
+                      radial-gradient(circle at 40% 20%, rgba(236, 72, 153, 0.1) 0%, transparent 50%);
+    animation: float 20s ease-in-out infinite;
+  }
+
+  .dark .magic-particles::before {
+    background-image: radial-gradient(circle at 20% 50%, rgba(139, 92, 246, 0.3) 0%, transparent 50%),
+                      radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.3) 0%, transparent 50%),
+                      radial-gradient(circle at 40% 20%, rgba(236, 72, 153, 0.3) 0%, transparent 50%);
   }
 }

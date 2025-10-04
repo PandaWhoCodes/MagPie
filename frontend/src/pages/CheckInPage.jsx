@@ -69,7 +69,7 @@ export default function CheckInPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-blue-950 dark:via-purple-950 dark:to-pink-950 transition-colors duration-300">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -78,13 +78,13 @@ export default function CheckInPage() {
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            className="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full mx-auto"
+            className="w-16 h-16 border-4 border-blue-500 dark:border-blue-400 border-t-transparent rounded-full mx-auto dark:shadow-lg dark:shadow-blue-500/30"
           />
           <motion.p
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="mt-4 text-gray-600 font-medium"
+            className="mt-4 text-gray-600 dark:text-gray-400 font-medium"
           >
             Loading...
           </motion.p>
@@ -94,11 +94,11 @@ export default function CheckInPage() {
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div className="min-h-screen relative overflow-hidden transition-colors duration-300">
       {/* Animated Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-blue-950 dark:via-purple-950 dark:to-pink-950 transition-colors duration-300">
         <motion.div
-          className="absolute top-20 -left-20 w-96 h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-70"
+          className="absolute top-20 -left-20 w-96 h-96 bg-blue-300 dark:bg-blue-600/30 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-xl opacity-70 dark:opacity-40"
           animate={{
             x: [0, 100, 0],
             y: [0, 50, 0],
@@ -110,7 +110,7 @@ export default function CheckInPage() {
           }}
         />
         <motion.div
-          className="absolute top-40 -right-20 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70"
+          className="absolute top-40 -right-20 w-96 h-96 bg-purple-300 dark:bg-purple-600/30 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-xl opacity-70 dark:opacity-40"
           animate={{
             x: [0, -100, 0],
             y: [0, 100, 0],
@@ -122,7 +122,7 @@ export default function CheckInPage() {
           }}
         />
         <motion.div
-          className="absolute -bottom-20 left-1/2 w-96 h-96 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70"
+          className="absolute -bottom-20 left-1/2 w-96 h-96 bg-pink-300 dark:bg-pink-600/30 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-xl opacity-70 dark:opacity-40"
           animate={{
             x: [0, 50, 0],
             y: [0, -50, 0],
@@ -133,6 +133,35 @@ export default function CheckInPage() {
             ease: "easeInOut"
           }}
         />
+
+        {/* Additional dark mode particles */}
+        <div className="dark:block hidden">
+          <motion.div
+            className="absolute top-1/3 right-1/4 w-2 h-2 bg-blue-400 rounded-full"
+            animate={{
+              scale: [1, 1.5, 1],
+              opacity: [0.3, 0.7, 0.3],
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+          <motion.div
+            className="absolute bottom-1/3 left-1/3 w-1.5 h-1.5 bg-purple-400 rounded-full"
+            animate={{
+              scale: [1, 2, 1],
+              opacity: [0.2, 0.6, 0.2],
+            }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 1
+            }}
+          />
+        </div>
       </div>
 
       {/* Content */}
@@ -143,7 +172,7 @@ export default function CheckInPage() {
           transition={{ duration: 0.6 }}
           className="w-full max-w-md"
         >
-          <div className="backdrop-blur-lg bg-white/80 rounded-3xl shadow-2xl border border-white/20 p-8 md:p-10">
+          <div className="backdrop-blur-lg bg-white/80 dark:bg-gray-900/60 rounded-3xl shadow-2xl dark:shadow-[0_20px_50px_rgba(59,130,246,0.2)] border border-white/20 dark:border-gray-700/30 p-8 md:p-10 transition-all duration-300">
             <motion.div
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -152,7 +181,7 @@ export default function CheckInPage() {
             >
               <motion.div
                 whileHover={{ scale: 1.1, rotate: 10 }}
-                className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl mb-4 shadow-xl"
+                className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-500 dark:from-blue-600 dark:to-purple-600 rounded-2xl mb-4 shadow-xl dark:shadow-blue-500/30"
               >
                 {qrCode?.qr_type === 'url' ? (
                   <LinkIcon className="w-10 h-10 text-white" />
@@ -165,7 +194,7 @@ export default function CheckInPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="text-4xl font-black text-gray-900 mb-2 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent"
+                className="text-4xl font-black text-gray-900 dark:text-gray-100 mb-2 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent"
               >
                 Event Check-In
               </motion.h1>
@@ -174,7 +203,7 @@ export default function CheckInPage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
-                className="text-gray-600 text-lg font-medium"
+                className="text-gray-600 dark:text-gray-300 text-lg font-medium"
               >
                 Enter your email to check in
               </motion.p>
@@ -196,13 +225,13 @@ export default function CheckInPage() {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.5 }}
                   >
-                    <label className="block text-sm font-bold text-gray-700 mb-2">
+                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                       Email Address
                     </label>
                     <input
                       type="email"
                       {...register('email', { required: 'Email is required' })}
-                      className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-blue-500 focus:ring-4 focus:ring-blue-100 transition-all duration-300 text-gray-900 font-medium placeholder-gray-400"
+                      className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/50 transition-all duration-300 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 font-medium placeholder-gray-400 dark:placeholder-gray-500"
                       placeholder="your@email.com"
                       autoFocus
                     />
@@ -230,9 +259,9 @@ export default function CheckInPage() {
                     transition={{ delay: 0.6 }}
                     className={`relative w-full py-4 rounded-xl text-lg font-bold text-white overflow-hidden transition-all duration-300 ${
                       checkInMutation.isPending
-                        ? 'bg-gradient-to-r from-gray-400 to-gray-500'
-                        : 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 hover:shadow-2xl'
-                    }`}
+                        ? 'bg-gradient-to-r from-gray-400 to-gray-500 dark:from-gray-600 dark:to-gray-700'
+                        : 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-blue-500 dark:via-purple-500 dark:to-pink-500 hover:shadow-2xl dark:hover:shadow-[0_10px_40px_rgba(59,130,246,0.4)]'
+                    } dark:border dark:border-purple-500/20`}
                   >
                     <AnimatePresence mode="wait">
                       {checkInMutation.isPending ? (
@@ -308,13 +337,13 @@ export default function CheckInPage() {
                     transition={{ delay: 0.4 }}
                   >
                     <div className="flex items-center justify-center space-x-2 mb-3">
-                      <Sparkles className="w-6 h-6 text-yellow-500" />
-                      <h2 className="text-3xl font-black text-gray-900">
+                      <Sparkles className="w-6 h-6 text-yellow-500 dark:text-yellow-400" />
+                      <h2 className="text-3xl font-black text-gray-900 dark:text-gray-100">
                         Welcome!
                       </h2>
-                      <Sparkles className="w-6 h-6 text-yellow-500" />
+                      <Sparkles className="w-6 h-6 text-yellow-500 dark:text-yellow-400" />
                     </div>
-                    <p className="text-gray-600 text-lg font-medium">
+                    <p className="text-gray-600 dark:text-gray-300 text-lg font-medium">
                       You've been successfully checked in.
                     </p>
                   </motion.div>
@@ -325,11 +354,11 @@ export default function CheckInPage() {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.6 }}
-                      className="bg-gradient-to-r from-blue-50 to-purple-50 border-2 border-blue-200 rounded-2xl p-6 shadow-lg"
+                      className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/30 dark:to-purple-900/30 border-2 border-blue-200 dark:border-blue-600/50 rounded-2xl p-6 shadow-lg dark:shadow-blue-500/20"
                     >
                       {qrCode.qr_type === 'url' ? (
                         <div>
-                          <p className="text-sm text-gray-600 mb-3 font-medium">
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 font-medium">
                             Click below to access:
                           </p>
                           <motion.a
@@ -338,7 +367,7 @@ export default function CheckInPage() {
                             rel="noopener noreferrer"
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
-                            className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold rounded-xl hover:shadow-lg transition-all"
+                            className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500 text-white font-bold rounded-xl hover:shadow-lg dark:hover:shadow-blue-500/30 transition-all"
                           >
                             <LinkIcon className="w-5 h-5" />
                             <span>Open Link</span>
@@ -346,10 +375,10 @@ export default function CheckInPage() {
                         </div>
                       ) : (
                         <div>
-                          <p className="text-sm text-gray-600 mb-3 font-bold">
+                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 font-bold">
                             📋 Information:
                           </p>
-                          <p className="text-gray-900 font-mono text-lg break-all bg-white/50 p-4 rounded-xl">
+                          <p className="text-gray-900 dark:text-gray-100 font-mono text-lg break-all bg-white/50 dark:bg-gray-800/50 p-4 rounded-xl">
                             {qrCode.message}
                           </p>
                         </div>

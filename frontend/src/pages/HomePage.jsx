@@ -114,7 +114,7 @@ export default function HomePage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 dark:from-purple-950 dark:via-blue-950 dark:to-pink-950 transition-colors duration-300">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -123,13 +123,13 @@ export default function HomePage() {
           <motion.div
             animate={{ rotate: 360 }}
             transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full mx-auto"
+            className="w-16 h-16 border-4 border-purple-500 dark:border-purple-400 border-t-transparent rounded-full mx-auto dark:shadow-lg dark:shadow-purple-500/30"
           />
           <motion.p
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2 }}
-            className="mt-4 text-gray-600 font-medium"
+            className="mt-4 text-gray-600 dark:text-gray-400 font-medium"
           >
             Loading event...
           </motion.p>
@@ -146,11 +146,11 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div className="min-h-screen relative overflow-hidden transition-colors duration-300">
       {/* Animated Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50">
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 dark:from-purple-950 dark:via-blue-950 dark:to-pink-950 transition-colors duration-300">
         <motion.div
-          className="absolute top-20 -left-20 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70"
+          className="absolute top-20 -left-20 w-72 h-72 bg-purple-300 dark:bg-purple-600/30 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-xl opacity-70 dark:opacity-40"
           animate={{
             x: [0, 100, 0],
             y: [0, 50, 0],
@@ -162,7 +162,7 @@ export default function HomePage() {
           }}
         />
         <motion.div
-          className="absolute top-40 -right-20 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-70"
+          className="absolute top-40 -right-20 w-72 h-72 bg-blue-300 dark:bg-blue-600/30 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-xl opacity-70 dark:opacity-40"
           animate={{
             x: [0, -100, 0],
             y: [0, 100, 0],
@@ -174,7 +174,7 @@ export default function HomePage() {
           }}
         />
         <motion.div
-          className="absolute -bottom-20 left-1/2 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70"
+          className="absolute -bottom-20 left-1/2 w-72 h-72 bg-pink-300 dark:bg-pink-600/30 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-xl opacity-70 dark:opacity-40"
           animate={{
             x: [0, 50, 0],
             y: [0, -50, 0],
@@ -185,6 +185,48 @@ export default function HomePage() {
             ease: "easeInOut"
           }}
         />
+
+        {/* Additional dark mode particles */}
+        <div className="dark:block hidden">
+          <motion.div
+            className="absolute top-1/4 left-1/4 w-2 h-2 bg-purple-400 rounded-full"
+            animate={{
+              scale: [1, 1.5, 1],
+              opacity: [0.3, 0.7, 0.3],
+            }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: "easeInOut"
+            }}
+          />
+          <motion.div
+            className="absolute bottom-1/3 right-1/3 w-1 h-1 bg-blue-400 rounded-full"
+            animate={{
+              scale: [1, 2, 1],
+              opacity: [0.2, 0.6, 0.2],
+            }}
+            transition={{
+              duration: 4,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 1
+            }}
+          />
+          <motion.div
+            className="absolute top-1/2 right-1/4 w-1.5 h-1.5 bg-pink-400 rounded-full"
+            animate={{
+              scale: [1, 1.8, 1],
+              opacity: [0.3, 0.5, 0.3],
+            }}
+            transition={{
+              duration: 3.5,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: 2
+            }}
+          />
+        </div>
       </div>
 
       {/* Content */}
@@ -218,7 +260,7 @@ export default function HomePage() {
                 transition={{ duration: 0.5, type: "spring" }}
                 className="inline-block mb-4"
               >
-                <Sparkles className="w-12 h-12 text-purple-600 mx-auto animate-pulse" />
+                <Sparkles className="w-12 h-12 text-purple-600 dark:text-purple-400 mx-auto animate-pulse dark:drop-shadow-[0_0_15px_rgba(168,85,247,0.5)]" />
               </motion.div>
             )}
 
@@ -237,7 +279,7 @@ export default function HomePage() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4, duration: 0.6 }}
-              className="text-2xl text-gray-600 font-medium"
+              className="text-2xl text-gray-600 dark:text-gray-300 font-medium"
             >
               {branding?.site_headline || 'Where Innovation Meets Community'}
             </motion.p>
@@ -248,13 +290,13 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3, duration: 0.6 }}
-            className="backdrop-blur-lg bg-white/80 rounded-3xl shadow-2xl border border-white/20 p-8 md:p-10 mb-8"
+            className="backdrop-blur-lg bg-white/80 dark:bg-gray-900/60 rounded-3xl shadow-2xl dark:shadow-[0_20px_50px_rgba(139,92,246,0.2)] border border-white/20 dark:border-gray-700/30 p-8 md:p-10 mb-8 transition-all duration-300"
           >
             <motion.h2
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.4, duration: 0.5 }}
-              className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent"
+              className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-gray-100 mb-4 bg-gradient-to-r from-purple-600 to-blue-600 dark:from-purple-400 dark:to-blue-400 bg-clip-text text-transparent"
             >
               {event.name}
             </motion.h2>
@@ -263,7 +305,7 @@ export default function HomePage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5, duration: 0.5 }}
-                className="text-lg text-gray-600 mb-8 leading-relaxed"
+                className="text-lg text-gray-600 dark:text-gray-300 mb-8 leading-relaxed"
               >
                 {event.description}
               </motion.p>
@@ -280,19 +322,19 @@ export default function HomePage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.6 + index * 0.1, duration: 0.5 }}
-                  className="flex items-start space-x-4 p-4 rounded-2xl bg-gradient-to-br from-purple-50 to-blue-50 hover:shadow-lg transition-all duration-300 group"
+                  className="flex items-start space-x-4 p-4 rounded-2xl bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 hover:shadow-lg dark:hover:shadow-purple-500/20 transition-all duration-300 group dark:border dark:border-purple-500/20"
                 >
                   <motion.div
                     whileHover={{ scale: 1.2, rotate: 10 }}
-                    className="p-3 rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 text-white shadow-lg"
+                    className="p-3 rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 dark:from-purple-600 dark:to-blue-600 text-white shadow-lg dark:shadow-purple-500/30"
                   >
                     <item.icon className="w-6 h-6" />
                   </motion.div>
                   <div>
-                    <p className="font-bold text-gray-900 text-lg">{item.label}</p>
-                    <p className="text-gray-700 font-medium">{item.value}</p>
+                    <p className="font-bold text-gray-900 dark:text-gray-100 text-lg">{item.label}</p>
+                    <p className="text-gray-700 dark:text-gray-300 font-medium">{item.value}</p>
                     {item.subvalue && (
-                      <p className="text-sm text-gray-500 mt-1">{item.subvalue}</p>
+                      <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{item.subvalue}</p>
                     )}
                   </div>
                 </motion.div>
@@ -303,11 +345,11 @@ export default function HomePage() {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.9, duration: 0.5 }}
-                  className="flex items-start space-x-4 p-4 rounded-2xl bg-gradient-to-br from-pink-50 to-purple-50 hover:shadow-lg transition-all duration-300"
+                  className="flex items-start space-x-4 p-4 rounded-2xl bg-gradient-to-br from-pink-50 to-purple-50 dark:from-pink-900/20 dark:to-purple-900/20 hover:shadow-lg dark:hover:shadow-pink-500/20 transition-all duration-300 dark:border dark:border-pink-500/20"
                 >
                   <motion.div
                     whileHover={{ scale: 1.2, rotate: -10 }}
-                    className="p-3 rounded-xl bg-gradient-to-br from-pink-500 to-purple-500 text-white shadow-lg"
+                    className="p-3 rounded-xl bg-gradient-to-br from-pink-500 to-purple-500 dark:from-pink-600 dark:to-purple-600 text-white shadow-lg dark:shadow-pink-500/30"
                   >
                     <ExternalLink className="w-6 h-6" />
                   </motion.div>
@@ -316,7 +358,7 @@ export default function HomePage() {
                       href={event.venue_map_link}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-lg font-bold text-purple-600 hover:text-purple-700 underline decoration-2 underline-offset-4 transition-colors"
+                      className="text-lg font-bold text-purple-600 dark:text-purple-400 hover:text-purple-700 dark:hover:text-purple-300 underline decoration-2 underline-offset-4 transition-colors"
                     >
                       View on Google Maps
                     </a>
@@ -331,7 +373,7 @@ export default function HomePage() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5, duration: 0.6 }}
-            className="backdrop-blur-lg bg-white/80 rounded-3xl shadow-2xl border border-white/20 p-8 md:p-10"
+            className="backdrop-blur-lg bg-white/80 dark:bg-gray-900/60 rounded-3xl shadow-2xl dark:shadow-[0_20px_50px_rgba(59,130,246,0.2)] border border-white/20 dark:border-gray-700/30 p-8 md:p-10 transition-all duration-300"
           >
             <motion.div
               initial={{ opacity: 0, x: -20 }}
@@ -339,10 +381,10 @@ export default function HomePage() {
               transition={{ delay: 0.6, duration: 0.5 }}
               className="flex items-center space-x-3 mb-8"
             >
-              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 flex items-center justify-center">
+              <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-blue-500 dark:from-purple-600 dark:to-blue-600 flex items-center justify-center dark:shadow-lg dark:shadow-purple-500/30">
                 <Sparkles className="w-6 h-6 text-white" />
               </div>
-              <h3 className="text-3xl font-bold text-gray-900">Register Now</h3>
+              <h3 className="text-3xl font-bold text-gray-900 dark:text-gray-100">Register Now</h3>
             </motion.div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
@@ -353,13 +395,13 @@ export default function HomePage() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.7, duration: 0.5 }}
                 >
-                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                  <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                     Email *
                   </label>
                   <input
                     type="email"
                     {...register('email', { required: 'Email is required' })}
-                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition-all duration-300 text-gray-900 font-medium placeholder-gray-400"
+                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 focus:border-purple-500 dark:focus:border-purple-400 focus:ring-4 focus:ring-purple-100 dark:focus:ring-purple-900/50 transition-all duration-300 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 font-medium placeholder-gray-400 dark:placeholder-gray-500"
                     placeholder="your@email.com"
                   />
                   <AnimatePresence>
@@ -381,7 +423,7 @@ export default function HomePage() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.7, duration: 0.5 }}
                 >
-                  <label className="block text-sm font-bold text-gray-700 mb-2">
+                  <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                     Phone *
                   </label>
                   <input
@@ -393,7 +435,7 @@ export default function HomePage() {
                         message: 'Phone must be 10 digits',
                       },
                     })}
-                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition-all duration-300 text-gray-900 font-medium placeholder-gray-400"
+                    className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 focus:border-purple-500 dark:focus:border-purple-400 focus:ring-4 focus:ring-purple-100 dark:focus:ring-purple-900/50 transition-all duration-300 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 font-medium placeholder-gray-400 dark:placeholder-gray-500"
                     placeholder="1234567890"
                   />
                   <AnimatePresence>
@@ -421,7 +463,7 @@ export default function HomePage() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.8 + index * 0.1, duration: 0.5 }}
                     >
-                      <label className="block text-sm font-bold text-gray-700 mb-2">
+                      <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
                         {field.field_label} {field.is_required && '*'}
                       </label>
 
@@ -430,7 +472,7 @@ export default function HomePage() {
                           {...register(field.field_name, {
                             required: field.is_required ? `${field.field_label} is required` : false,
                           })}
-                          className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition-all duration-300 text-gray-900 font-medium placeholder-gray-400"
+                          className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 focus:border-purple-500 dark:focus:border-purple-400 focus:ring-4 focus:ring-purple-100 dark:focus:ring-purple-900/50 transition-all duration-300 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 font-medium placeholder-gray-400 dark:placeholder-gray-500"
                           rows="4"
                         />
                       ) : field.field_type === 'select' ? (
@@ -438,7 +480,7 @@ export default function HomePage() {
                           {...register(field.field_name, {
                             required: field.is_required ? `${field.field_label} is required` : false,
                           })}
-                          className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition-all duration-300 text-gray-900 font-medium"
+                          className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 focus:border-purple-500 dark:focus:border-purple-400 focus:ring-4 focus:ring-purple-100 dark:focus:ring-purple-900/50 transition-all duration-300 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 font-medium"
                         >
                           <option value="">Select...</option>
                           {field.field_options &&
@@ -453,7 +495,7 @@ export default function HomePage() {
                           <input
                             type="checkbox"
                             {...register(field.field_name)}
-                            className="w-5 h-5 text-purple-600 border-gray-300 rounded focus:ring-purple-500"
+                            className="w-5 h-5 text-purple-600 dark:text-purple-400 border-gray-300 dark:border-gray-600 rounded focus:ring-purple-500 dark:focus:ring-purple-400 dark:bg-gray-800"
                           />
                         </div>
                       ) : (
@@ -462,7 +504,7 @@ export default function HomePage() {
                           {...register(field.field_name, {
                             required: field.is_required ? `${field.field_label} is required` : false,
                           })}
-                          className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-100 transition-all duration-300 text-gray-900 font-medium placeholder-gray-400"
+                          className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 focus:border-purple-500 dark:focus:border-purple-400 focus:ring-4 focus:ring-purple-100 dark:focus:ring-purple-900/50 transition-all duration-300 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 font-medium placeholder-gray-400 dark:placeholder-gray-500"
                         />
                       )}
 
@@ -491,9 +533,9 @@ export default function HomePage() {
                 whileTap={!isSubmitting ? { scale: 0.98 } : {}}
                 className={`relative w-full py-4 rounded-xl text-lg font-bold text-white overflow-hidden transition-all duration-300 ${
                   successState
-                    ? 'bg-gradient-to-r from-green-500 to-emerald-500'
-                    : 'bg-gradient-to-r from-purple-600 via-blue-600 to-pink-600 hover:shadow-2xl'
-                }`}
+                    ? 'bg-gradient-to-r from-green-500 to-emerald-500 dark:from-green-600 dark:to-emerald-600 dark:shadow-[0_10px_30px_rgba(16,185,129,0.3)]'
+                    : 'bg-gradient-to-r from-purple-600 via-blue-600 to-pink-600 dark:from-purple-500 dark:via-blue-500 dark:to-pink-500 hover:shadow-2xl dark:hover:shadow-[0_10px_40px_rgba(139,92,246,0.4)]'
+                } dark:border dark:border-purple-500/20`}
               >
                 <AnimatePresence mode="wait">
                   {successState ? (

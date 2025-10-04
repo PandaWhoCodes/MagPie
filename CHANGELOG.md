@@ -18,6 +18,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Features animated pulsing heart emoji and hover effect on Build2Learn link
 - Demo video link to README
   - `README.md:5-7` - Added demo video section with Google Drive link at the top of README
+- **Dark Mode Support for User-Facing Frontend** (default enabled)
+  - `frontend/tailwind.config.js:3` - Configured TailwindCSS for class-based dark mode
+  - `frontend/tailwind.config.js:14-43` - Added Magic UI animations (glow, pulse-glow, shimmer, float)
+  - `frontend/src/contexts/ThemeContext.jsx` - Theme context provider for global theme state management
+  - `frontend/src/hooks/useTheme.js` - Custom hook for accessing theme context
+  - `frontend/src/hooks/useLocalStorage.js` - Hook for persisting theme preference in localStorage
+  - `frontend/src/components/ThemeToggle.jsx` - Animated sun/moon theme toggle button with rotation and glow effects
+  - `frontend/src/App.jsx:2-55` - Integrated ThemeProvider and conditional ThemeToggle (hidden on dashboard)
+  - `frontend/src/styles/index.css:7-82` - Added comprehensive dark mode styles with glassmorphism effects and Magic UI particles
+  - `frontend/src/pages/HomePage.jsx` - Full dark mode implementation with enhanced animations:
+    - Dark gradient backgrounds with animated blobs
+    - Dark mode particles for enhanced visual effects
+    - Glassmorphism cards with dark variants
+    - Form inputs with dark styling and glow focus states
+    - Submit button with dark mode glow effects
+  - `frontend/src/pages/ThankYouPage.jsx` - Dark mode styling for success page:
+    - Green/emerald dark gradients
+    - Dark mode particles and floating hearts
+    - Dark glassmorphism for event details
+    - Social links with dark hover effects
+  - `frontend/src/pages/CheckInPage.jsx` - Dark mode for check-in flow:
+    - Blue/purple dark gradients
+    - Dark mode particles animation
+    - Form with dark input styling
+    - Success state with dark mode colors
+  - `frontend/src/pages/NoEventPage.jsx` - Simple dark mode for no events page
+  - `frontend/src/components/Footer.jsx` - Dark mode text and link colors
 
 ### Changed
 - Improved schema migration error handling for WAL conflicts
