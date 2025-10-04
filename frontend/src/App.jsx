@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 import { ThemeProvider } from './contexts/ThemeContext';
 import ThemeToggle from './components/ThemeToggle';
+import { useTheme } from './hooks/useTheme';
 
 // Pages
 import HomePage from './pages/HomePage';
@@ -24,9 +25,18 @@ const queryClient = new QueryClient({
 // Component to conditionally show ThemeToggle
 function AppContent() {
   const location = useLocation();
+  const { setLightTheme } = useTheme();
 
   // Only show theme toggle on user-facing pages (not dashboard)
   const isUserFacingPage = !location.pathname.includes('dashboard');
+  const isDashboardPage = location.pathname.includes('dashboard');
+
+  // Force light mode for dashboard
+  useEffect(() => {
+    if (isDashboardPage) {
+      setLightTheme();
+    }
+  }, [isDashboardPage, setLightTheme]);
 
   return (
     <div className="min-h-screen transition-colors duration-300">

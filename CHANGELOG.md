@@ -7,6 +7,54 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.2.0] - 2025-10-04
+
+### Added
+- **WhatsApp Bulk Messaging Feature** (Production-Ready)
+  - `backend/app/services/whatsapp_service.py` - WhatsApp messaging service using Twilio API
+    - Automatic phone number formatting (+91 for India if no + prefix)
+    - Bulk messaging to all event registrants
+    - Individual message delivery tracking
+    - Error handling for failed messages
+  - `backend/app/api/whatsapp.py` - WhatsApp API endpoints
+    - `POST /api/whatsapp/send-bulk/` - Send messages to all registrants
+    - `GET /api/whatsapp/registrants-count/{event_id}` - Get recipient count
+  - `backend/app/main.py:6,45` - Registered WhatsApp router
+  - `backend/app/core/config.py:20-23` - Added Twilio configuration settings
+  - `frontend/src/components/WhatsAppModal.jsx` - WhatsApp notification modal
+    - Custom message input (supports multi-line)
+    - Real-time recipient count display
+    - Sending progress indicator
+    - Success/failure summary with statistics
+    - Failed message details with expandable view
+  - `frontend/src/components/RegistrationsList.jsx:4-5,9,115-121,217-223` - Added "Send WhatsApp" button
+    - Green WhatsApp-themed button in registrations header
+    - Opens modal to compose and send messages
+  - `frontend/src/services/api.js:53-57` - WhatsApp API client functions
+  - `backend/test_twilio_whatsapp.py` - Test script for Twilio WhatsApp API
+  - `backend/TWILIO_SETUP_GUIDE.md` - Complete setup guide with pricing
+  - **Pricing**: Sandbox FREE (50 msgs/day), Production ~₹0.75/message
+  - **Dependencies**: twilio==9.8.3, python-dotenv
+  - **Tested**: Successfully sent test message to +91 9674016731
+
+### Changed
+- Phone number validation improved
+  - Automatically adds +91 prefix for Indian numbers without country code
+  - Preserves existing + prefix if present
+  - Formats for Twilio WhatsApp API (whatsapp:+...)
+
+### Fixed
+- Dashboard dark mode issue
+  - `frontend/src/App.jsx:1,7,28,32,35-39` - Dashboard now forces light theme automatically
+  - User-facing pages maintain dark/light mode toggle
+  - Dashboard always displays in light mode regardless of theme preference
+
+### Deprecated
+- WhatsApp notification system - PyWhatKit
+  - `backend/test_whatsapp.py` - WhatsApp Web automation (NOT RECOMMENDED)
+  - Uses pywhatkit library (requires personal WhatsApp account)
+  - Replaced by Twilio API for automated, production-ready solution
+
 ## [1.1.0] - 2025-10-04
 
 ### Added

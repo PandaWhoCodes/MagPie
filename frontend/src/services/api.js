@@ -50,4 +50,10 @@ export const brandingApi = {
   update: (data) => api.put('/branding', data),
 };
 
+// WhatsApp API
+export const whatsappApi = {
+  sendBulkMessages: (eventId, message) => api.post('/whatsapp/send-bulk/', { event_id: eventId, message }),
+  getRegistrantsCount: (eventId) => api.get(`/whatsapp/registrants-count/${eventId}`),
+};
+
 export default api;

@@ -17,6 +17,11 @@ class Settings(BaseSettings):
     # CORS
     FRONTEND_URL: str = "http://localhost:3000"
 
+    # Twilio WhatsApp (Optional - only needed if using WhatsApp feature)
+    TWILIO_ACCOUNT_SID: str = ""
+    TWILIO_AUTH_TOKEN: str = ""
+    TWILIO_WHATSAPP_NUMBER: str = "whatsapp:+14155238886"
+
     class Config:
         env_file = ".env"
         case_sensitive = True

@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { eventsApi } from '../services/api';
-import { Download, Search, CheckCircle, XCircle } from 'lucide-react';
+import { Download, Search, CheckCircle, XCircle, MessageCircle } from 'lucide-react';
+import WhatsAppModal from './WhatsAppModal';
 
 export default function RegistrationsList({ eventId }) {
   const [searchTerm, setSearchTerm] = useState('');
+  const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
 
   const { data: registrations = [], isLoading } = useQuery({
     queryKey: ['registrations', eventId],
@@ -109,10 +111,19 @@ export default function RegistrationsList({ eventId }) {
             className="input-field pl-10"
           />
         </div>
-        <button onClick={exportToCSV} className="btn-primary flex items-center space-x-2">
-          <Download className="w-5 h-5" />
-          <span>Export CSV</span>
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setIsWhatsAppModalOpen(true)}
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
+          >
+            <MessageCircle className="w-5 h-5" />
+            <span>Send WhatsApp</span>
+          </button>
+          <button onClick={exportToCSV} className="btn-primary flex items-center space-x-2">
+            <Download className="w-5 h-5" />
+            <span>Export CSV</span>
+          </button>
+        </div>
       </div>
 
       {/* Stats */}
@@ -202,6 +213,14 @@ export default function RegistrationsList({ eventId }) {
           <p className="text-gray-600">No registrations match your search</p>
         </div>
       )}
+
+      {/* WhatsApp Modal */}
+      <WhatsAppModal
+        eventId={eventId}
+        isOpen={isWhatsAppModalOpen}
+        onClose={() => setIsWhatsAppModalOpen(false)}
+        registrantsCount={registrations.length}
+      />
     </div>
   );
 }

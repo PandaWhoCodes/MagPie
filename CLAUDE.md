@@ -17,7 +17,7 @@ Both servers are running and operational.
 ### Backend
 - **Framework**: FastAPI
 - **Database**: Turso (libsql-client, no ORM - direct SQL)
-- **Key Libraries**: pydantic, qrcode, Pillow
+- **Key Libraries**: pydantic, qrcode, Pillow, twilio (WhatsApp messaging), python-dotenv
 - **API Docs**: http://localhost:8000/docs
 
 ### Frontend
@@ -46,13 +46,13 @@ b2l_registration/
 │   └── app/
 │       ├── main.py           # FastAPI entry point
 │       ├── core/             # Database, config
-│       ├── api/              # Route handlers (events, registrations, qr_codes, event_fields, branding)
-│       ├── services/         # Business logic
+│       ├── api/              # Route handlers (events, registrations, qr_codes, event_fields, branding, whatsapp)
+│       ├── services/         # Business logic (event, registration, qr_code, whatsapp)
 │       └── models/           # Pydantic models
 └── frontend/
     └── src/
         ├── pages/            # HomePage, Dashboard, ThankYouPage, CheckInPage
-        ├── components/       # EventForm, RegistrationsList, QRCodeModal
+        ├── components/       # EventForm, RegistrationsList, QRCodeModal, WhatsAppModal
         ├── services/         # api.js (axios API calls)
         └── styles/           # TailwindCSS
 ```
@@ -68,7 +68,7 @@ b2l_registration/
 ## API Endpoints
 - Root: http://0.0.0.0:8000/
 - Health Check: http://0.0.0.0:8000/health
-- API Routes: `/api/events`, `/api/registrations`, `/api/qr_codes`, `/api/event_fields`, `/api/branding`
+- API Routes: `/api/events`, `/api/registrations`, `/api/qr_codes`, `/api/event_fields`, `/api/branding`, `/api/whatsapp`
 
 ## Database Schema
 ### Tables
@@ -107,6 +107,15 @@ b2l_registration/
 - Export registrations with dynamic fields
 - Properly escapes CSV data, avoids duplicate fields
 
+### WhatsApp Notifications (NEW!)
+- Send bulk WhatsApp messages to all event registrants
+- Automatic phone number formatting (+91 for India)
+- Uses Twilio WhatsApp Business API
+- Track message delivery status
+- See failed messages with detailed error info
+- Sandbox: FREE testing (50 msgs/day)
+- Production: ~₹0.75/message
+
 ## Development Notes
 
 ### DO ✅
@@ -127,9 +136,14 @@ b2l_registration/
 - Forget to handle email/phone for auto-fill
 
 ## Environment Variables
+
+### Backend (.env)
 - `TURSO_DATABASE_URL` - Turso database URL
 - `TURSO_AUTH_TOKEN` - Turso authentication token
 - `FRONTEND_URL` - Frontend URL for CORS
+- `TWILIO_ACCOUNT_SID` - Twilio account identifier (for WhatsApp)
+- `TWILIO_AUTH_TOKEN` - Twilio authentication token (for WhatsApp)
+- `TWILIO_WHATSAPP_NUMBER` - Twilio WhatsApp number (default: whatsapp:+14155238886)
 
 ## Common Development Tasks
 - **Add field to event**: Update EventForm.jsx, add to form submission
@@ -137,6 +151,18 @@ b2l_registration/
 - **Add animation**: Use Framer Motion in public pages
 - **Export data**: Update RegistrationsList.jsx CSV logic
 - **Change styling**: Use Tailwind classes or update index.css
+- **Send WhatsApp messages**: Use "Send WhatsApp" button in registrations list (dashboard)
+
+## WhatsApp Integration Setup
+See [TWILIO_SETUP_GUIDE.md](backend/TWILIO_SETUP_GUIDE.md) for complete setup instructions.
+
+### Quick Setup:
+1. Sign up at https://www.twilio.com/try-twilio
+2. Get Account SID and Auth Token
+3. Add credentials to `backend/.env`
+4. Activate WhatsApp Sandbox
+5. Recipients send `join <code>` to +1 415 523 8886
+6. Test with `python backend/test_twilio_whatsapp.py`
 
 ## Notes
 - Backend uses Turso database (SQLite-compatible)

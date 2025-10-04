@@ -68,3 +68,6 @@ logs/
 .coverage
 htmlcov/
 .pytest_cache/
+
+# PyWhatKit
+PyWhatKit_DB.txt
