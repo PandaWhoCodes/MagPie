@@ -165,7 +165,7 @@ export default function HomePage() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="w-full max-w-md relative z-10"
+            className="w-full max-w-md relative z-10 pb-20"
           >
             <motion.div
               initial={{ opacity: 0, y: 10 }}
@@ -227,6 +227,17 @@ export default function HomePage() {
               <div className="mt-4 space-y-2 text-sm">
                 <p className="text-white/70">📅 {event.date} • ⏰ {event.time}</p>
                 <p className="text-white/70">📍 {event.venue}</p>
+                {event.venue_map_link && (
+                  <a
+                    href={event.venue_map_link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center text-white/60 hover:text-white/90 transition-colors duration-300 underline underline-offset-2"
+                  >
+                    <ExternalLink className="w-4 h-4 mr-1" />
+                    View on Google Maps
+                  </a>
+                )}
               </div>
             </motion.div>
 
@@ -433,7 +444,7 @@ export default function HomePage() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.8, duration: 0.6 }}
-          className="absolute bottom-4 left-0 right-0 text-center z-10"
+          className="absolute bottom-8 left-0 right-0 text-center z-10"
         >
           <p className="text-sm text-white/40">
             Made with{' '}
