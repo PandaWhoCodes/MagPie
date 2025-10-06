@@ -53,12 +53,13 @@ FastAPI (Web Framework)
 React 18 (UI Library)
     ├── Vite (Build Tool)
     ├── TailwindCSS (Styling)
-    ├── Framer Motion (Animations)
+    ├── Framer Motion + Motion (Animations)
     ├── React Query (State Management)
     ├── React Hook Form (Form Handling)
     ├── React Router DOM (Routing)
     ├── Axios (HTTP Client)
-    └── Lucide React (Icons)
+    ├── Lucide React (Icons)
+    └── Custom Theme System (Multi-theme support)
 ```
 
 ### Database Stack
@@ -269,6 +270,27 @@ CREATE TABLE qr_codes (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (event_id) REFERENCES events(id) ON DELETE CASCADE
 );
+
+-- Branding Settings Table
+CREATE TABLE branding_settings (
+    id TEXT PRIMARY KEY,                    -- Single row with id='default'
+    site_title TEXT DEFAULT 'Build2Learn',
+    site_headline TEXT DEFAULT 'Where Innovation Meets Community',
+    logo_url TEXT,                          -- Optional logo URL
+    text_style TEXT DEFAULT 'gradient',     -- Title text style
+    theme TEXT DEFAULT 'default',           -- UI theme ('default' or 'midnight_black')
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Message Templates Table
+CREATE TABLE message_templates (
+    id TEXT PRIMARY KEY,                    -- UUID
+    template_name TEXT NOT NULL UNIQUE,
+    template_text TEXT NOT NULL,            -- Template with {{variables}}
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX idx_template_name ON message_templates(template_name);
 ```
 
 ### Entity Relationships
@@ -544,7 +566,7 @@ frontend/
 │   ├── App.jsx                    # Root component with routing
 │   │
 │   ├── pages/                     # Page components
-│   │   ├── HomePage.jsx           # Public registration (animated)
+│   │   ├── HomePage.jsx           # Public registration (theme-aware, animated)
 │   │   ├── ThankYouPage.jsx       # Post-registration (animated)
 │   │   ├── CheckInPage.jsx        # QR check-in (animated)
 │   │   └── Dashboard.jsx          # Admin dashboard (simple)
@@ -552,13 +574,21 @@ frontend/
 │   ├── components/                # Reusable components
 │   │   ├── EventForm.jsx          # Create/edit event form
 │   │   ├── RegistrationsList.jsx  # View registrations
-│   │   └── QRCodeModal.jsx        # QR code management
+│   │   ├── QRCodeModal.jsx        # QR code management
+│   │   ├── BrandingSettings.jsx   # Theme & branding configuration
+│   │   └── themes/                # Theme-specific components
+│   │       └── AnimatedBackground.jsx  # Theme-aware backgrounds
+│   │
+│   ├── config/                    # Configuration files
+│   │   └── themes.js              # Theme definitions and configs
 │   │
 │   ├── services/                  # API integration
 │   │   └── api.js                 # Axios API calls
 │   │
 │   └── styles/                    # Styling
-│       └── index.css              # TailwindCSS + custom styles
+│       ├── index.css              # TailwindCSS + custom styles
+│       └── themes/                # Theme-specific styles
+│           └── midnight-black.css # Midnight Black theme styles
 │
 ├── package.json                   # Dependencies
 ├── vite.config.js                 # Vite configuration
@@ -678,22 +708,67 @@ export const eventsApi = {
 // Similar structure for registrations, qr_codes, etc.
 ```
 
+### Theme System
+
+The application supports multiple visual themes that can be selected in the Dashboard:
+
+```
+Theme Architecture
+    │
+    ├─ Theme Configuration (config/themes.js)
+    │  ├─ THEMES object with theme definitions
+    │  ├─ Theme-specific styling presets
+    │  └─ getThemeConfig() helper function
+    │
+    ├─ Theme Components (components/themes/)
+    │  └─ AnimatedBackground.jsx
+    │     ├─ Conditional rendering based on theme
+    │     ├─ Default: Colorful gradient orbs
+    │     └─ Midnight Black: Subtle orbs + particles
+    │
+    ├─ Theme Styles (styles/themes/)
+    │  └─ midnight-black.css
+    │     ├─ Pure black background
+    │     ├─ Glassmorphism effects
+    │     └─ Custom form/button styling
+    │
+    └─ Theme Selection
+       └─ Persisted in branding_settings.theme
+          ├─ 'default' - Colorful gradients
+          └─ 'midnight_black' - Sleek dark
+
+Available Themes:
+1. Default Theme
+   - Colorful gradients (purple/blue/pink)
+   - Large animated orbs with mix-blend effects
+   - Full event info cards with detailed layout
+   - Glassmorphism with colored backgrounds
+
+2. Midnight Black Theme
+   - Pure black background (#000)
+   - Subtle purple/blue orbs (8-10% opacity)
+   - 15 floating particles for depth
+   - Centered compact card design
+   - Fluid animations with grid overlay + vignette
+```
+
 ### Animation Strategy
 
 ```
 Public Pages (HomePage, ThankYouPage, CheckInPage)
     │
-    ├─ Framer Motion animations
+    ├─ Framer Motion + Motion animations
     │  ├─ Page transitions (fade, slide)
     │  ├─ Form field animations (stagger)
     │  ├─ Button hover effects
     │  ├─ Confetti (success celebration)
-    │  └─ Ripple effects (check-in)
+    │  ├─ Ripple effects (check-in)
+    │  └─ Theme-specific background animations
     │
-    └─ Glassmorphism UI
-       ├─ Backdrop blur
-       ├─ Translucent backgrounds
-       └─ Gradient borders
+    └─ Theme-aware UI
+       ├─ Conditional rendering based on theme
+       ├─ Dynamic styling from theme config
+       └─ Backdrop blur + translucent backgrounds
 
 Admin Pages (Dashboard)
     │

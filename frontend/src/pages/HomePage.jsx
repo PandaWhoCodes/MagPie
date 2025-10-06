@@ -5,15 +5,19 @@ import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { eventsApi, registrationsApi, brandingApi } from '../services/api';
-import { Calendar, Clock, MapPin, ExternalLink, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Calendar, Clock, MapPin, ExternalLink, Sparkles, CheckCircle2, ArrowRight } from 'lucide-react';
 import StylizedText from '../components/StylizedText';
 import Footer from '../components/Footer';
+import ThemeToggle from '../components/ThemeToggle';
+import { AnimatedBackground } from '../components/themes/AnimatedBackground';
+import { getThemeConfig } from '../config/themes';
 
 export default function HomePage() {
   const navigate = useNavigate();
   const [autoFillAttempted, setAutoFillAttempted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successState, setSuccessState] = useState(false);
+  const [focusedField, setFocusedField] = useState(null);
   const { register, handleSubmit, formState: { errors }, watch, setValue } = useForm();
 
   // Fetch active event
@@ -38,6 +42,9 @@ export default function HomePage() {
     cacheTime: 0,
     retry: false,
   });
+
+  const theme = branding?.theme || 'default';
+  const themeConfig = getThemeConfig(theme);
 
   // Watch email and phone for auto-fill
   const emailValue = watch('email');
@@ -145,89 +152,314 @@ export default function HomePage() {
     registrationMutation.mutate(data);
   };
 
+  // Midnight Black Theme
+  if (theme === 'midnight_black') {
+    return (
+      <div className={`${themeConfig.containerClass} theme-midnight-black`}>
+        {/* No dark mode toggle for Midnight Black theme */}
+        <AnimatedBackground theme="midnight_black" />
+
+        <AnimatePresence mode="wait">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="w-full max-w-md relative z-10"
+          >
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2, duration: 0.6 }}
+              className="mb-12 text-center"
+            >
+              {branding?.logo_url ? (
+                <motion.div
+                  animate={{
+                    rotate: [0, 8, -8, 0],
+                    scale: [1, 1.05, 1.05, 1],
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    repeatDelay: 4,
+                    ease: "easeInOut"
+                  }}
+                  className="inline-block mb-6"
+                >
+                  <img src={branding.logo_url} alt="Logo" className="h-10 mx-auto object-contain opacity-80" />
+                </motion.div>
+              ) : (
+                <motion.div
+                  animate={{
+                    rotate: [0, 8, -8, 0],
+                    scale: [1, 1.05, 1.05, 1],
+                  }}
+                  transition={{
+                    duration: 3,
+                    repeat: Infinity,
+                    repeatDelay: 4,
+                    ease: "easeInOut"
+                  }}
+                  className="inline-block mb-6"
+                >
+                  <Sparkles className="w-10 h-10 text-white/80" strokeWidth={1.5} />
+                </motion.div>
+              )}
+              <h1 className="mb-3 text-white">
+                {branding?.site_title || 'Build2Learn'}
+              </h1>
+              <p className="text-white/50">
+                {branding?.site_headline || 'Where Innovation Meets Community'}
+              </p>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3, duration: 0.6 }}
+              className="mb-8"
+            >
+              <h2 className="text-white mb-2">{event.name}</h2>
+              {event.description && (
+                <p className="text-white/50 text-sm">{event.description}</p>
+              )}
+              <div className="mt-4 space-y-2 text-sm">
+                <p className="text-white/70">📅 {event.date} • ⏰ {event.time}</p>
+                <p className="text-white/70">📍 {event.venue}</p>
+              </div>
+            </motion.div>
+
+            <motion.form
+              onSubmit={handleSubmit(onSubmit)}
+              className="space-y-6"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4, duration: 0.6 }}
+            >
+              <motion.div
+                animate={{
+                  scale: focusedField === 'email' ? 1.01 : 1,
+                }}
+                transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <label htmlFor="email" className={themeConfig.labelClass}>
+                  Email Address
+                </label>
+                <input
+                  id="email"
+                  type="email"
+                  {...register('email', { required: 'Email is required' })}
+                  onFocus={() => setFocusedField('email')}
+                  onBlur={() => setFocusedField(null)}
+                  placeholder="you@example.com"
+                  className={themeConfig.inputClass}
+                  required
+                />
+                <AnimatePresence>
+                  {errors.email && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="mt-2 text-sm text-red-600 font-medium"
+                    >
+                      {errors.email.message}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+
+              <motion.div
+                animate={{
+                  scale: focusedField === 'phone' ? 1.01 : 1,
+                }}
+                transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+              >
+                <label htmlFor="phone" className={themeConfig.labelClass}>
+                  Phone Number
+                </label>
+                <input
+                  id="phone"
+                  type="tel"
+                  {...register('phone', {
+                    required: 'Phone is required',
+                    pattern: {
+                      value: /^\d{10}$/,
+                      message: 'Phone must be 10 digits',
+                    },
+                  })}
+                  onFocus={() => setFocusedField('phone')}
+                  onBlur={() => setFocusedField(null)}
+                  placeholder="1234567890"
+                  className={themeConfig.inputClass}
+                  required
+                />
+                <AnimatePresence>
+                  {errors.phone && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      className="mt-2 text-sm text-red-600 font-medium"
+                    >
+                      {errors.phone.message}
+                    </motion.p>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+
+              {/* Dynamic fields */}
+              {event.fields && event.fields.length > 0 && (
+                <>
+                  {event.fields.map((field, index) => (
+                    <motion.div
+                      key={field.id}
+                      animate={{
+                        scale: focusedField === field.field_name ? 1.01 : 1,
+                      }}
+                      transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                    >
+                      <label htmlFor={field.field_name} className={themeConfig.labelClass}>
+                        {field.field_label} {field.is_required && '*'}
+                      </label>
+
+                      {field.field_type === 'textarea' ? (
+                        <textarea
+                          id={field.field_name}
+                          {...register(field.field_name, {
+                            required: field.is_required ? `${field.field_label} is required` : false,
+                          })}
+                          onFocus={() => setFocusedField(field.field_name)}
+                          onBlur={() => setFocusedField(null)}
+                          className={themeConfig.inputClass}
+                          rows="4"
+                        />
+                      ) : field.field_type === 'select' ? (
+                        <select
+                          id={field.field_name}
+                          {...register(field.field_name, {
+                            required: field.is_required ? `${field.field_label} is required` : false,
+                          })}
+                          onFocus={() => setFocusedField(field.field_name)}
+                          onBlur={() => setFocusedField(null)}
+                          className={themeConfig.inputClass}
+                        >
+                          <option value="">Select...</option>
+                          {field.field_options &&
+                            JSON.parse(field.field_options).map((option) => (
+                              <option key={option} value={option}>
+                                {option}
+                              </option>
+                            ))}
+                        </select>
+                      ) : field.field_type === 'checkbox' ? (
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id={field.field_name}
+                            {...register(field.field_name)}
+                            className="w-5 h-5 text-purple-600 border-white/10 rounded focus:ring-purple-500 bg-white/5"
+                          />
+                        </div>
+                      ) : (
+                        <input
+                          type={field.field_type}
+                          id={field.field_name}
+                          {...register(field.field_name, {
+                            required: field.is_required ? `${field.field_label} is required` : false,
+                          })}
+                          onFocus={() => setFocusedField(field.field_name)}
+                          onBlur={() => setFocusedField(null)}
+                          className={themeConfig.inputClass}
+                        />
+                      )}
+
+                      <AnimatePresence>
+                        {errors[field.field_name] && (
+                          <motion.p
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            className="mt-2 text-sm text-red-600 font-medium"
+                          >
+                            {errors[field.field_name].message}
+                          </motion.p>
+                        )}
+                      </AnimatePresence>
+                    </motion.div>
+                  ))}
+                </>
+              )}
+
+              <motion.div
+                whileHover={{ scale: !isSubmitting && !successState ? 1.01 : 1 }}
+                whileTap={{ scale: !isSubmitting && !successState ? 0.99 : 1 }}
+              >
+                <button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className={successState ? 'success-button w-full h-14 mt-8 transition-all duration-300 rounded-xl font-bold' : themeConfig.buttonClass}
+                >
+                  {successState ? (
+                    <span className="flex items-center justify-center space-x-2">
+                      <CheckCircle2 className="w-5 h-5" />
+                      <span>Success!</span>
+                    </span>
+                  ) : isSubmitting ? (
+                    <span className="flex items-center justify-center space-x-2">
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                        className="w-5 h-5 border-2 border-current border-t-transparent rounded-full"
+                      />
+                      <span>Registering...</span>
+                    </span>
+                  ) : (
+                    <span className="flex items-center justify-center">
+                      <span>Continue</span>
+                      <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    </span>
+                  )}
+                </button>
+              </motion.div>
+            </motion.form>
+
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Footer for Midnight Black theme */}
+        <motion.footer
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8, duration: 0.6 }}
+          className="absolute bottom-4 left-0 right-0 text-center z-10"
+        >
+          <p className="text-sm text-white/40">
+            Made with{' '}
+            <span className="text-red-400 inline-block">❤️</span>{' '}
+            at{' '}
+            <a
+              href="https://build2learn.in"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white/60 hover:text-white/80 font-medium transition-colors duration-300 underline underline-offset-2"
+            >
+              Build2Learn
+            </a>
+          </p>
+        </motion.footer>
+      </div>
+    );
+  }
+
+  // Default Theme
   return (
     <div className="min-h-screen relative overflow-hidden transition-colors duration-300">
+      {/* Dark mode toggle only for default theme */}
+      <ThemeToggle />
       {/* Animated Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 dark:from-purple-950 dark:via-blue-950 dark:to-pink-950 transition-colors duration-300">
-        <motion.div
-          className="absolute top-20 -left-20 w-72 h-72 bg-purple-300 dark:bg-purple-600/30 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-xl opacity-70 dark:opacity-40"
-          animate={{
-            x: [0, 100, 0],
-            y: [0, 50, 0],
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-        <motion.div
-          className="absolute top-40 -right-20 w-72 h-72 bg-blue-300 dark:bg-blue-600/30 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-xl opacity-70 dark:opacity-40"
-          animate={{
-            x: [0, -100, 0],
-            y: [0, 100, 0],
-          }}
-          transition={{
-            duration: 15,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-        <motion.div
-          className="absolute -bottom-20 left-1/2 w-72 h-72 bg-pink-300 dark:bg-pink-600/30 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-xl opacity-70 dark:opacity-40"
-          animate={{
-            x: [0, 50, 0],
-            y: [0, -50, 0],
-          }}
-          transition={{
-            duration: 18,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-
-        {/* Additional dark mode particles */}
-        <div className="dark:block hidden">
-          <motion.div
-            className="absolute top-1/4 left-1/4 w-2 h-2 bg-purple-400 rounded-full"
-            animate={{
-              scale: [1, 1.5, 1],
-              opacity: [0.3, 0.7, 0.3],
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
-          <motion.div
-            className="absolute bottom-1/3 right-1/3 w-1 h-1 bg-blue-400 rounded-full"
-            animate={{
-              scale: [1, 2, 1],
-              opacity: [0.2, 0.6, 0.2],
-            }}
-            transition={{
-              duration: 4,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 1
-            }}
-          />
-          <motion.div
-            className="absolute top-1/2 right-1/4 w-1.5 h-1.5 bg-pink-400 rounded-full"
-            animate={{
-              scale: [1, 1.8, 1],
-              opacity: [0.3, 0.5, 0.3],
-            }}
-            transition={{
-              duration: 3.5,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 2
-            }}
-          />
-        </div>
-      </div>
+      <AnimatedBackground theme="default" />
 
       {/* Content */}
       <div className="relative z-10 min-h-screen py-12 px-4">

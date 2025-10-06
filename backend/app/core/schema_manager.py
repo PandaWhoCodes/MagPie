@@ -133,7 +133,22 @@ class SchemaManager:
                     Column('site_headline', 'TEXT', nullable=True, default="'Where Innovation Meets Community'"),
                     Column('logo_url', 'TEXT', nullable=True),
                     Column('text_style', 'TEXT', nullable=True, default="'gradient'"),
+                    Column('theme', 'TEXT', nullable=True, default="'default'"),
                     Column('updated_at', 'TEXT', nullable=True, default='CURRENT_TIMESTAMP'),
+                ]
+            ),
+
+            'message_templates': Table(
+                name='message_templates',
+                columns=[
+                    Column('id', 'TEXT', nullable=False, primary_key=True),
+                    Column('template_name', 'TEXT', nullable=False),
+                    Column('template_text', 'TEXT', nullable=False),
+                    Column('created_at', 'TEXT', nullable=True, default='CURRENT_TIMESTAMP'),
+                    Column('updated_at', 'TEXT', nullable=True, default='CURRENT_TIMESTAMP'),
+                ],
+                indexes=[
+                    Index('idx_message_templates_name', 'message_templates', ['template_name'])
                 ]
             ),
 

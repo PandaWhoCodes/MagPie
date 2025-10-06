@@ -7,6 +7,107 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.3.0] - 2025-01-08
+
+### Added
+- **Theme System with Midnight Black Theme**
+  - `backend/app/core/schema_manager.py:136` - Added `theme` column to branding_settings table (TEXT, default='default')
+  - `backend/app/models/branding.py:11,20` - Added theme field to BrandingSettings and BrandingUpdate models
+  - `backend/app/services/branding_service.py:41-43` - Updated branding service to handle theme field
+  - `frontend/package.json` - Added `motion` package for enhanced animations
+  - `frontend/src/components/themes/AnimatedBackground.jsx` - Theme-aware animated background component
+    - Supports both 'default' and 'midnight_black' themes
+    - Default: Colorful gradients with purple/blue/pink orbs
+    - Midnight Black: Sleek dark theme with subtle purple/blue orbs, floating particles, grid overlay, vignette effect
+  - `frontend/src/config/themes.js` - Theme configuration with styling presets
+    - Exports THEMES object with 'default' and 'midnight_black' configurations
+    - Provides getThemeConfig() helper function
+  - `frontend/src/styles/themes/midnight-black.css` - Midnight Black theme styles
+    - Pure black background with glassmorphism effects
+    - Custom form, button, and card styling
+    - Proper dark mode support
+  - `frontend/src/main.jsx:5` - Import midnight-black.css styles
+  - `frontend/src/pages/HomePage.jsx` - Complete theme support implementation
+    - Conditionally renders UI based on selected theme
+    - Default theme: Full event info cards, detailed layout
+    - Midnight Black: Centered compact card with fluid animations
+    - Both themes support all existing features (auto-fill, dynamic fields, validation)
+  - `frontend/src/components/BrandingSettings.jsx:117-131` - Added theme selector dropdown
+    - "Default (Colorful Gradients)" option
+    - "Midnight Black (Sleek Dark)" option
+    - Persists in branding_settings table
+  - `frontend/src/pages/ThankYouPage.jsx` - Theme support for thank you page
+    - Conditionally renders based on selected theme
+    - Midnight Black variant with compact centered design
+    - Default variant with colorful gradients
+  - `frontend/src/pages/HomePage.jsx:11,460` - Dark mode toggle conditionally shown
+    - Only displayed for default theme
+    - Hidden for Midnight Black theme (since it's always dark)
+  - `frontend/src/App.jsx:43` - Removed global ThemeToggle, now page-specific
+
+### Added
+- **WhatsApp Message Templates System**
+  - `backend/app/core/schema_manager.py:140-152` - Added message_templates table schema
+    - Fields: id, template_name, template_text, created_at, updated_at
+    - Index on template_name for efficient lookups
+  - `backend/app/models/message_template.py` - Pydantic models for templates
+    - MessageTemplateBase, MessageTemplateCreate, MessageTemplateUpdate
+    - MessageTemplate with automatic variable extraction
+    - WhatsAppBulkMessageRequest with template and filter support
+  - `backend/app/services/message_template_service.py` - Template management service
+    - CRUD operations for templates
+    - Variable extraction from {{variable}} syntax
+    - Variable substitution in templates
+  - `backend/app/api/message_templates.py` - REST API endpoints for templates
+    - `GET /api/message-templates/` - List all templates
+    - `POST /api/message-templates/` - Create template
+    - `GET /api/message-templates/{id}` - Get specific template
+    - `PUT /api/message-templates/{id}` - Update template
+    - `DELETE /api/message-templates/{id}` - Delete template
+  - `backend/app/main.py:6,46` - Registered message templates router
+  - `frontend/src/components/MessageTemplates.jsx` - Template management UI
+    - Create, edit, delete templates
+    - Visual display of template variables
+    - Preview of template text with emoji support
+  - `frontend/src/services/api.js:60-67` - Message templates API client
+
+- **WhatsApp Message Filtering & Personalization**
+  - `backend/app/services/whatsapp_service.py:98-233` - Enhanced bulk messaging
+    - Template variable substitution (global + per-user)
+    - User subset filtering by field value
+    - Get distinct field values for filtering
+  - `backend/app/api/whatsapp.py` - Updated WhatsApp endpoints
+    - Support for template_id and template_variables
+    - Filter by field (send_to, filter_field, filter_value)
+    - `GET /api/whatsapp/field-values/{event_id}/{field_name}` - Get distinct values
+  - `frontend/src/components/WhatsAppModal.jsx` - Complete modal redesign
+    - Message mode selection (direct message or template)
+    - Template selection dropdown
+    - Template variable input fields
+    - Send to options (all or subset)
+    - Field-based filtering with dynamic value dropdowns
+    - Message preview for templates
+  - `frontend/src/components/RegistrationsList.jsx:19-25,226-232` - Pass event fields to modal
+  - `frontend/src/services/api.js:54-58` - Updated WhatsApp API calls
+
+- **Dashboard Message Templates Tab**
+  - `frontend/src/pages/Dashboard.jsx:21,31,157-166,183-184` - New templates tab
+    - Tab navigation: Events | Message Templates | Branding
+    - Full CRUD interface for templates
+
+### Changed
+- WhatsApp messaging now supports:
+  - Template-based messages with reusable content
+  - Variable substitution (e.g., {{name}}, {{event_date}})
+  - Field-based user filtering for targeted messaging
+  - Personalization using registration field data
+
+### Fixed
+- **WhatsApp Field Filtering with Special Characters**
+  - `frontend/src/services/api.js:57` - URL-encode field names in API calls
+  - Fixes filtering by fields with special characters (e.g., "Are you coming?" with `?`)
+  - Field names are now properly encoded using `encodeURIComponent()`
+
 ## [1.2.0] - 2025-10-04
 
 ### Added

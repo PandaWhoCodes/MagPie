@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from app.core.config import get_settings
 from app.core.database import db
-from app.api import events, registrations, qr_codes, event_fields, branding, whatsapp
+from app.api import events, registrations, qr_codes, event_fields, branding, whatsapp, message_templates
 
 settings = get_settings()
 
@@ -43,6 +43,7 @@ app.include_router(qr_codes.router, prefix="/api")
 app.include_router(event_fields.router, prefix="/api")
 app.include_router(branding.router, prefix="/api")
 app.include_router(whatsapp.router, prefix="/api")
+app.include_router(message_templates.router)
 
 
 @app.get("/")

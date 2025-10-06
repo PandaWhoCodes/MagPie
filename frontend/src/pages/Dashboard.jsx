@@ -18,6 +18,7 @@ import EventForm from '../components/EventForm';
 import RegistrationsList from '../components/RegistrationsList';
 import QRCodeModal from '../components/QRCodeModal';
 import BrandingSettings from '../components/BrandingSettings';
+import MessageTemplates from '../components/MessageTemplates';
 import Footer from '../components/Footer';
 
 export default function Dashboard() {
@@ -27,7 +28,7 @@ export default function Dashboard() {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showRegistrations, setShowRegistrations] = useState(false);
   const [showQRModal, setShowQRModal] = useState(false);
-  const [activeTab, setActiveTab] = useState('events'); // 'events' or 'branding'
+  const [activeTab, setActiveTab] = useState('events'); // 'events', 'branding', or 'templates'
 
   // Fetch all events
   const { data: events = [], isLoading } = useQuery({
@@ -154,6 +155,16 @@ export default function Dashboard() {
               Events
             </button>
             <button
+              onClick={() => setActiveTab('templates')}
+              className={`px-4 py-2 font-medium transition-colors ${
+                activeTab === 'templates'
+                  ? 'text-primary border-b-2 border-primary'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Message Templates
+            </button>
+            <button
               onClick={() => setActiveTab('branding')}
               className={`px-4 py-2 font-medium transition-colors ${
                 activeTab === 'branding'
@@ -168,6 +179,9 @@ export default function Dashboard() {
 
         {/* Branding Tab */}
         {activeTab === 'branding' && <BrandingSettings />}
+
+        {/* Message Templates Tab */}
+        {activeTab === 'templates' && <MessageTemplates />}
 
         {/* Events Tab */}
         {activeTab === 'events' && (

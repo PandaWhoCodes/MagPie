@@ -16,6 +16,14 @@ export default function RegistrationsList({ eventId }) {
     },
   });
 
+  const { data: event } = useQuery({
+    queryKey: ['event', eventId],
+    queryFn: async () => {
+      const response = await eventsApi.getById(eventId);
+      return response.data;
+    },
+  });
+
   const filteredRegistrations = registrations.filter(
     (reg) =>
       reg.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -217,6 +225,7 @@ export default function RegistrationsList({ eventId }) {
       {/* WhatsApp Modal */}
       <WhatsAppModal
         eventId={eventId}
+        eventFields={event?.fields || []}
         isOpen={isWhatsAppModalOpen}
         onClose={() => setIsWhatsAppModalOpen(false)}
         registrantsCount={registrations.length}

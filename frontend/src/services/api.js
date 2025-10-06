@@ -52,8 +52,18 @@ export const brandingApi = {
 
 // WhatsApp API
 export const whatsappApi = {
-  sendBulkMessages: (eventId, message) => api.post('/whatsapp/send-bulk/', { event_id: eventId, message }),
+  sendBulkMessages: (data) => api.post('/whatsapp/send-bulk/', data),
   getRegistrantsCount: (eventId) => api.get(`/whatsapp/registrants-count/${eventId}`),
+  getFieldValues: (eventId, fieldName) => api.get(`/whatsapp/field-values/${eventId}/${encodeURIComponent(fieldName)}`),
+};
+
+// Message Templates API
+export const messageTemplatesApi = {
+  getAll: () => api.get('/message-templates/'),
+  getById: (id) => api.get(`/message-templates/${id}`),
+  create: (data) => api.post('/message-templates/', data),
+  update: (id, data) => api.put(`/message-templates/${id}`, data),
+  delete: (id) => api.delete(`/message-templates/${id}`),
 };
 
 export default api;

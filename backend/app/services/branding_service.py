@@ -38,6 +38,10 @@ class BrandingService:
             fields.append("text_style = ?")
             values.append(update.text_style)
 
+        if update.theme is not None:
+            fields.append("theme = ?")
+            values.append(update.theme)
+
         if not fields:
             return await BrandingService.get_branding()
 

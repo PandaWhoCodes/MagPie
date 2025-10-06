@@ -116,6 +116,22 @@ export default function BrandingSettings() {
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">
+            Theme
+          </label>
+          <select
+            {...register('theme')}
+            className="input-field"
+          >
+            <option value="default">Default (Colorful Gradients)</option>
+            <option value="midnight_black">Midnight Black (Sleek Dark)</option>
+          </select>
+          <p className="mt-1 text-xs text-gray-500">
+            Choose the overall theme for your registration page
+          </p>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             Text Style
           </label>
           <select

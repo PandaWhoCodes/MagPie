@@ -5,7 +5,8 @@ Handles bulk messaging to event registrants
 
 import os
 import re
-from typing import List, Dict, Any
+import json
+from typing import List, Dict, Any, Optional
 from twilio.rest import Client
 from twilio.base.exceptions import TwilioRestException
 from app.core.database import db
@@ -94,13 +95,23 @@ class WhatsAppService:
                 "error": f"Unexpected error: {str(e)}"
             }
 
-    async def send_bulk_messages(self, event_id: str, message: str) -> Dict[str, Any]:
+    async def send_bulk_messages(
+        self,
+        event_id: str,
+        message: str,
+        filter_field: Optional[str] = None,
+        filter_value: Optional[str] = None,
+        template_variables: Optional[Dict[str, str]] = None
+    ) -> Dict[str, Any]:
         """
-        Send WhatsApp messages to all registrants of an event
+        Send WhatsApp messages to all or subset of registrants of an event
 
         Args:
             event_id: Event ID to send messages for
-            message: Message text to send
+            message: Message text to send (can contain {{variables}})
+            filter_field: Field name to filter registrations by (optional)
+            filter_value: Value to match for filtering (optional)
+            template_variables: Dict of global variable substitutions (optional)
 
         Returns:
             Dict with summary of sent messages (success, failed, total)
@@ -126,16 +137,48 @@ class WhatsAppService:
                 "error": "No registrations found for this event"
             }
 
-        # Send messages to all registrants
+        # Filter registrations if filter_field and filter_value are provided
+        if filter_field and filter_value:
+            filtered_registrations = []
+            for reg in registrations:
+                form_data = json.loads(reg.get('form_data', '{}'))
+                if form_data.get(filter_field) == filter_value:
+                    filtered_registrations.append(reg)
+            registrations = filtered_registrations
+
+        if not registrations:
+            return {
+                "success": False,
+                "total": 0,
+                "sent": 0,
+                "failed": 0,
+                "results": [],
+                "error": f"No registrations found matching filter: {filter_field}={filter_value}"
+            }
+
+        # Send messages to all filtered registrants
         results = []
         sent_count = 0
         failed_count = 0
 
         for reg in registrations:
             phone = reg.get('phone', '')
+            form_data = json.loads(reg.get('form_data', '{}'))
+
+            # Prepare message with variable substitution
+            personalized_message = message
+
+            # First apply global template variables
+            if template_variables:
+                for var_name, var_value in template_variables.items():
+                    personalized_message = personalized_message.replace(f"{{{{{var_name}}}}}", str(var_value))
+
+            # Then apply per-user variables from form_data
+            for field_name, field_value in form_data.items():
+                personalized_message = personalized_message.replace(f"{{{{{field_name}}}}}", str(field_value))
 
             # Send message
-            result = self.send_message(phone, message)
+            result = self.send_message(phone, personalized_message)
 
             # Track result
             if result['success']:
@@ -168,3 +211,23 @@ class WhatsAppService:
             [event_id]
         )
         return result['count'] if result else 0
+
+    async def get_distinct_field_values(self, event_id: str, field_name: str) -> List[str]:
+        """Get distinct values for a field from all registrations of an event"""
+        registrations = await db.fetch_all(
+            """
+            SELECT form_data
+            FROM registrations
+            WHERE event_id = ?
+            """,
+            [event_id]
+        )
+
+        distinct_values = set()
+        for reg in registrations:
+            form_data = json.loads(reg.get('form_data', '{}'))
+            value = form_data.get(field_name)
+            if value:
+                distinct_values.add(str(value))
+
+        return sorted(list(distinct_values))

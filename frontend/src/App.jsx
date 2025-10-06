@@ -40,7 +40,7 @@ function AppContent() {
 
   return (
     <div className="min-h-screen transition-colors duration-300">
-      {isUserFacingPage && <ThemeToggle />}
+      {/* ThemeToggle will be conditionally rendered inside pages based on branding theme */}
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/thank-you" element={<ThankYouPage />} />

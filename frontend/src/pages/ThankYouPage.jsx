@@ -1,8 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, Calendar, Clock, MapPin, ExternalLink, Sparkles, PartyPopper, Heart } from 'lucide-react';
 import Footer from '../components/Footer';
+import ThemeToggle from '../components/ThemeToggle';
+import { AnimatedBackground } from '../components/themes/AnimatedBackground';
+import { brandingApi } from '../services/api';
+import { getThemeConfig } from '../config/themes';
 
 // Confetti particle component
 const ConfettiPiece = ({ delay = 0 }) => {
@@ -82,6 +87,21 @@ export default function ThankYouPage() {
   const { event, registration } = location.state || {};
   const [showConfetti, setShowConfetti] = useState(true);
 
+  // Fetch branding settings
+  const { data: branding } = useQuery({
+    queryKey: ['branding'],
+    queryFn: async () => {
+      const response = await brandingApi.get();
+      return response.data;
+    },
+    staleTime: 0,
+    cacheTime: 0,
+    retry: false,
+  });
+
+  const theme = branding?.theme || 'default';
+  const themeConfig = getThemeConfig(theme);
+
   useEffect(() => {
     if (showConfetti) {
       const timer = setTimeout(() => {
@@ -98,8 +118,189 @@ export default function ThankYouPage() {
     return null;
   }
 
+  // Midnight Black Theme
+  if (theme === 'midnight_black') {
+    return (
+      <div className={`${themeConfig.containerClass} theme-midnight-black`}>
+        {/* No dark mode toggle for Midnight Black theme */}
+        <AnimatedBackground theme="midnight_black" />
+
+        {/* Confetti Animation */}
+        {showConfetti && (
+          <div className="absolute inset-0 pointer-events-none z-50 overflow-hidden">
+            {[...Array(50)].map((_, i) => (
+              <ConfettiPiece key={`confetti-${i}`} delay={i * 0.05} />
+            ))}
+          </div>
+        )}
+
+        <AnimatePresence mode="wait">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+            className="w-full max-w-md relative z-10"
+          >
+            {/* Success Icon */}
+            <motion.div
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+              className="flex items-center justify-center mb-8"
+            >
+              <div className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full shadow-2xl relative">
+                <motion.div
+                  animate={{
+                    scale: [1, 1.2, 1],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                  className="absolute inset-0 bg-green-400 rounded-full opacity-30"
+                />
+                <CheckCircle className="w-16 h-16 text-white relative z-10" />
+              </div>
+            </motion.div>
+
+            {/* Success Message */}
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3, duration: 0.6 }}
+              className="mb-8 text-center"
+            >
+              <h1 className="text-4xl font-bold text-white mb-2">You're Registered!</h1>
+              <p className="text-white/60">Thank you for joining Build2Learn! 🎉</p>
+            </motion.div>
+
+            {/* Event Details */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.4, duration: 0.6 }}
+              className="mb-6"
+            >
+              <h2 className="text-white text-xl font-semibold mb-3">{event.name}</h2>
+              {event.description && (
+                <p className="text-white/50 text-sm mb-4">{event.description}</p>
+              )}
+              <div className="space-y-2 text-sm">
+                <p className="text-white/70">📅 {event.date} • ⏰ {event.time}</p>
+                <p className="text-white/70">📍 {event.venue}</p>
+                {event.venue_map_link && (
+                  <a
+                    href={event.venue_map_link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-white/60 hover:text-white/80 underline block"
+                  >
+                    View on Google Maps →
+                  </a>
+                )}
+              </div>
+            </motion.div>
+
+            {/* Confirmation Message */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5, duration: 0.6 }}
+              className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-4 mb-6"
+            >
+              <p className="text-white/80 text-sm">
+                ✉️ <strong>Confirmation Sent!</strong>
+              </p>
+              <p className="text-white/60 text-sm mt-1">
+                Check <strong className="text-green-400">{registration.email}</strong> for your QR code and event details.
+              </p>
+            </motion.div>
+
+            {/* Important Notes */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.6, duration: 0.6 }}
+              className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-4 mb-6"
+            >
+              <p className="text-white/80 font-semibold mb-3 flex items-center">
+                <span className="mr-2">📌</span> Important Notes
+              </p>
+              <ul className="space-y-2 text-white/60 text-sm">
+                <li className="flex items-start">
+                  <span className="text-green-400 mr-2">✓</span>
+                  <span>Arrive 15 minutes early for check-in</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-green-400 mr-2">✓</span>
+                  <span>Bring your laptop and equipment</span>
+                </li>
+                <li className="flex items-start">
+                  <span className="text-green-400 mr-2">✓</span>
+                  <span>Check email for QR code details</span>
+                </li>
+              </ul>
+            </motion.div>
+
+            {/* Back to Home */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.7, duration: 0.6 }}
+              className="text-center"
+            >
+              <button
+                onClick={() => navigate('/')}
+                className="text-white/60 hover:text-white/80 text-sm transition-colors underline"
+              >
+                ← Back to Home
+              </button>
+            </motion.div>
+
+            {/* Footer */}
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.8, duration: 0.6 }}
+              className="mt-8 text-center text-sm text-white/30"
+            >
+              Powered by Build2Learn
+            </motion.p>
+          </motion.div>
+        </AnimatePresence>
+
+        <motion.footer
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.9, duration: 0.6 }}
+          className="absolute bottom-4 left-0 right-0 text-center z-10"
+        >
+          <p className="text-sm text-white/40">
+            Made with{' '}
+            <span className="text-red-400 inline-block">❤️</span>{' '}
+            at{' '}
+            <a
+              href="https://build2learn.in"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-white/60 hover:text-white/80 font-medium transition-colors duration-300 underline underline-offset-2"
+            >
+              Build2Learn
+            </a>
+          </p>
+        </motion.footer>
+      </div>
+    );
+  }
+
+  // Default Theme
   return (
     <div className="min-h-screen relative overflow-hidden transition-colors duration-300">
+      {/* Dark mode toggle only for default theme */}
+      <ThemeToggle />
+
       {/* Animated Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 dark:from-green-950 dark:via-emerald-950 dark:to-teal-950 transition-colors duration-300">
         <motion.div

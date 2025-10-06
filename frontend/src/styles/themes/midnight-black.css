@@ -1,0 +1,165 @@
+/* Midnight Black Theme Styles */
+
+.theme-midnight-black {
+  /* Base styles */
+  background: #000000;
+  color: white;
+}
+
+.theme-midnight-black h1 {
+  color: white;
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.theme-midnight-black h2 {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.theme-midnight-black h3 {
+  color: white;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.theme-midnight-black p {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 1rem;
+}
+
+/* Form elements */
+.theme-midnight-black input,
+.theme-midnight-black textarea,
+.theme-midnight-black select {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+  border-radius: 0.75rem;
+  padding: 0.875rem 1rem;
+  height: 3.5rem;
+  transition: all 0.3s ease;
+}
+
+.theme-midnight-black input:focus,
+.theme-midnight-black textarea:focus,
+.theme-midnight-black select:focus {
+  border-color: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.08);
+  outline: none;
+}
+
+.theme-midnight-black input:hover,
+.theme-midnight-black textarea:hover,
+.theme-midnight-black select:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.theme-midnight-black input::placeholder,
+.theme-midnight-black textarea::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.theme-midnight-black textarea {
+  height: auto;
+  min-height: 6rem;
+}
+
+/* Labels */
+.theme-midnight-black label {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.875rem;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+/* Buttons */
+.theme-midnight-black button[type="submit"] {
+  background: white;
+  color: black;
+  font-weight: 700;
+  border-radius: 0.75rem;
+  height: 3.5rem;
+  margin-top: 2rem;
+  transition: all 0.3s ease;
+}
+
+.theme-midnight-black button[type="submit"]:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.theme-midnight-black button[type="submit"]:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* Cards */
+.theme-midnight-black .card-container {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1.5rem;
+  padding: 2rem;
+}
+
+/* Event info cards */
+.theme-midnight-black .event-info-item {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 1rem;
+  padding: 1rem;
+  transition: all 0.3s ease;
+}
+
+.theme-midnight-black .event-info-item:hover {
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px rgba(139, 92, 246, 0.2);
+}
+
+/* Icons */
+.theme-midnight-black .icon-container {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.8), rgba(59, 130, 246, 0.8));
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+}
+
+/* Error messages */
+.theme-midnight-black .error-message {
+  color: #ef4444;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
+
+/* Success state */
+.theme-midnight-black .success-button {
+  background: linear-gradient(to right, #10b981, #059669);
+  box-shadow: 0 10px 30px rgba(16, 185, 129, 0.3);
+}
+
+/* Checkbox styles */
+.theme-midnight-black input[type="checkbox"] {
+  width: 1.25rem;
+  height: 1.25rem;
+  accent-color: rgba(139, 92, 246, 0.8);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Select dropdown */
+.theme-midnight-black select option {
+  background: #1a1a1a;
+  color: white;
+}
+
+/* Animation utilities */
+.theme-midnight-black .scale-on-focus {
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.theme-midnight-black .scale-on-focus:focus-within {
+  transform: scale(1.01);
+}

@@ -8,6 +8,7 @@ class BrandingSettings(BaseModel):
     site_headline: str
     logo_url: Optional[str] = None
     text_style: str = 'gradient'
+    theme: str = 'default'
     updated_at: str
 
 
@@ -16,3 +17,4 @@ class BrandingUpdate(BaseModel):
     site_headline: Optional[str] = None
     logo_url: Optional[str] = None
     text_style: Optional[str] = None
+    theme: Optional[str] = None

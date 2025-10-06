@@ -24,11 +24,12 @@ Both servers are running and operational.
 - **Framework**: React 18
 - **Build Tool**: Vite
 - **Styling**: TailwindCSS
-- **Animations**: Framer Motion (public pages only)
+- **Animations**: Framer Motion (public pages only), Motion (theme-specific animations)
 - **State Management**: React Query (@tanstack/react-query)
 - **Forms**: React Hook Form
 - **Icons**: Lucide React
 - **HTTP Client**: Axios
+- **Theming**: Custom theme system with multiple visual styles
 
 ## Quick Start Commands
 ```bash
@@ -53,12 +54,15 @@ b2l_registration/
     └── src/
         ├── pages/            # HomePage, Dashboard, ThankYouPage, CheckInPage
         ├── components/       # EventForm, RegistrationsList, QRCodeModal, WhatsAppModal
+        │   └── themes/       # Theme-specific components (AnimatedBackground)
+        ├── config/           # Configuration files (themes.js)
         ├── services/         # api.js (axios API calls)
-        └── styles/           # TailwindCSS
+        └── styles/           # TailwindCSS, theme-specific styles
+            └── themes/       # Theme-specific CSS files
 ```
 
 ## Access Points
-- **Public Registration**: http://localhost:3000/ (animated, glassmorphism UI)
+- **Public Registration**: http://localhost:3000/ (theme-based UI - Default or Midnight Black)
 - **Dashboard**: http://localhost:3000/dashboard_under (simple UI, no auth)
 - **Thank You Page**: http://localhost:3000/thank-you (after registration)
 - **Check-in**: `/check-in/:eventId/:qrId` (QR code redirect)
@@ -77,6 +81,8 @@ b2l_registration/
 3. **user_profiles** - Stored user data for auto-fill
 4. **event_fields** - Dynamic fields per event
 5. **qr_codes** - Generated QR codes for events
+6. **branding_settings** - Site branding and theme configuration
+7. **message_templates** - WhatsApp message templates
 
 ### Key Relationships
 - Event → Event Fields (one-to-many)
@@ -107,7 +113,7 @@ b2l_registration/
 - Export registrations with dynamic fields
 - Properly escapes CSV data, avoids duplicate fields
 
-### WhatsApp Notifications (NEW!)
+### WhatsApp Notifications
 - Send bulk WhatsApp messages to all event registrants
 - Automatic phone number formatting (+91 for India)
 - Uses Twilio WhatsApp Business API
@@ -115,6 +121,20 @@ b2l_registration/
 - See failed messages with detailed error info
 - Sandbox: FREE testing (50 msgs/day)
 - Production: ~₹0.75/message
+
+### Theme System
+- **Two Available Themes**:
+  - **Default**: Colorful gradients (purple/blue/pink), full event info cards, detailed layout
+  - **Midnight Black**: Sleek dark theme with pure black background, subtle orbs, floating particles
+- Theme selection in Dashboard → Branding Settings
+- Persists in database (branding_settings.theme)
+- Both themes support all features (auto-fill, dynamic fields, validation)
+- Theme-specific animations and styling
+- Files:
+  - `frontend/src/components/themes/AnimatedBackground.jsx` - Theme-aware background
+  - `frontend/src/config/themes.js` - Theme configuration
+  - `frontend/src/styles/themes/midnight-black.css` - Midnight Black styles
+  - `frontend/src/pages/HomePage.jsx` - Conditional rendering based on theme
 
 ## Development Notes
 
@@ -152,6 +172,8 @@ b2l_registration/
 - **Export data**: Update RegistrationsList.jsx CSV logic
 - **Change styling**: Use Tailwind classes or update index.css
 - **Send WhatsApp messages**: Use "Send WhatsApp" button in registrations list (dashboard)
+- **Change theme**: Dashboard → Branding Settings → Select theme → Save Changes
+- **Add new theme**: Create theme config in themes.js, add CSS in styles/themes/, update HomePage conditional rendering
 
 ## WhatsApp Integration Setup
 See [WHATSAPP_SETUP.md](docs/WHATSAPP_SETUP.md) for complete setup instructions.
