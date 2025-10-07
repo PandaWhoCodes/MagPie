@@ -125,7 +125,7 @@ export default function Dashboard() {
                 Admin Dashboard
               </h1>
               <p className="text-gray-600">
-                Manage your Build2Learn events
+                Manage your MagPie events
               </p>
             </div>
             {activeTab === 'events' && (

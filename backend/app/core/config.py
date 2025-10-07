@@ -6,7 +6,7 @@ class Settings(BaseSettings):
     """Application settings"""
 
     # Application
-    APP_NAME: str = "Build2Learn Registration"
+    APP_NAME: str = "MagPie Event Registration"
     APP_VERSION: str = "1.0.0"
     DEBUG: bool = False
 

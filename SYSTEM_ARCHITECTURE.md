@@ -1,4 +1,4 @@
-# System Architecture - Build2Learn Registration System
+# System Architecture - MagPie Event Registration Platform
 
 ## Table of Contents
 1. [Overview](#overview)
@@ -17,7 +17,7 @@
 
 ## Overview
 
-The Build2Learn Registration System is a full-stack event management and registration platform built with modern technologies. It follows a client-server architecture with a React frontend, FastAPI backend, and Turso (SQLite) database.
+The MagPie Event Registration Platform is a full-stack event management and registration platform built with modern technologies. It follows a client-server architecture with a React frontend, FastAPI backend, and Turso (SQLite) database.
 
 ### Key Characteristics
 - **Architecture Pattern**: Client-Server, REST API
@@ -274,7 +274,7 @@ CREATE TABLE qr_codes (
 -- Branding Settings Table
 CREATE TABLE branding_settings (
     id TEXT PRIMARY KEY,                    -- Single row with id='default'
-    site_title TEXT DEFAULT 'Build2Learn',
+    site_title TEXT DEFAULT 'MagPie',
     site_headline TEXT DEFAULT 'Where Innovation Meets Community',
     logo_url TEXT,                          -- Optional logo URL
     text_style TEXT DEFAULT 'gradient',     -- Title text style
@@ -465,7 +465,7 @@ async def lifespan(app: FastAPI):
     print("👋 Database closed")
 
 app = FastAPI(
-    title="Build2Learn Registration",
+    title="MagPie Registration",
     version="1.0.0",
     lifespan=lifespan,
 )
@@ -1435,7 +1435,7 @@ Priority 2:
 
 ## Conclusion
 
-This architecture provides a solid foundation for the Build2Learn Registration System. It balances simplicity with functionality, performance with maintainability, and current needs with future scalability.
+This architecture provides a solid foundation for the MagPie Event Registration Platform. It balances simplicity with functionality, performance with maintainability, and current needs with future scalability.
 
 ### Key Strengths
 - Simple, easy to understand
@@ -1463,4 +1463,4 @@ This architecture provides a solid foundation for the Build2Learn Registration S
 
 **Last Updated**: 2025-10-02
 **Version**: 1.0.0
-**Maintained By**: Build2Learn Team
+**Maintained By**: MagPie Team

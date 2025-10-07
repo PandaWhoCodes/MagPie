@@ -50,7 +50,7 @@ app.include_router(message_templates.router)
 async def root():
     """Root endpoint"""
     return {
-        "message": "Build2Learn Registration API",
+        "message": "MagPie Event Registration API",
         "version": settings.APP_VERSION,
         "status": "running",
     }

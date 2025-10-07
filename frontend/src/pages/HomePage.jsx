@@ -207,7 +207,7 @@ export default function HomePage() {
                 </motion.div>
               )}
               <h1 className="mb-3 text-white">
-                {branding?.site_title || 'Build2Learn'}
+                {branding?.site_title || 'MagPie'}
               </h1>
               <p className="text-white/50">
                 {branding?.site_headline || 'Where Innovation Meets Community'}
@@ -456,7 +456,7 @@ export default function HomePage() {
               rel="noopener noreferrer"
               className="text-white/60 hover:text-white/80 font-medium transition-colors duration-300 underline underline-offset-2"
             >
-              Build2Learn
+              MagPie
             </a>
           </p>
         </motion.footer>
@@ -514,7 +514,7 @@ export default function HomePage() {
               className="mb-4"
             >
               <StylizedText
-                text={branding?.site_title || 'Build2Learn'}
+                text={branding?.site_title || 'MagPie'}
                 style={branding?.text_style || 'gradient'}
               />
             </motion.h1>

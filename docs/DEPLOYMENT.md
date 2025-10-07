@@ -1,4 +1,4 @@
-# Deployment Guide - Build2Learn Registration System
+# Deployment Guide - MagPie Event Registration Platform
 
 Guide for deploying the application to production on Render or other platforms.
 
@@ -118,7 +118,7 @@ gunicorn app.main:app -w 4 -k uvicorn.workers.UvicornWorker --bind 0.0.0.0:8000
 **Systemd service** (`/etc/systemd/system/b2l-backend.service`):
 ```ini
 [Unit]
-Description=Build2Learn Backend
+Description=MagPie Backend
 After=network.target
 
 [Service]

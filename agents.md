@@ -1,4 +1,4 @@
-# Agent Guide - Build2Learn Registration System
+# Agent Guide - MagPie Event Registration Platform
 
 This document helps AI agents understand the codebase structure and where to make specific types of changes.
 

@@ -139,7 +139,7 @@ export default function EventForm({ event, onSuccess, onCancel }) {
           <input
             {...register('name', { required: 'Event name is required' })}
             className="input-field"
-            placeholder="e.g., Build2Learn Hackathon 2025"
+            placeholder="e.g., MagPie Summit 2025"
           />
           {errors.name && (
             <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>

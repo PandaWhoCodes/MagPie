@@ -1,6 +1,6 @@
-# Setup Guide - Build2Learn Registration System
+# Setup Guide - MagPie Event Registration Platform
 
-Complete installation and configuration guide for the Build2Learn Registration System.
+Complete installation and configuration guide for the MagPie Event Registration Platform.
 
 ## Table of Contents
 - [Prerequisites](#prerequisites)

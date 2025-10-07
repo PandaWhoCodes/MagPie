@@ -1,4 +1,4 @@
-# Features Documentation - Build2Learn Registration System
+# Features Documentation - MagPie Event Registration Platform
 
 Comprehensive guide to all features and functionality.
 

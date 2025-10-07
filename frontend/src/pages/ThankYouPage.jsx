@@ -173,7 +173,7 @@ export default function ThankYouPage() {
               className="mb-8 text-center"
             >
               <h1 className="text-4xl font-bold text-white mb-2">You're Registered!</h1>
-              <p className="text-white/60">Thank you for joining Build2Learn! 🎉</p>
+              <p className="text-white/60">Thank you for joining MagPie! 🎉</p>
             </motion.div>
 
             {/* Event Details */}
@@ -266,7 +266,7 @@ export default function ThankYouPage() {
               transition={{ delay: 0.8, duration: 0.6 }}
               className="mt-8 text-center text-sm text-white/30"
             >
-              Powered by Build2Learn
+              Powered by MagPie
             </motion.p>
           </motion.div>
         </AnimatePresence>
@@ -287,7 +287,7 @@ export default function ThankYouPage() {
               rel="noopener noreferrer"
               className="text-white/60 hover:text-white/80 font-medium transition-colors duration-300 underline underline-offset-2"
             >
-              Build2Learn
+              MagPie
             </a>
           </p>
         </motion.footer>
@@ -454,7 +454,7 @@ export default function ThankYouPage() {
                 transition={{ delay: 0.9 }}
                 className="text-2xl text-gray-600 dark:text-gray-300 font-medium"
               >
-                Thank you for joining Build2Learn! 🎉
+                Thank you for joining MagPie! 🎉
               </motion.p>
             </motion.div>
           </motion.div>

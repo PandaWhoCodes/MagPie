@@ -1,4 +1,4 @@
-# API Documentation - Build2Learn Registration System
+# API Documentation - MagPie Event Registration Platform
 
 Complete API reference for all endpoints with request/response examples.
 

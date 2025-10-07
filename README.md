@@ -1,10 +1,23 @@
-# Build2Learn Registration System
+# 🐦‍⬛ MagPie Event Registration Platform
 
-A professional, production-ready event registration system with dynamic forms, QR code check-ins, and WhatsApp notifications.
+> **MagPie**: Like the clever bird that collects shiny things, MagPie intelligently gathers and organizes your event registrations with style and efficiency.
+
+A professional, production-ready event registration system with dynamic forms, QR code check-ins, and WhatsApp notifications - now with a touch of avian elegance!
 
 [![Demo](https://img.shields.io/badge/Demo-Watch%20Video-blue)](https://drive.google.com/file/d/1LoGf9au5TWb-CxOKrGy-izX913Js2pK4/view?usp=sharing)
-[![Version](https://img.shields.io/badge/version-1.2.0-green.svg)](https://github.com/PandaWhoCodes/b2l_registration/releases)
+[![Version](https://img.shields.io/badge/version-1.2.0-green.svg)](https://github.com/PandaWhoCodes/magpie/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+---
+
+## 🪶 Why MagPie?
+
+Just like the magpie bird known for its intelligence and ability to recognize patterns, MagPie Event Registration Platform:
+- **Collects** registrations with precision
+- **Remembers** user data intelligently (auto-fill feature)
+- **Organizes** events with beautiful simplicity
+- **Communicates** effectively (WhatsApp notifications)
+- **Adapts** to your needs (dynamic forms)
 
 ---
 
@@ -12,11 +25,11 @@ A professional, production-ready event registration system with dynamic forms, Q
 
 - 🎯 **Event Management** - Create, edit, clone, and manage events
 - 📝 **Dynamic Registration Forms** - Add custom fields per event
-- 🔄 **Auto-fill System** - Remembers user data across events
+- 🔄 **Smart Auto-fill System** - MagPie remembers user data across events
 - 📱 **WhatsApp Notifications** - Send bulk messages to registrants ✨ NEW!
 - 🔗 **QR Code Check-ins** - Generate and scan QR codes for attendance
 - 📊 **Analytics & Export** - View registrations and export to CSV
-- 🎨 **Modern UI** - Responsive design with smooth animations
+- 🎨 **Modern UI Themes** - Choose between colorful Default or sleek Midnight Black
 - ⚡ **Fast & Reliable** - Built with FastAPI and React
 
 ---
@@ -32,9 +45,9 @@ A professional, production-ready event registration system with dynamic forms, Q
 ### Installation
 
 ```bash
-# Clone repository
-git clone https://github.com/PandaWhoCodes/b2l_registration.git
-cd b2l_registration
+# Clone the MagPie repository
+git clone https://github.com/PandaWhoCodes/magpie.git
+cd magpie
 
 # Backend setup
 cd backend
@@ -55,13 +68,27 @@ npm install
 npm run dev
 ```
 
-**Access**:
-- Frontend: http://localhost:3000
-- Dashboard: http://localhost:3000/dashboard_under
-- API: http://localhost:8000
-- API Docs: http://localhost:8000/docs
+**Access MagPie**:
+- 🏠 Frontend: http://localhost:3000
+- 📊 Dashboard: http://localhost:3000/dashboard_under
+- 🔧 API: http://localhost:8000
+- 📖 API Docs: http://localhost:8000/docs
 
 For detailed installation instructions, see **[Setup Guide](docs/SETUP.md)**.
+
+---
+
+## 🎨 Themes
+
+MagPie comes with two beautiful themes:
+
+### 🌈 **Default Theme**
+Vibrant gradients with purple, blue, and pink hues - perfect for creative events
+
+### 🌑 **Midnight Black Theme**
+Sleek, pure black background with floating particles - for those who prefer elegance in darkness
+
+Switch themes from Dashboard → Branding Settings
 
 ---
 
@@ -80,13 +107,13 @@ For detailed installation instructions, see **[Setup Guide](docs/SETUP.md)**.
 
 ## 🛠️ Tech Stack
 
-### Backend
+### Backend Nest 🪺
 - **FastAPI** - Modern Python web framework
 - **Turso** - Serverless SQLite database
 - **Twilio** - WhatsApp messaging API
 - **Pydantic** - Data validation
 
-### Frontend
+### Frontend Feathers 🪶
 - **React 18** - UI library
 - **Vite** - Build tool
 - **TailwindCSS** - Styling
@@ -112,23 +139,18 @@ Send bulk WhatsApp messages to all event registrants with one click!
 ## 🎯 Usage
 
 ### 1. Create an Event
-
 Visit Dashboard → Create Event → Add custom fields → Save
 
 ### 2. Activate Event
-
-Click toggle icon to activate (only one event can be active)
+Click toggle icon to activate (only one event can be active at a time - like a magpie focusing on one shiny object!)
 
 ### 3. Share Registration Link
-
 Share `http://localhost:3000` with participants
 
 ### 4. Manage Registrations
-
 View registrations → Export CSV → Send WhatsApp messages
 
 ### 5. Check-in with QR Codes
-
 Generate QR code → Print/display → Scan at event
 
 **For detailed usage**, see [Features Guide](docs/FEATURES.md).
@@ -146,6 +168,7 @@ Generate QR code → Print/display → Scan at event
 - 📥 **Export CSV** - Download registration data
 - 🔗 **Generate QR Codes** - For check-ins with custom messages
 - ⚡ **Toggle Active Status** - Activate/deactivate events
+- 🎨 **Theme Switcher** - Toggle between Default and Midnight Black
 
 ---
 
@@ -166,7 +189,7 @@ git push origin master
 
 ### Other Platforms
 
-Supports deployment to:
+MagPie can nest anywhere:
 - Vercel / Netlify (frontend)
 - AWS / DigitalOcean (backend)
 - Docker containers
@@ -184,7 +207,7 @@ Supports deployment to:
 - ✅ CORS configuration
 - ✅ Environment variables for secrets
 
-**Note**: No authentication by design. For production, add authentication middleware.
+**Note**: No authentication by design. For production, add authentication middleware to protect your nest.
 
 ---
 
@@ -211,7 +234,7 @@ VITE_API_URL=http://localhost:8000
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please:
+MagPies are social birds, and so are we! Contributions are welcome:
 
 1. Fork the repository
 2. Create a feature branch
@@ -230,15 +253,23 @@ MIT License - Feel free to use and modify for your needs.
 ## 🆘 Support
 
 - 📖 [Documentation](docs/)
-- 🐛 [Report Issues](https://github.com/PandaWhoCodes/b2l_registration/issues)
-- 💬 [Discussions](https://github.com/PandaWhoCodes/b2l_registration/discussions)
+- 🐛 [Report Issues](https://github.com/PandaWhoCodes/magpie/issues)
+- 💬 [Discussions](https://github.com/PandaWhoCodes/magpie/discussions)
 
 ---
 
 ## 🙏 Acknowledgments
 
-Built for Build2Learn by [PandaWhoCodes](https://github.com/PandaWhoCodes)
+Built with passion by [PandaWhoCodes](https://github.com/PandaWhoCodes)
 
 ---
 
-**Made with ❤️ for Build2Learn**
+## 🐦‍⬛ Fun Fact
+
+Did you know? Magpies are one of the few animals that can recognize themselves in a mirror - just like how MagPie recognizes returning users and auto-fills their data!
+
+---
+
+**Made with ❤️ and a touch of avian intelligence**
+
+*~ MagPie: Where Events Take Flight ~*

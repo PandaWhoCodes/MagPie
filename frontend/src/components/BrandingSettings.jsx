@@ -69,7 +69,7 @@ export default function BrandingSettings() {
           <input
             {...register('site_title', { required: 'Site title is required' })}
             className="input-field"
-            placeholder="e.g., Build2Learn"
+            placeholder="e.g., MagPie"
           />
           {errors.site_title && (
             <p className="mt-1 text-sm text-red-600">{errors.site_title.message}</p>

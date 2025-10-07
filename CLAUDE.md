@@ -1,7 +1,7 @@
 # Claude Code Session Notes
 
 ## Project Overview
-Build2Learn Registration System - A full-stack event registration management platform with dynamic form fields, QR code check-ins, and auto-fill capabilities.
+MagPie Event Registration Platform - A full-stack event registration management platform with dynamic form fields, QR code check-ins, and auto-fill capabilities.
 
 ## Architecture
 - **Backend**: FastAPI (Python 3.11+) - Running on http://0.0.0.0:8000
@@ -42,7 +42,7 @@ cd frontend && npm run dev
 
 ## Project Structure
 ```
-b2l_registration/
+magpie/
 ├── backend/
 │   └── app/
 │       ├── main.py           # FastAPI entry point

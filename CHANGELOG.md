@@ -1,11 +1,30 @@
 # Changelog
 
-All notable changes to the Build2Learn Registration System will be documented in this file.
+All notable changes to the MagPie Event Registration Platform will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+### Changed
+- **Project Rebranding to MagPie**
+  - `README.md` - Complete rebrand with creative magpie metaphors and theme
+  - `CLAUDE.md:4,45` - Updated project name to MagPie Event Registration Platform
+  - `frontend/index.html:7` - Changed title to "MagPie - Event Registration Platform"
+  - `frontend/package.json:2` - Renamed package to "magpie-frontend"
+  - `frontend/src/components/Footer.jsx:9` - Updated footer to show MagPie branding
+  - `frontend/src/components/EventForm.jsx:142` - Changed example placeholder to "MagPie Summit 2025"
+  - `frontend/src/components/BrandingSettings.jsx:72` - Updated placeholder to "MagPie"
+  - `frontend/src/pages/HomePage.jsx:210,517,459` - Updated default title to MagPie
+  - `frontend/src/pages/ThankYouPage.jsx:176,269,290,457` - Updated branding to MagPie
+  - `backend/app/core/config.py:9` - Changed APP_NAME to "MagPie Event Registration"
+  - `backend/app/core/schema_manager.py:132,350` - Updated default branding to MagPie
+  - `backend/app/main.py:53` - Changed API message to "MagPie Event Registration API"
+  - `docs/API.md:1` - Updated documentation title to MagPie
+  - `docs/DEPLOYMENT.md:1,121` - Updated documentation title to MagPie
+  - `docs/FEATURES.md:1` - Updated documentation title to MagPie
+  - `docs/SETUP.md:1,3` - Updated documentation title to MagPie
 
 ## [1.3.0] - 2025-01-08
 

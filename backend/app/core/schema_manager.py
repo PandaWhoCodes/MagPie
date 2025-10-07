@@ -129,7 +129,7 @@ class SchemaManager:
                 name='branding_settings',
                 columns=[
                     Column('id', 'TEXT', nullable=False, primary_key=True),
-                    Column('site_title', 'TEXT', nullable=True, default="'Build2Learn'"),
+                    Column('site_title', 'TEXT', nullable=True, default="'MagPie'"),
                     Column('site_headline', 'TEXT', nullable=True, default="'Where Innovation Meets Community'"),
                     Column('logo_url', 'TEXT', nullable=True),
                     Column('text_style', 'TEXT', nullable=True, default="'gradient'"),
@@ -347,6 +347,6 @@ class SchemaManager:
             print("  📝 Inserting default branding settings...")
             self.conn.execute("""
                 INSERT INTO branding_settings (id, site_title, site_headline, text_style)
-                VALUES ('default', 'Build2Learn', 'Where Innovation Meets Community', 'gradient')
+                VALUES ('default', 'MagPie', 'Where Events Take Flight', 'gradient')
             """)
             print("    ✅ Default branding settings inserted")
