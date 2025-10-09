@@ -7,3 +7,7 @@ libsql
 python-dotenv==1.0.1
 qrcode[pil]==7.4.2
 python-multipart==0.0.12
+pytest==7.4.3
+pytest-asyncio==0.21.1
+httpx==0.25.2
+pytest-cov==4.1.0

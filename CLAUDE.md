@@ -146,6 +146,8 @@ magpie/
 - Use TailwindCSS utility classes
 - Handle errors gracefully with toast notifications
 - Follow REST API conventions with trailing slashes
+- **Run tests after EVERY backend change**: `cd backend && source venv/bin/activate && pytest`
+- **Update tests when modifying existing functionality** - Keep test coverage accurate
 
 ### DON'T ❌
 - Add authentication (not required per spec)
@@ -154,6 +156,8 @@ magpie/
 - Allow multiple active events simultaneously
 - Manual field identifiers (auto-generate from labels)
 - Forget to handle email/phone for auto-fill
+- Skip running tests after backend changes
+- Leave outdated tests after functionality updates
 
 ## Environment Variables
 

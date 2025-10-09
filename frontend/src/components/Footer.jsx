@@ -6,7 +6,7 @@ const Footer = () => {
         <span className="text-red-500 dark:text-red-400 animate-pulse inline-block">❤️</span>{' '}
         by{' '}
         <span className="text-purple-600 dark:text-purple-400 font-bold">
-          MagPie
+          Build2Learn
         </span>
       </p>
     </footer>

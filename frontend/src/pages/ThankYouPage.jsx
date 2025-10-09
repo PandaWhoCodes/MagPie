@@ -287,7 +287,7 @@ export default function ThankYouPage() {
               rel="noopener noreferrer"
               className="text-white/60 hover:text-white/80 font-medium transition-colors duration-300 underline underline-offset-2"
             >
-              MagPie
+              Build2Learn
             </a>
           </p>
         </motion.footer>
