@@ -1,14 +1,18 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
 from typing import List
 from app.schemas.event import EventCreate, EventUpdate, EventResponse
 from app.services.event_service import EventService
+from app.core.auth import clerk_auth, AuthenticatedUser
 
 router = APIRouter(prefix="/events", tags=["events"])
 
 
 @router.post("/", response_model=EventResponse, status_code=status.HTTP_201_CREATED)
-async def create_event(event: EventCreate):
-    """Create a new event"""
+async def create_event(
+    event: EventCreate,
+    auth: AuthenticatedUser = Depends(clerk_auth)
+):
+    """Create a new event (protected)"""
     try:
         return await EventService.create_event(event)
     except Exception as e:
@@ -19,8 +23,10 @@ async def create_event(event: EventCreate):
 
 
 @router.get("/", response_model=List[EventResponse])
-async def get_all_events():
-    """Get all events"""
+async def get_all_events(
+    auth: AuthenticatedUser = Depends(clerk_auth)
+):
+    """Get all events (protected)"""
     try:
         return await EventService.get_all_events()
     except Exception as e:
@@ -51,8 +57,11 @@ async def get_active_event():
 
 
 @router.get("/{event_id}", response_model=EventResponse)
-async def get_event(event_id: str):
-    """Get event by ID"""
+async def get_event(
+    event_id: str,
+    auth: AuthenticatedUser = Depends(clerk_auth)
+):
+    """Get event by ID (protected)"""
     try:
         event = await EventService.get_event(event_id)
         if not event:
@@ -71,8 +80,12 @@ async def get_event(event_id: str):
 
 
 @router.patch("/{event_id}", response_model=EventResponse)
-async def update_event(event_id: str, event: EventUpdate):
-    """Update event"""
+async def update_event(
+    event_id: str,
+    event: EventUpdate,
+    auth: AuthenticatedUser = Depends(clerk_auth)
+):
+    """Update event (protected)"""
     try:
         updated_event = await EventService.update_event(event_id, event)
         if not updated_event:
@@ -91,8 +104,11 @@ async def update_event(event_id: str, event: EventUpdate):
 
 
 @router.post("/{event_id}/toggle", response_model=EventResponse)
-async def toggle_event_status(event_id: str):
-    """Toggle event active status"""
+async def toggle_event_status(
+    event_id: str,
+    auth: AuthenticatedUser = Depends(clerk_auth)
+):
+    """Toggle event active status (protected)"""
     try:
         event = await EventService.toggle_event_status(event_id)
         if not event:
@@ -111,8 +127,12 @@ async def toggle_event_status(event_id: str):
 
 
 @router.post("/{event_id}/clone", response_model=EventResponse)
-async def clone_event(event_id: str, new_name: str):
-    """Clone an existing event"""
+async def clone_event(
+    event_id: str,
+    new_name: str,
+    auth: AuthenticatedUser = Depends(clerk_auth)
+):
+    """Clone an existing event (protected)"""
     try:
         event = await EventService.clone_event(event_id, new_name)
         if not event:
@@ -131,8 +151,11 @@ async def clone_event(event_id: str, new_name: str):
 
 
 @router.delete("/{event_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_event(event_id: str):
-    """Delete event"""
+async def delete_event(
+    event_id: str,
+    auth: AuthenticatedUser = Depends(clerk_auth)
+):
+    """Delete event (protected)"""
     try:
         await EventService.delete_event(event_id)
     except Exception as e:
@@ -143,8 +166,11 @@ async def delete_event(event_id: str):
 
 
 @router.get("/{event_id}/registrations")
-async def get_event_registrations(event_id: str):
-    """Get all registrations for an event"""
+async def get_event_registrations(
+    event_id: str,
+    auth: AuthenticatedUser = Depends(clerk_auth)
+):
+    """Get all registrations for an event (protected)"""
     try:
         return await EventService.get_event_registrations(event_id)
     except Exception as e:

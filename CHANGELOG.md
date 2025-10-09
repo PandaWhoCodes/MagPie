@@ -5,6 +5,75 @@ All notable changes to the MagPie Event Registration Platform will be documented
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+## [1.5.0] - 2025-10-10
+
+### Added
+- **Clerk authentication for dashboard (frontend)**
+  - `frontend/package.json` - Added `@clerk/clerk-react` v5.51.0 dependency
+  - `frontend/.env.example` - Added `VITE_CLERK_PUBLISHABLE_KEY` environment variable
+  - `frontend/src/main.jsx:3,9-13,17` - Wrapped app with `<ClerkProvider>` for authentication
+  - `frontend/src/App.jsx:5,31,34-36` - Added Clerk imports and auth token getter setup
+  - `frontend/src/App.jsx:51-98` - Added protected dashboard route and sign-in/sign-up routes
+  - `frontend/src/pages/Dashboard.jsx:3,27,131,147` - Added `UserButton` and user info display
+  - `frontend/src/services/api.js:12-39` - Added Axios interceptor to attach auth tokens to API requests
+  - Users managed via Clerk dashboard - no code changes needed for user management
+  - Free tier includes 10,000 monthly active users
+
+- **Clerk authentication for backend API**
+  - `backend/requirements.txt` - Added `fastapi-clerk-auth==0.0.7`, `cryptography==46.0.2`, `PyJWT==2.10.1`
+  - `backend/.env` - Added `CLERK_SECRET_KEY` environment variable
+  - `backend/.env.example` - Added `CLERK_SECRET_KEY` placeholder
+  - `backend/app/core/auth.py` - NEW FILE: Clerk authentication configuration with JWT validation
+  - All dashboard API routes now protected with `Depends(clerk_auth)`:
+    - `backend/app/api/events.py` - Protected all routes except `/active` (public for registration form)
+    - `backend/app/api/registrations.py` - Protected GET registration route (POST remains public)
+    - `backend/app/api/qr_codes.py` - Protected all routes
+    - `backend/app/api/event_fields.py` - Protected write routes (GET remains public for registration form)
+    - `backend/app/api/branding.py` - Protected PUT route (GET remains public)
+    - `backend/app/api/whatsapp.py` - Protected bulk message sending
+    - `backend/app/api/message_templates.py` - Protected all routes
+  - Returns 403 Forbidden for unauthenticated requests to protected routes
+  - Public routes remain accessible: event registration form, auto-fill, branding theme
+
+### Changed
+- **Dashboard route renamed from `/dashboard_under` to `/dashboard`**
+  - `frontend/src/App.jsx:70-81` - Updated route path to `/dashboard` with authentication protection
+  - `CLAUDE.md:66-67` - Updated access points documentation
+  - `CLAUDE.md:26` - Added Clerk to frontend technology stack
+  - `CLAUDE.md:173-175` - Added frontend environment variables section
+  - `CLAUDE.md:155-161` - Removed "Don't add authentication" from DON'T list
+  - `CLAUDE.md:187-207` - Added Authentication Setup section with Clerk instructions
+  - `README.md:8,73,163,207-214,225,236` - Updated version, dashboard URL, features, security, env vars
+  - `docs/SETUP.md` - Added complete Clerk authentication setup section
+    - Step-by-step Clerk account creation instructions
+    - API key configuration for frontend and backend
+    - User management and redirect URL setup
+    - Authentication troubleshooting section
+    - Updated environment variable examples
+    - Updated access URLs and next steps
+  - Dashboard now requires authentication to access
+  - Unauthenticated users automatically redirected to sign-in page
+
+### Security
+- **Backend API now secured with JWT-based authentication**
+  - All dashboard administrative endpoints require valid Clerk session token
+  - Public registration form endpoints remain accessible without authentication
+  - Token validation performed using Clerk JWKS endpoint with SSL certificate support
+  - Automatic 401 Unauthorized for missing or invalid tokens on protected routes
+  - Custom `AuthenticatedUser` class provides decoded JWT claims to route handlers
+
+### Fixed
+- **Test suite updated for authentication**
+  - `backend/tests/conftest.py:108-122` - Added `mock_auth_user` fixture with mock JWT claims
+  - `backend/tests/conftest.py:126-135` - Updated `client` fixture with `app.dependency_overrides`
+  - `backend/tests/conftest.py:139-148` - Updated `async_client` fixture with auth bypass
+  - Uses FastAPI's dependency override pattern to bypass Clerk authentication in tests
+  - Mock user simulates valid Clerk authentication with realistic JWT claims
+  - All 71 tests passing with 74% code coverage
+  - No changes needed to individual test files - auth handled in conftest.py
+
 ## [1.4.0] - 2025-10-09
 
 ### Changed

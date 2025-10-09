@@ -9,6 +9,35 @@ const api = axios.create({
   },
 });
 
+// Store the get token function - will be set by the app
+let getTokenFunction = null;
+
+// Function to set the token getter (called from App component)
+export const setAuthTokenGetter = (getToken) => {
+  getTokenFunction = getToken;
+};
+
+// Axios request interceptor to add auth token to requests
+api.interceptors.request.use(
+  async (config) => {
+    // Only add token if getTokenFunction is set (user is authenticated)
+    if (getTokenFunction) {
+      try {
+        const token = await getTokenFunction();
+        if (token) {
+          config.headers.Authorization = `Bearer ${token}`;
+        }
+      } catch (error) {
+        console.error('Error getting auth token:', error);
+      }
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
 // Events API
 export const eventsApi = {
   getAll: () => api.get('/events'),

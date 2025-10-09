@@ -23,6 +23,7 @@ Both servers are running and operational.
 ### Frontend
 - **Framework**: React 18
 - **Build Tool**: Vite
+- **Authentication**: Clerk (@clerk/clerk-react)
 - **Styling**: TailwindCSS
 - **Animations**: Framer Motion (public pages only), Motion (theme-specific animations)
 - **State Management**: React Query (@tanstack/react-query)
@@ -63,7 +64,8 @@ magpie/
 
 ## Access Points
 - **Public Registration**: http://localhost:3000/ (theme-based UI - Default or Midnight Black)
-- **Dashboard**: http://localhost:3000/dashboard_under (simple UI, no auth)
+- **Dashboard**: http://localhost:3000/dashboard (protected with Clerk authentication)
+- **Sign In**: http://localhost:3000/sign-in (Clerk authentication page)
 - **Thank You Page**: http://localhost:3000/thank-you (after registration)
 - **Check-in**: `/check-in/:eventId/:qrId` (QR code redirect)
 - **Backend API**: http://localhost:8000
@@ -150,7 +152,6 @@ magpie/
 - **Update tests when modifying existing functionality** - Keep test coverage accurate
 
 ### DON'T ❌
-- Add authentication (not required per spec)
 - Add animations to dashboard pages
 - Use an ORM (direct SQL with Turso)
 - Allow multiple active events simultaneously
@@ -165,9 +166,14 @@ magpie/
 - `TURSO_DATABASE_URL` - Turso database URL
 - `TURSO_AUTH_TOKEN` - Turso authentication token
 - `FRONTEND_URL` - Frontend URL for CORS
+- `CLERK_SECRET_KEY` - Clerk secret key for backend API authentication
 - `TWILIO_ACCOUNT_SID` - Twilio account identifier (for WhatsApp)
 - `TWILIO_AUTH_TOKEN` - Twilio authentication token (for WhatsApp)
 - `TWILIO_WHATSAPP_NUMBER` - Twilio WhatsApp number (default: whatsapp:+14155238886)
+
+### Frontend (.env)
+- `VITE_API_URL` - Backend API URL (default: http://localhost:8000/api)
+- `VITE_CLERK_PUBLISHABLE_KEY` - Clerk publishable key for authentication
 
 ## Common Development Tasks
 - **Add field to event**: Update EventForm.jsx, add to form submission
@@ -178,6 +184,53 @@ magpie/
 - **Send WhatsApp messages**: Use "Send WhatsApp" button in registrations list (dashboard)
 - **Change theme**: Dashboard → Branding Settings → Select theme → Save Changes
 - **Add new theme**: Create theme config in themes.js, add CSS in styles/themes/, update HomePage conditional rendering
+
+## Authentication Setup (Clerk)
+
+The dashboard is protected with Clerk authentication (both frontend and backend). To set up:
+
+### Quick Setup:
+1. Sign up at https://clerk.com
+2. Create a new application
+3. Copy your **Publishable Key** and **Secret Key** from the API Keys page
+4. Add to `frontend/.env`:
+   ```
+   VITE_CLERK_PUBLISHABLE_KEY=pk_test_...
+   ```
+5. Add to `backend/.env`:
+   ```
+   CLERK_SECRET_KEY=sk_test_...
+   ```
+6. Add users via Clerk dashboard at https://dashboard.clerk.com
+7. Users can sign in at http://localhost:3000/sign-in
+
+### Key Features:
+- **User Management**: Add/remove users via Clerk dashboard (no code needed)
+- **Pre-built UI**: Beautiful sign-in/sign-up forms out of the box
+- **Free Tier**: 10,000 monthly active users included
+- **UserButton**: Profile dropdown with sign-out in dashboard header
+- **Protected Routes**: Dashboard automatically redirects unauthenticated users
+- **Backend Security**: All dashboard API endpoints require valid JWT token
+- **Public Routes**: Registration form endpoints remain accessible without auth
+
+### Protected vs Public API Routes:
+
+**Protected (require authentication):**
+- All event management endpoints (create, update, delete, toggle, clone)
+- View all events and registrations
+- QR code management
+- Event field management (write operations)
+- Branding settings updates
+- WhatsApp bulk messaging
+- Message template management
+
+**Public (no authentication required):**
+- `GET /api/events/active` - For registration form
+- `POST /api/registrations/` - Submit registration
+- `GET /api/registrations/profile/autofill` - Auto-fill user data
+- `POST /api/registrations/check-in/{event_id}` - QR code check-in
+- `GET /api/branding/` - Get theme settings
+- `GET /api/events/{event_id}/fields/` - Get event fields for registration form
 
 ## WhatsApp Integration Setup
 See [WHATSAPP_SETUP.md](docs/WHATSAPP_SETUP.md) for complete setup instructions.

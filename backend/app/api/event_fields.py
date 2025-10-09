@@ -1,7 +1,8 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
 from typing import List
 from app.schemas.event import EventFieldCreate, EventFieldResponse
 from app.services.event_service import EventService
+from app.core.auth import clerk_auth, AuthenticatedUser
 
 router = APIRouter(prefix="/events/{event_id}/fields", tags=["event-fields"])
 
@@ -27,8 +28,12 @@ async def get_event_fields(event_id: str):
 
 
 @router.put("/", response_model=List[EventFieldResponse])
-async def update_event_fields(event_id: str, fields: List[EventFieldCreate]):
-    """Replace all fields for an event"""
+async def update_event_fields(
+    event_id: str,
+    fields: List[EventFieldCreate],
+    auth: AuthenticatedUser = Depends(clerk_auth)
+):
+    """Replace all fields for an event (protected)"""
     try:
         updated_fields = await EventService.update_event_fields(event_id, fields)
         if updated_fields is None:
@@ -47,8 +52,12 @@ async def update_event_fields(event_id: str, fields: List[EventFieldCreate]):
 
 
 @router.post("/", response_model=EventFieldResponse, status_code=status.HTTP_201_CREATED)
-async def add_event_field(event_id: str, field: EventFieldCreate):
-    """Add a new field to an event"""
+async def add_event_field(
+    event_id: str,
+    field: EventFieldCreate,
+    auth: AuthenticatedUser = Depends(clerk_auth)
+):
+    """Add a new field to an event (protected)"""
     try:
         new_field = await EventService.add_event_field(event_id, field)
         if not new_field:
@@ -67,8 +76,12 @@ async def add_event_field(event_id: str, field: EventFieldCreate):
 
 
 @router.delete("/{field_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_event_field(event_id: str, field_id: str):
-    """Delete a field from an event"""
+async def delete_event_field(
+    event_id: str,
+    field_id: str,
+    auth: AuthenticatedUser = Depends(clerk_auth)
+):
+    """Delete a field from an event (protected)"""
     try:
         success = await EventService.delete_event_field(event_id, field_id)
         if not success:

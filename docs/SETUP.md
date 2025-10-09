@@ -6,6 +6,7 @@ Complete installation and configuration guide for the MagPie Event Registration 
 - [Prerequisites](#prerequisites)
 - [Backend Setup](#backend-setup)
 - [Frontend Setup](#frontend-setup)
+- [Authentication Setup (Clerk)](#authentication-setup-clerk)
 - [WhatsApp Integration (Optional)](#whatsapp-integration-optional)
 - [Running the Application](#running-the-application)
 - [Troubleshooting](#troubleshooting)
@@ -69,6 +70,9 @@ TURSO_AUTH_TOKEN=your_turso_auth_token_here
 # CORS Configuration
 FRONTEND_URL=http://localhost:3000
 
+# Authentication (Required - see Authentication Setup section)
+CLERK_SECRET_KEY=sk_test_your_clerk_secret_key_here
+
 # WhatsApp Integration (Optional - see WHATSAPP_SETUP.md)
 TWILIO_ACCOUNT_SID=your_account_sid_here
 TWILIO_AUTH_TOKEN=your_auth_token_here
@@ -110,10 +114,14 @@ Create a `.env` file in the `frontend` directory:
 cp .env.example .env
 ```
 
-Edit `.env` (defaults work for local development):
+Edit `.env` and add your configuration:
 
 ```env
+# Backend API URL
 VITE_API_URL=http://localhost:8000
+
+# Clerk Authentication (Required - see Authentication Setup section)
+VITE_CLERK_PUBLISHABLE_KEY=pk_test_your_clerk_publishable_key_here
 ```
 
 ### 4. Verify Installation
@@ -126,6 +134,83 @@ yarn dev
 ```
 
 Frontend should start on `http://localhost:3000`
+
+---
+
+## Authentication Setup (Clerk)
+
+The dashboard is protected with Clerk authentication. You'll need a Clerk account to access admin features.
+
+### 1. Create Clerk Account
+
+1. **Sign up at Clerk**
+   - Visit: https://clerk.com
+   - Click "Get Started for Free"
+   - Sign up with GitHub, Google, or email
+
+2. **Create a New Application**
+   - Click "Create Application"
+   - Name it (e.g., "MagPie Events")
+   - Select authentication methods (Email, Google, etc.)
+   - Click "Create Application"
+
+### 2. Get API Keys
+
+1. **Copy your API keys** from the Clerk dashboard:
+   - **Publishable Key**: `pk_test_...` (starts with `pk_`)
+   - **Secret Key**: `sk_test_...` (starts with `sk_`)
+
+2. **Add to Backend `.env`**:
+   ```env
+   CLERK_SECRET_KEY=sk_test_your_actual_key_here
+   ```
+
+3. **Add to Frontend `.env`**:
+   ```env
+   VITE_CLERK_PUBLISHABLE_KEY=pk_test_your_actual_key_here
+   ```
+
+### 3. Configure Clerk Application
+
+1. **Set Redirect URLs** (in Clerk Dashboard):
+   - Development: `http://localhost:3000`
+   - Add `/sign-in`, `/sign-up`, `/dashboard` paths if needed
+
+2. **Add Test Users** (Optional):
+   - Go to "Users" in Clerk dashboard
+   - Click "Create User"
+   - Add email and password for testing
+
+### 4. Verify Authentication
+
+1. **Restart both servers** after adding keys
+2. **Visit**: http://localhost:3000/dashboard
+3. **You should be redirected to sign-in page**
+4. **Sign up or sign in** with your test user
+
+### Key Features
+
+- ✅ **Free Tier**: 10,000 monthly active users
+- ✅ **Pre-built UI**: Beautiful sign-in/sign-up forms
+- ✅ **User Management**: Add/remove users via dashboard (no code)
+- ✅ **Protected Dashboard**: Only authenticated users can access
+- ✅ **Public Registration**: Event registration forms remain public
+
+### What's Protected
+
+**Dashboard Features (Require Authentication)**:
+- Create/edit/delete events
+- View all registrations
+- Generate QR codes
+- Send WhatsApp messages
+- Export CSV data
+- Configure branding/themes
+
+**Public Features (No Authentication)**:
+- Event registration form
+- Thank you page
+- QR code check-in
+- Auto-fill functionality
 
 ---
 
@@ -176,7 +261,8 @@ npm run dev
 ### Access the Application
 
 - **Public Registration**: http://localhost:3000
-- **Admin Dashboard**: http://localhost:3000/dashboard_under
+- **Admin Dashboard**: http://localhost:3000/dashboard (requires Clerk sign-in)
+- **Sign In/Up**: http://localhost:3000/sign-in
 - **Backend API**: http://localhost:8000
 - **API Documentation**: http://localhost:8000/docs
 
@@ -189,6 +275,11 @@ npm run dev
 **Error: "Turso credentials not found"**
 - Check `.env` file exists in `backend/` directory
 - Verify `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` are set
+
+**Error: "CLERK_SECRET_KEY not found"**
+- Check `.env` file has `CLERK_SECRET_KEY=sk_test_...`
+- Get your secret key from https://dashboard.clerk.com
+- Restart backend server after adding the key
 
 **Error: "Module not found"**
 ```bash
@@ -229,6 +320,23 @@ rm -rf dist
 npm run build
 ```
 
+### Authentication Issues
+
+**Error: "Clerk publishable key not found"**
+- Check `frontend/.env` has `VITE_CLERK_PUBLISHABLE_KEY=pk_test_...`
+- Get your publishable key from https://dashboard.clerk.com
+- Restart frontend server after adding the key
+
+**Redirected to sign-in but can't access**
+- Create a user in Clerk dashboard
+- Or sign up with email on the sign-in page
+- Make sure Clerk application is properly configured
+
+**Dashboard returns 403 Forbidden**
+- Check both frontend and backend have correct Clerk keys
+- Verify you're signed in (check for user button in top-right)
+- Try signing out and signing in again
+
 ### WhatsApp Issues
 
 **Error: "Twilio credentials not found"**
@@ -247,20 +355,29 @@ npm run build
 
 After setup is complete:
 
-1. **Create Your First Event**
-   - Go to http://localhost:3000/dashboard_under
-   - Click "Create Event"
+1. **Sign In to Dashboard**
+   - Go to http://localhost:3000/dashboard
+   - Sign in with your Clerk account
+   - Or create a new account on the sign-in page
+
+2. **Create Your First Event**
+   - Click "Create Event" in the dashboard
+   - Add event details
    - Add custom registration fields
+   - Save and activate the event
 
-2. **Test Registration**
-   - Go to http://localhost:3000
+3. **Test Registration**
+   - Go to http://localhost:3000 (public page)
    - Complete the registration form
+   - You'll see the thank you page after successful registration
 
-3. **Explore Features**
+4. **Explore Dashboard Features**
    - View registrations
    - Export to CSV
    - Generate QR codes
    - Send WhatsApp messages (if configured)
+   - Manage message templates
+   - Configure branding and themes
 
 ---
 

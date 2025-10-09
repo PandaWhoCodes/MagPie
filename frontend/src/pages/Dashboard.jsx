@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { UserButton, useUser } from '@clerk/clerk-react';
 import toast from 'react-hot-toast';
 import { eventsApi, qrCodesApi } from '../services/api';
 import {
@@ -23,6 +24,7 @@ import Footer from '../components/Footer';
 
 export default function Dashboard() {
   const queryClient = useQueryClient();
+  const { user } = useUser();
   const [showEventForm, setShowEventForm] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -126,20 +128,24 @@ export default function Dashboard() {
               </h1>
               <p className="text-gray-600">
                 Manage your MagPie events
+                {user && <span className="ml-2">• Logged in as {user.firstName || user.emailAddresses[0].emailAddress}</span>}
               </p>
             </div>
-            {activeTab === 'events' && (
-              <button
-                onClick={() => {
-                  setEditingEvent(null);
-                  setShowEventForm(true);
-                }}
-                className="btn-primary flex items-center space-x-2"
-              >
-                <Plus className="w-5 h-5" />
-                <span>Create Event</span>
-              </button>
-            )}
+            <div className="flex items-center space-x-4">
+              {activeTab === 'events' && (
+                <button
+                  onClick={() => {
+                    setEditingEvent(null);
+                    setShowEventForm(true);
+                  }}
+                  className="btn-primary flex items-center space-x-2"
+                >
+                  <Plus className="w-5 h-5" />
+                  <span>Create Event</span>
+                </button>
+              )}
+              <UserButton afterSignOutUrl="/" />
+            </div>
           </div>
 
           {/* Tabs */}

@@ -5,7 +5,7 @@
 A professional, production-ready event registration system with dynamic forms, QR code check-ins, and WhatsApp notifications - now with a touch of avian elegance!
 
 [![Demo](https://img.shields.io/badge/Demo-Watch%20Video-blue)](https://drive.google.com/file/d/1LoGf9au5TWb-CxOKrGy-izX913Js2pK4/view?usp=sharing)
-[![Version](https://img.shields.io/badge/version-1.2.0-green.svg)](https://github.com/PandaWhoCodes/magpie/releases)
+[![Version](https://img.shields.io/badge/version-1.5.0-green.svg)](https://github.com/PandaWhoCodes/magpie/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
 ---
@@ -26,10 +26,11 @@ Just like the magpie bird known for its intelligence and ability to recognize pa
 - 🎯 **Event Management** - Create, edit, clone, and manage events
 - 📝 **Dynamic Registration Forms** - Add custom fields per event
 - 🔄 **Smart Auto-fill System** - MagPie remembers user data across events
-- 📱 **WhatsApp Notifications** - Send bulk messages to registrants ✨ NEW!
+- 📱 **WhatsApp Notifications** - Send bulk messages to registrants with templates and filtering
 - 🔗 **QR Code Check-ins** - Generate and scan QR codes for attendance
 - 📊 **Analytics & Export** - View registrations and export to CSV
 - 🎨 **Modern UI Themes** - Choose between colorful Default or sleek Midnight Black
+- 🔒 **Secure Dashboard** - Clerk authentication protects admin features
 - ⚡ **Fast & Reliable** - Built with FastAPI and React
 
 ---
@@ -70,7 +71,7 @@ npm run dev
 
 **Access MagPie**:
 - 🏠 Frontend: http://localhost:3000
-- 📊 Dashboard: http://localhost:3000/dashboard_under
+- 📊 Dashboard: http://localhost:3000/dashboard
 - 🔧 API: http://localhost:8000
 - 📖 API Docs: http://localhost:8000/docs
 
@@ -159,12 +160,14 @@ Generate QR code → Print/display → Scan at event
 
 ## 📊 Dashboard Features
 
-**Access**: `/dashboard_under` (no authentication required)
+**Access**: `/dashboard` (Clerk authentication required)
 
+- 🔐 **Secure Access** - Protected with Clerk authentication
 - ✏️ **Create/Edit Events** - Manage event details and fields
 - 🔄 **Clone Events** - Duplicate with one click
 - 👥 **View Registrations** - Search, filter, check-in status
-- 📱 **Send WhatsApp** - Bulk messaging to all registrants
+- 📱 **Send WhatsApp** - Bulk messaging with templates and field-based filtering
+- 💬 **Message Templates** - Create reusable WhatsApp message templates with variables
 - 📥 **Export CSV** - Download registration data
 - 🔗 **Generate QR Codes** - For check-ins with custom messages
 - ⚡ **Toggle Active Status** - Activate/deactivate events
@@ -201,13 +204,14 @@ MagPie can nest anywhere:
 
 ## 🔐 Security
 
+- ✅ Clerk authentication for dashboard access
+- ✅ JWT-based API authentication
 - ✅ Input validation (Pydantic)
 - ✅ SQL injection prevention
 - ✅ XSS protection
 - ✅ CORS configuration
 - ✅ Environment variables for secrets
-
-**Note**: No authentication by design. For production, add authentication middleware to protect your nest.
+- ✅ Protected admin endpoints with public registration routes
 
 ---
 
@@ -218,6 +222,7 @@ MagPie can nest anywhere:
 TURSO_DATABASE_URL=your_database_url
 TURSO_AUTH_TOKEN=your_auth_token
 FRONTEND_URL=http://localhost:3000
+CLERK_SECRET_KEY=sk_test_...
 
 # Optional: WhatsApp
 TWILIO_ACCOUNT_SID=your_account_sid
@@ -228,6 +233,7 @@ TWILIO_WHATSAPP_NUMBER=whatsapp:+14155238886
 ### Frontend (.env)
 ```env
 VITE_API_URL=http://localhost:8000
+VITE_CLERK_PUBLISHABLE_KEY=pk_test_...
 ```
 
 ---

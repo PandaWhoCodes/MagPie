@@ -2,19 +2,23 @@
 WhatsApp messaging API endpoints
 """
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Depends
 from typing import Dict, Any, Optional
 from app.models.message_template import WhatsAppBulkMessageRequest
 from app.services.whatsapp_service import WhatsAppService
 from app.services.message_template_service import message_template_service
+from app.core.auth import clerk_auth, AuthenticatedUser
 
 router = APIRouter(prefix="/whatsapp", tags=["whatsapp"])
 
 
 @router.post("/send-bulk/", status_code=status.HTTP_200_OK)
-async def send_bulk_whatsapp_messages(request: WhatsAppBulkMessageRequest):
+async def send_bulk_whatsapp_messages(
+    request: WhatsAppBulkMessageRequest,
+    auth: AuthenticatedUser = Depends(clerk_auth)
+):
     """
-    Send WhatsApp messages to all or subset of registrants of an event
+    Send WhatsApp messages to all or subset of registrants of an event (protected)
 
     - **event_id**: Event ID to send messages for
     - **message**: Direct message text (optional if template_id provided)

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status, Query
+from fastapi import APIRouter, HTTPException, status, Query, Depends
 from typing import Optional
 from app.schemas.registration import (
     RegistrationCreate,
@@ -7,6 +7,7 @@ from app.schemas.registration import (
     CheckInRequest,
 )
 from app.services.registration_service import RegistrationService
+from app.core.auth import clerk_auth, AuthenticatedUser
 
 router = APIRouter(prefix="/registrations", tags=["registrations"])
 
@@ -36,8 +37,11 @@ async def create_registration(registration: RegistrationCreate):
 
 
 @router.get("/{registration_id}", response_model=RegistrationResponse)
-async def get_registration(registration_id: str):
-    """Get registration by ID"""
+async def get_registration(
+    registration_id: str,
+    auth: AuthenticatedUser = Depends(clerk_auth)
+):
+    """Get registration by ID (protected)"""
     try:
         registration = await RegistrationService.get_registration(registration_id)
         if not registration:

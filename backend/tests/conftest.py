@@ -7,6 +7,7 @@ from httpx import AsyncClient
 from app.main import app
 from app.core.database import db
 from app.core.schema_manager import SchemaManager
+from app.core.auth import clerk_auth, AuthenticatedUser
 
 # Set test environment
 os.environ["TESTING"] = "1"
@@ -104,16 +105,47 @@ async def test_db(test_db_connection, monkeypatch):
 
 
 @pytest.fixture
-def client(test_db):
-    """Provide test client"""
-    return TestClient(app)
+def mock_auth_user():
+    """Create a mock authenticated user for testing"""
+    class MockCredentials:
+        credentials = "mock_token"
+        scheme = "Bearer"
+
+    mock_decoded = {
+        'sub': 'test_user_12345',
+        'sid': 'test_session_67890',
+        'email': 'test@example.com',
+        'iss': 'https://test-clerk.clerk.accounts.dev',
+        'exp': 9999999999  # Far future expiry
+    }
+
+    return AuthenticatedUser(MockCredentials(), mock_decoded)
 
 
 @pytest.fixture
-async def async_client(test_db):
-    """Provide async test client"""
+def client(test_db, mock_auth_user):
+    """Provide test client with auth bypass"""
+    # Override the clerk_auth dependency to return mock user
+    app.dependency_overrides[clerk_auth] = lambda: mock_auth_user
+
+    client = TestClient(app)
+    yield client
+
+    # Clear overrides after test
+    app.dependency_overrides.clear()
+
+
+@pytest.fixture
+async def async_client(test_db, mock_auth_user):
+    """Provide async test client with auth bypass"""
+    # Override the clerk_auth dependency to return mock user
+    app.dependency_overrides[clerk_auth] = lambda: mock_auth_user
+
     async with AsyncClient(app=app, base_url="http://test") as ac:
         yield ac
+
+    # Clear overrides after test
+    app.dependency_overrides.clear()
 
 
 @pytest.fixture

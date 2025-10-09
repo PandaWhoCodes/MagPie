@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from app.core.config import get_settings
@@ -35,6 +35,16 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# Debug middleware to log auth headers
+@app.middleware("http")
+async def log_auth_middleware(request: Request, call_next):
+    if request.url.path.startswith("/api/events") and request.method != "OPTIONS":
+        auth_header = request.headers.get("Authorization", "")
+        print(f"DEBUG: Path: {request.url.path}, Auth header present: {bool(auth_header)}, Token prefix: {auth_header[:30] if auth_header else 'None'}")
+    response = await call_next(request)
+    return response
 
 # Include routers
 app.include_router(events.router, prefix="/api")
