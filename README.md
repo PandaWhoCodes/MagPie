@@ -27,6 +27,7 @@ Just like the magpie bird known for its intelligence and ability to recognize pa
 - 📝 **Dynamic Registration Forms** - Add custom fields per event
 - 🔄 **Smart Auto-fill System** - MagPie remembers user data across events
 - 📱 **WhatsApp Notifications** - Send bulk messages to registrants with templates and filtering
+- 📧 **Email Notifications** - Beautiful HTML emails with Resend (100 emails/day free tier)
 - 🔗 **QR Code Check-ins** - Generate and scan QR codes for attendance
 - 📊 **Analytics & Export** - View registrations and export to CSV
 - 🎨 **Modern UI Themes** - Choose between colorful Default or sleek Midnight Black

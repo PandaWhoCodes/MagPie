@@ -56,9 +56,12 @@ Render provides automatic deployments with a simple `render.yaml` configuration.
    - `TURSO_DATABASE_URL`: Your Turso database URL
    - `TURSO_AUTH_TOKEN`: Your Turso auth token
    - `FRONTEND_URL`: Your frontend URL (will be provided after frontend deploys)
-   - `TWILIO_ACCOUNT_SID`: (Optional) Twilio account SID
-   - `TWILIO_AUTH_TOKEN`: (Optional) Twilio auth token
+   - `CLERK_SECRET_KEY`: Your Clerk secret key for authentication
+   - `TWILIO_ACCOUNT_SID`: (Optional) Twilio account SID for WhatsApp
+   - `TWILIO_AUTH_TOKEN`: (Optional) Twilio auth token for WhatsApp
    - `TWILIO_WHATSAPP_NUMBER`: (Optional) Twilio WhatsApp number
+   - `RESEND_API_KEY`: (Optional) Resend API key for email notifications (get from https://resend.com/api-keys)
+   - `RESEND_FROM_EMAIL`: (Optional) Email sender address (default: onboarding@resend.dev)
 
 6. **Click** "Apply"
 7. **Wait** for deployment (5-10 minutes)
@@ -195,6 +198,7 @@ server {
 TURSO_DATABASE_URL=libsql://your-database.turso.io
 TURSO_AUTH_TOKEN=your_auth_token
 FRONTEND_URL=https://your-frontend-domain.com
+CLERK_SECRET_KEY=sk_test_...
 ```
 
 **Optional** (WhatsApp):
@@ -202,6 +206,12 @@ FRONTEND_URL=https://your-frontend-domain.com
 TWILIO_ACCOUNT_SID=AC...
 TWILIO_AUTH_TOKEN=your_auth_token
 TWILIO_WHATSAPP_NUMBER=whatsapp:+14155238886
+```
+
+**Optional** (Email):
+```env
+RESEND_API_KEY=re_...
+RESEND_FROM_EMAIL=onboarding@resend.dev
 ```
 
 ### Frontend
