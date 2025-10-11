@@ -4,7 +4,7 @@
 
 A professional, production-ready event registration system with dynamic forms, QR code check-ins, and WhatsApp notifications - now with a touch of avian elegance!
 
-[![Demo](https://img.shields.io/badge/Demo-Watch%20Video-blue)](https://drive.google.com/file/d/1LoGf9au5TWb-CxOKrGy-izX913Js2pK4/view?usp=sharing)
+[![Demo](https://img.shields.io/badge/Demo-Watch%20Video-blue)](https://drive.google.com/file/d/1W42gVCeKxXibLobceXQVuoBM6rmvLJnA/view?usp=sharing)
 [![Version](https://img.shields.io/badge/version-1.5.0-green.svg)](https://github.com/PandaWhoCodes/magpie/releases)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
