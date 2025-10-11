@@ -211,14 +211,114 @@ TWILIO_WHATSAPP_NUMBER=whatsapp:+14155238886
 **Optional** (Email):
 ```env
 RESEND_API_KEY=re_...
-RESEND_FROM_EMAIL=onboarding@resend.dev
+RESEND_FROM_EMAIL=onboarding@resend.dev  # For testing only
+# RESEND_FROM_EMAIL=noreply@yourdomain.com  # For production with custom domain
 ```
 
 ### Frontend
 
 ```env
 VITE_API_URL=https://your-backend-domain.com
+VITE_CLERK_PUBLISHABLE_KEY=pk_live_...  # Your production Clerk key
 ```
+
+---
+
+## Email Service Setup (Resend)
+
+### For Testing (Free)
+
+1. **Sign up** at https://resend.com/signup
+2. **Get API key** from https://resend.com/api-keys
+3. **Use test sender**: `onboarding@resend.dev`
+   ```env
+   RESEND_API_KEY=re_xxxxxxxxxxxxx
+   RESEND_FROM_EMAIL=onboarding@resend.dev
+   ```
+4. **Test limits**: 100 emails/day, 3,000/month
+
+### For Production (Custom Domain)
+
+Follow: https://resend.com/docs/knowledge-base/introduction
+
+#### Step 1: Add Your Domain
+
+1. **Go to** https://resend.com/domains
+2. **Click** "Add Domain"
+3. **Enter** your domain (e.g., `yourdomain.com`)
+
+#### Step 2: Verify DNS Records
+
+Add these DNS records to your domain:
+
+**SPF Record** (TXT):
+```
+Name: @
+Value: v=spf1 include:_spf.resend.com ~all
+```
+
+**DKIM Record** (TXT):
+```
+Name: resend._domainkey
+Value: [Provided by Resend - copy from dashboard]
+```
+
+**DMARC Record** (TXT) - Optional but recommended:
+```
+Name: _dmarc
+Value: v=DMARC1; p=none; rua=mailto:dmarc@yourdomain.com
+```
+
+**MX Record** - Optional (only if receiving emails):
+```
+Priority: 10
+Value: feedback-smtp.us-east-1.amazonses.com
+```
+
+#### Step 3: Verify Domain
+
+1. **Wait** 24-48 hours for DNS propagation
+2. **Click** "Verify" in Resend dashboard
+3. **Check** status - should show "Verified"
+
+#### Step 4: Update Environment Variables
+
+```env
+RESEND_API_KEY=re_xxxxxxxxxxxxx
+RESEND_FROM_EMAIL=noreply@yourdomain.com
+# Or use any email like: hello@yourdomain.com, support@yourdomain.com
+```
+
+#### Step 5: Test Production Setup
+
+Send a test email from your dashboard to verify the custom domain works.
+
+### Production Limits
+
+**Free tier**:
+- 100 emails/day
+- 3,000 emails/month
+- No credit card required
+
+**Paid plans** (if needed):
+- Pro: $20/month - 50,000 emails
+- Scale: Custom pricing - Unlimited
+
+### Troubleshooting
+
+**Domain not verifying?**
+- Check DNS records with: `dig TXT resend._domainkey.yourdomain.com`
+- DNS can take 24-48 hours to propagate
+- Ensure records are added to root domain, not subdomain
+
+**Emails going to spam?**
+- Add DMARC record
+- Warm up domain by sending gradually
+- Ensure SPF and DKIM records are correct
+
+**Rate limits?**
+- Free tier: 2 requests/second
+- Upgrade plan if sending more frequently
 
 ---
 
