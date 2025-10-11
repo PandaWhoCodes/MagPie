@@ -33,9 +33,7 @@ api.interceptors.request.use(
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  }
+  (error) => Promise.reject(error)
 );
 
 // Events API
@@ -93,6 +91,12 @@ export const messageTemplatesApi = {
   create: (data) => api.post('/message-templates/', data),
   update: (id, data) => api.put(`/message-templates/${id}`, data),
   delete: (id) => api.delete(`/message-templates/${id}`),
+};
+
+// Email API
+export const emailApi = {
+  sendBulkEmails: (data) => api.post('/email/send-bulk/', data),
+  getFieldValues: (eventId, fieldName) => api.get(`/email/field-values/${eventId}/${encodeURIComponent(fieldName)}`),
 };
 
 export default api;

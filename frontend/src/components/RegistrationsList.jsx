@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { eventsApi } from '../services/api';
-import { Download, Search, CheckCircle, XCircle, MessageCircle } from 'lucide-react';
+import { Download, Search, CheckCircle, XCircle, MessageCircle, Mail } from 'lucide-react';
 import WhatsAppModal from './WhatsAppModal';
+import EmailModal from './EmailModal';
 
 export default function RegistrationsList({ eventId }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
+  const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
 
   const { data: registrations = [], isLoading } = useQuery({
     queryKey: ['registrations', eventId],
@@ -121,6 +123,13 @@ export default function RegistrationsList({ eventId }) {
         </div>
         <div className="flex items-center gap-2">
           <button
+            onClick={() => setIsEmailModalOpen(true)}
+            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
+          >
+            <Mail className="w-5 h-5" />
+            <span>Send Email</span>
+          </button>
+          <button
             onClick={() => setIsWhatsAppModalOpen(true)}
             className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
           >
@@ -228,6 +237,15 @@ export default function RegistrationsList({ eventId }) {
         eventFields={event?.fields || []}
         isOpen={isWhatsAppModalOpen}
         onClose={() => setIsWhatsAppModalOpen(false)}
+        registrantsCount={registrations.length}
+      />
+
+      {/* Email Modal */}
+      <EmailModal
+        eventId={eventId}
+        eventFields={event?.fields || []}
+        isOpen={isEmailModalOpen}
+        onClose={() => setIsEmailModalOpen(false)}
         registrantsCount={registrations.length}
       />
     </div>

@@ -74,7 +74,14 @@ magpie/
 ## API Endpoints
 - Root: http://0.0.0.0:8000/
 - Health Check: http://0.0.0.0:8000/health
-- API Routes: `/api/events`, `/api/registrations`, `/api/qr_codes`, `/api/event_fields`, `/api/branding`, `/api/whatsapp`
+- API Routes: `/api/events`, `/api/registrations`, `/api/qr_codes`, `/api/event_fields`, `/api/branding`, `/api/whatsapp`, `/api/email`
+
+### ⚠️ IMPORTANT: API Prefix Requirement
+**ALL new API endpoints MUST be under the `/api` prefix.**
+- ✅ Correct: `router = APIRouter(prefix="/email", tags=["email"])` with `app.include_router(email.router, prefix="/api")`
+- ❌ Wrong: Endpoints outside `/api` prefix
+- This ensures consistency and proper frontend integration
+- The frontend `api.js` is configured with base URL `http://localhost:8000/api`
 
 ## Database Schema
 ### Tables
@@ -124,6 +131,22 @@ magpie/
 - Sandbox: FREE testing (50 msgs/day)
 - Production: ~₹0.75/message
 
+### Email Notifications
+- Send beautiful HTML emails to all event registrants
+- Uses Resend API for reliable email delivery
+- Beautiful email templates with MagPie branding (gradient header, clean content, professional footer)
+- Support for message templates and variable substitution (`{{fieldname}}`)
+- Send to all registrants or filtered subset by field value
+- Track email delivery status
+- Free tier: 100 emails/day, 3,000 emails/month
+- No credit card required for testing
+- Setup: Get API key from https://resend.com/api-keys
+- Files:
+  - `backend/app/services/email_service.py` - Registration confirmation emails
+  - `backend/app/services/email_messaging_service.py` - Bulk email service
+  - `backend/app/api/email.py` - API endpoints at `/api/email`
+  - `frontend/src/components/EmailModal.jsx` - Email composition modal
+
 ### Theme System
 - **Two Available Themes**:
   - **Default**: Colorful gradients (purple/blue/pink), full event info cards, detailed layout
@@ -148,6 +171,7 @@ magpie/
 - Use TailwindCSS utility classes
 - Handle errors gracefully with toast notifications
 - Follow REST API conventions with trailing slashes
+- **ALL new API endpoints MUST be under `/api` prefix** - See API Prefix Requirement above
 - **Run tests after EVERY backend change**: `cd backend && source venv/bin/activate && pytest`
 - **Update tests when modifying existing functionality** - Keep test coverage accurate
 
@@ -159,6 +183,7 @@ magpie/
 - Forget to handle email/phone for auto-fill
 - Skip running tests after backend changes
 - Leave outdated tests after functionality updates
+- **Create API endpoints outside the `/api` prefix** - This breaks frontend integration
 
 ## Environment Variables
 
@@ -170,6 +195,8 @@ magpie/
 - `TWILIO_ACCOUNT_SID` - Twilio account identifier (for WhatsApp)
 - `TWILIO_AUTH_TOKEN` - Twilio authentication token (for WhatsApp)
 - `TWILIO_WHATSAPP_NUMBER` - Twilio WhatsApp number (default: whatsapp:+14155238886)
+- `RESEND_API_KEY` - Resend API key for email service (get from https://resend.com/api-keys)
+- `RESEND_FROM_EMAIL` - Email sender address (default: onboarding@resend.dev for testing)
 
 ### Frontend (.env)
 - `VITE_API_URL` - Backend API URL (default: http://localhost:8000/api)
@@ -182,6 +209,7 @@ magpie/
 - **Export data**: Update RegistrationsList.jsx CSV logic
 - **Change styling**: Use Tailwind classes or update index.css
 - **Send WhatsApp messages**: Use "Send WhatsApp" button in registrations list (dashboard)
+- **Send Email messages**: Use "Send Email" button in registrations list (dashboard)
 - **Change theme**: Dashboard → Branding Settings → Select theme → Save Changes
 - **Add new theme**: Create theme config in themes.js, add CSS in styles/themes/, update HomePage conditional rendering
 

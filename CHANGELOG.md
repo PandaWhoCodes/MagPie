@@ -7,6 +7,39 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.0] - 2025-10-11
+
+### Added
+- **Email notification system for event registrants** (Fixes #1)
+  - `backend/app/services/email_service.py` - NEW FILE: Email service using Resend API for registration confirmations
+  - `backend/app/services/email_messaging_service.py` - NEW FILE: Bulk email service for sending to all registrants
+  - `backend/app/api/email.py` - NEW FILE: API endpoints at `/api/email` for bulk email sending with filtering
+  - `backend/requirements.txt:18` - Added `resend==2.16.0` dependency
+  - `backend/.env:16-17` - Added `RESEND_API_KEY` and `RESEND_FROM_EMAIL` configuration
+  - `backend/app/main.py:6,57` - Added email router to FastAPI app with `/api` prefix
+  - `frontend/src/components/EmailModal.jsx` - NEW FILE: Modal component for composing and sending emails
+  - `frontend/src/components/RegistrationsList.jsx:5-6,11,126-131,244-250` - Added "Send Email" button next to WhatsApp
+  - `frontend/src/services/api.js:21-37,106-109` - Added email API client with proper auth
+  - Supports message templates, variable substitution (`{{fieldname}}`), and filtered sending
+  - Beautiful HTML email templates with MagPie branding (gradient header, content area, footer)
+  - Free tier: 100 emails/day, 3000/month via Resend
+  - `README.md:30` - Added email feature to key features list
+  - `CLAUDE.md:134-148,198-199,212` - Added email feature documentation and setup instructions
+  - `docs/DEPLOYMENT.md:63-64,211-215` - Added Resend environment variables to deployment guide
+
+### Changed
+- **API prefix enforcement**
+  - `CLAUDE.md:79-84,158,170` - Added mandatory `/api` prefix requirement for all new endpoints
+  - All new API endpoints MUST be under `/api` prefix for frontend integration consistency
+  - This ensures proper frontend-backend communication and prevents routing issues
+- **Replaced Mailgun with Resend for email service**
+  - Mailgun configuration deprecated due to authentication issues
+  - Resend provides simpler setup with generous free tier
+  - No domain verification needed for testing (uses onboarding@resend.dev)
+
+### Removed
+- `backend/scripts/` - Removed test scripts folder (no longer needed)
+
 ## [1.5.0] - 2025-10-10
 
 ### Added
