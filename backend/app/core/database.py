@@ -13,24 +13,30 @@ class Database:
         self.schema_manager = None
 
     async def connect(self):
-        """Connect to Turso database"""
-        # Connect using embedded replica for better performance
-        self.conn = libsql.connect(
-            "local.db",
-            sync_url=settings.TURSO_DATABASE_URL,
-            auth_token=settings.TURSO_AUTH_TOKEN
-        )
+        """Connect to database"""
+        if settings.LOCAL_SQLITE:
+            # Local development: Use local SQLite if the flag is enabled
+            self.conn = libsql.connect("../local-dev/magpie_local.db")
+            print("✅ Connected to local SQLite database")
+        else:
+            # Production: Use Turso with embedded replica
+            self.conn = libsql.connect(
+                "local.db",
+                sync_url=settings.TURSO_DATABASE_URL,
+                auth_token=settings.TURSO_AUTH_TOKEN
+            )
+            print("✅ Connected to Turso database")
 
-        # Initialize schema manager and sync schema BEFORE syncing with remote
-        # This prevents WAL conflicts during migrations
+        # Initialize schema manager and sync schema
         self.schema_manager = SchemaManager(self.conn)
         self.schema_manager.sync_schema()
 
-        # Sync with remote database after schema is updated
-        try:
-            self.conn.sync()
-        except Exception as e:
-            print(f"⚠️  Warning: Could not sync with remote database: {e}")
+        # Only sync with remote if using Turso
+        if not settings.LOCAL_SQLITE:
+            try:
+                self.conn.sync()
+            except Exception as e:
+                print(f"⚠️  Warning: Could not sync with remote database: {e}")
 
     async def close(self):
         """Close database connection"""
@@ -44,7 +50,11 @@ class Database:
         else:
             result = self.conn.execute(query)
         self.conn.commit()
-        self.conn.sync()
+
+        # Only sync with remote if using Turso
+        if not settings.LOCAL_SQLITE:
+            self.conn.sync()
+
         return result
 
     async def fetch_all(self, query: str, params: list = None):
