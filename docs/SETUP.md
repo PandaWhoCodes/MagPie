@@ -67,8 +67,8 @@ Edit `.env` and add your credentials:
 TURSO_DATABASE_URL=libsql://b2lregistration-pandawhocodes.aws-ap-south-1.turso.io
 TURSO_AUTH_TOKEN=your_turso_auth_token_here
 
-# Local SQLite Development (set to true for local development without Turso)
-LOCAL_SQLITE=false
+# Local  Development (as of now set to true for local sqlite without Turso)
+IS_LOCAL=false
 
 # CORS Configuration
 FRONTEND_URL=http://localhost:3000
@@ -86,15 +86,15 @@ TWILIO_WHATSAPP_NUMBER=whatsapp:+14155238886
 
 For local development without requiring Turso database setup:
 
-1. **Set `LOCAL_SQLITE=true`** in your `.env` file
-2. **Leave Turso credentials empty** 
+1. **Set `IS_LOCAL=true`** in your `.env` file
+2. **Leave Turso credentials empty**
 3. **The application will automatically use a local SQLite database**
 
 ```env
 # For local development (no Turso required)
 TURSO_DATABASE_URL=
 TURSO_AUTH_TOKEN=
-LOCAL_SQLITE=true
+IS_LOCAL=true
 ```
 
 **Benefits:**
@@ -104,7 +104,7 @@ LOCAL_SQLITE=true
 - ✅ Data persists locally in `local-dev/magpie_local.db`
 - ✅ Easy to switch between local and production databases
 
-**Note:** Production deployments should use `LOCAL_SQLITE=false` with proper Turso credentials.
+**Note:** Production deployments should use `IS_LOCAL=false` with proper Turso credentials.
 
 ### 5. Verify Installation
 
@@ -302,7 +302,7 @@ npm run dev
 **Error: "Turso credentials not found"**
 - Check `.env` file exists in `backend/` directory
 - For production: Verify `TURSO_DATABASE_URL` and `TURSO_AUTH_TOKEN` are set
-- For local development if needed: Set `LOCAL_SQLITE=true` and leave Turso credentials empty if you want to run it via local sqlite
+- For local development if needed: Set `IS_LOCAL=true` and leave Turso credentials empty if you want to run it via local sqlite
 
 **Error: "CLERK_SECRET_KEY not found"**
 - Check `.env` file has `CLERK_SECRET_KEY=sk_test_...`

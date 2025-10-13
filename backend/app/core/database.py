@@ -14,7 +14,7 @@ class Database:
 
     async def connect(self):
         """Connect to database"""
-        if settings.LOCAL_SQLITE:
+        if settings.IS_LOCAL:
             # Local development: Use local SQLite if the flag is enabled
             self.conn = libsql.connect("../local-dev/magpie_local.db")
             print("✅ Connected to local SQLite database")
@@ -32,7 +32,7 @@ class Database:
         self.schema_manager.sync_schema()
 
         # Only sync with remote if using Turso
-        if not settings.LOCAL_SQLITE:
+        if not settings.IS_LOCAL:
             try:
                 self.conn.sync()
             except Exception as e:
@@ -52,7 +52,7 @@ class Database:
         self.conn.commit()
 
         # Only sync with remote if using Turso
-        if not settings.LOCAL_SQLITE:
+        if not settings.IS_LOCAL:
             self.conn.sync()
 
         return result

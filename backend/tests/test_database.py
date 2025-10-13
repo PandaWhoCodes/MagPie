@@ -3,6 +3,7 @@ import os
 import pytest
 import libsql
 from app.core.schema_manager import SchemaManager
+from app.core.config import Settings
 
 
 class TestDatabase:
@@ -48,3 +49,29 @@ class TestDatabase:
         conn.close()
         if os.path.exists(local_db_path):
             os.remove(local_db_path)
+
+    def test_is_local_setting_from_env(self, monkeypatch):
+        """Test that IS_LOCAL setting is read correctly from environment"""
+        # Test with IS_LOCAL=true
+        monkeypatch.setenv("IS_LOCAL", "true")
+        settings = Settings()
+        assert settings.IS_LOCAL is True
+
+        # Test with IS_LOCAL=false
+        monkeypatch.setenv("IS_LOCAL", "false")
+        settings = Settings()
+        assert settings.IS_LOCAL is False
+
+        # Test default value (should be False) - need to clear all env vars and .env file
+        monkeypatch.delenv("IS_LOCAL", raising=False)
+        # Clear all environment variables to simulate no .env file
+        monkeypatch.setenv("TURSO_DATABASE_URL", "")
+        monkeypatch.setenv("TURSO_AUTH_TOKEN", "")
+        monkeypatch.setenv("CLERK_SECRET_KEY", "")
+        monkeypatch.setenv("FRONTEND_URL", "")
+        monkeypatch.setenv("TWILIO_ACCOUNT_SID", "")
+        monkeypatch.setenv("TWILIO_AUTH_TOKEN", "")
+        monkeypatch.setenv("TWILIO_WHATSAPP_NUMBER", "")
+        # Force reload settings without .env file
+        settings = Settings(_env_file=None)
+        assert settings.IS_LOCAL is False

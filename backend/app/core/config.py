@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     TURSO_AUTH_TOKEN: str
 
     # Local development flag
-    LOCAL_SQLITE: bool = False
+    IS_LOCAL: bool = False
 
     # CORS
     FRONTEND_URL: str = "http://localhost:3000"
