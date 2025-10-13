@@ -265,12 +265,6 @@ MIT License - Feel free to use and modify for your needs.
 
 ---
 
-## 🙏 Acknowledgments
-
-Built with passion by [PandaWhoCodes](https://github.com/PandaWhoCodes)
-
----
-
 ## 🐦‍⬛ Fun Fact
 
 Did you know? Magpies are one of the few animals that can recognize themselves in a mirror - just like how MagPie recognizes returning users and auto-fills their data!
