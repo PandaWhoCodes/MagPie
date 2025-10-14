@@ -555,6 +555,241 @@ turso db shell b2l-registration < backup.sql
 
 ---
 
+## Troubleshooting Frontend Deployment
+
+### Common Issues and Solutions
+
+#### Issue 1: `vite: not found` Error
+
+**Symptoms:**
+```bash
+npm ERR! magpie-frontend@1.0.0 dev: `vite`
+npm ERR! spawn ENOENT
+npm WARN Local package.json exists, but node_modules missing
+```
+
+**Solution:**
+```bash
+# Install dependencies first
+cd frontend
+npm install
+
+# Then run dev server
+npm run dev
+```
+
+**Root Cause:** Dependencies not installed. Always run `npm install` before `npm run dev` or `npm run build`.
+
+---
+
+#### Issue 2: Node.js Version Too Old
+
+**Symptoms:**
+```bash
+npm WARN notsup Unsupported engine for @clerk/clerk-react@5.52.0
+npm WARN notsup wanted: {"node":">=18.17.0"} (current: {"node":"10.19.0"})
+npm ERR! notarget No matching version found
+```
+
+**Solution:**
+```bash
+# Upgrade to Node.js 18 LTS
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+sudo apt-get install -y nodejs
+
+# Verify version
+node --version  # Should show v18.x.x
+
+# Reinstall dependencies
+cd frontend
+rm -rf node_modules package-lock.json
+npm install
+```
+
+**Root Cause:** Project requires Node.js 18.17.0+ for Clerk, Vite, and modern React features.
+
+---
+
+#### Issue 3: PostCSS Configuration Error
+
+**Symptoms:**
+```bash
+Failed to load PostCSS config: [SyntaxError] Unexpected token 'export'
+/home/MagPie/frontend/postcss.config.js:1
+export default {
+^^^^^^
+SyntaxError: Unexpected token 'export'
+```
+
+**Solution Option A (Recommended):**
+```bash
+# Add "type": "module" to package.json
+cd frontend
+npm pkg set type=module
+
+# Restart dev server
+npm run dev
+```
+
+**Solution Option B (Alternative):**
+```bash
+# Convert postcss.config.js to CommonJS
+cd frontend
+mv postcss.config.js postcss.config.cjs
+
+# Update the file
+cat > postcss.config.cjs << 'EOF'
+module.exports = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+}
+EOF
+
+# Restart dev server
+npm run dev
+```
+
+**Root Cause:** PostCSS config uses ES module syntax but Node treats it as CommonJS.
+
+---
+
+#### Issue 4: Clerk Postinstall Script Fails
+
+**Symptoms:**
+```bash
+npm ERR! Failed at the @clerk/shared@3.27.3 postinstall script.
+npm ERR! errno 1
+```
+
+**Solution:**
+```bash
+# Install with legacy peer deps flag
+cd frontend
+npm install --legacy-peer-deps
+
+# Alternative: Skip postinstall scripts (if needed)
+npm install --legacy-peer-deps --ignore-scripts
+```
+
+**Root Cause:** Peer dependency conflicts or postinstall script compatibility issues.
+
+---
+
+#### Issue 5: Build Works but Frontend Shows Blank Page
+
+**Symptoms:**
+- Build completes successfully
+- Browser shows blank white page
+- Console shows errors about missing routes or API calls
+
+**Solution:**
+```bash
+# 1. Check environment variables
+cat frontend/.env
+
+# Should have:
+VITE_API_URL=https://your-backend-domain.com/api
+VITE_CLERK_PUBLISHABLE_KEY=pk_live_your_key_here
+
+# 2. Verify backend CORS settings allow your domain
+# backend/.env should have:
+FRONTEND_URL=https://your-frontend-domain.com
+
+# 3. Rebuild with correct env vars
+npm run build
+
+# 4. Check browser console for specific errors
+```
+
+**Root Cause:** Missing or incorrect environment variables.
+
+---
+
+### Frontend Deployment Checklist
+
+Before deploying frontend, verify:
+
+- [ ] **Node.js version** >= 18.17.0
+  ```bash
+  node --version
+  ```
+
+- [ ] **Dependencies installed**
+  ```bash
+  npm install
+  ```
+
+- [ ] **Environment variables set**
+  ```bash
+  cat .env
+  # VITE_API_URL=https://api.yourdomain.com/api
+  # VITE_CLERK_PUBLISHABLE_KEY=pk_live_xxx
+  ```
+
+- [ ] **Backend CORS configured**
+  ```bash
+  # backend/.env
+  FRONTEND_URL=https://yourdomain.com
+  ```
+
+- [ ] **Build succeeds**
+  ```bash
+  npm run build
+  # Should create dist/ folder
+  ```
+
+- [ ] **Clerk domain added**
+  - Go to https://dashboard.clerk.com
+  - Settings → Domains
+  - Add your production domain
+
+- [ ] **Test locally first**
+  ```bash
+  npm run preview
+  # Test at http://localhost:4173
+  ```
+
+---
+
+### Quick Reference: Frontend Commands
+
+```bash
+# Development
+npm install              # Install dependencies
+npm run dev             # Start dev server (http://localhost:3000)
+
+# Production Build
+npm run build           # Build for production (creates dist/)
+npm run preview         # Preview production build locally
+
+# Deployment
+npx serve -s dist -l 3000           # Serve with 'serve' package
+pm2 serve dist 3000 --name frontend --spa  # Serve with PM2
+```
+
+---
+
+### Platform-Specific Notes
+
+#### Ubuntu 20.04 LTS
+- Use `curl -fsSL https://deb.nodesource.com/setup_18.x` for Node.js
+- Python 3.8 is default (works fine for backend)
+- May need `--legacy-peer-deps` flag for npm install
+
+#### Ubuntu 22.04 LTS
+- Node.js 18 available in default repos
+- Python 3.10 is default (works great)
+- Usually works without `--legacy-peer-deps`
+
+#### Docker
+- Use `node:18-alpine` base image
+- Multi-stage build recommended
+- See `PRODUCTION_DEPLOY_FRONTEND.md` for Dockerfile
+
+---
+
 ## Support
 
 For deployment issues:
