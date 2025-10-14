@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **Email Provider System with Brevo Support**
+  - `backend/app/providers/email_provider.py` - NEW FILE: Abstract base class for email providers
+  - `backend/app/providers/resend_provider.py` - NEW FILE: Resend email provider implementation
+  - `backend/app/providers/brevo_provider.py` - NEW FILE: Brevo email provider implementation (using Brevo Python SDK v1.2.0)
+  - `backend/app/providers/email_factory.py` - NEW FILE: Factory pattern for provider instantiation and configuration
+  - `backend/app/providers/__init__.py` - NEW FILE: Provider package exports
+  - `backend/requirements.txt:19` - Added `brevo-python==1.2.0` dependency
+  - `backend/.env:13-23` - Added email provider configuration with Brevo as default:
+    - `EMAIL_PROVIDER` - Choose between 'brevo' or 'resend' (default: brevo)
+    - `BREVO_API_KEY` - Brevo API key (FREE: 300 emails/day)
+    - `BREVO_FROM_EMAIL` - Sender email address for Brevo
+    - `BREVO_FROM_NAME` - Sender name for Brevo
+  - Brevo set as default email provider (more generous free tier: 300 emails/day vs Resend's 100)
+  - Flexible provider architecture allows easy addition of new email providers
+
+### Changed
+- **Email services refactored to use provider system**
+  - `backend/app/services/email_service.py:1-18` - Refactored to use email provider factory
+    - Removed direct Resend dependency
+    - Uses `get_email_provider()` to get configured provider
+    - Supports both Resend and Brevo seamlessly
+  - `backend/app/services/email_service.py:20-63` - Updated `send_registration_confirmation()` to use provider's `send_email()` method
+  - `backend/app/services/email_service.py:65-115` - Updated `send_welcome_email()` to use provider's `send_email()` method
+  - `backend/app/services/email_messaging_service.py:1-24` - Refactored to use email provider factory
+    - Removed direct Resend dependency
+    - Uses `get_email_provider()` for initialization
+  - `backend/app/services/email_messaging_service.py:26-57` - Updated `send_email()` to use provider interface
+  - Email provider can now be switched by changing `EMAIL_PROVIDER` env var (no code changes needed)
+  - Backward compatible: Existing Resend configurations still work
+
 ## [1.6.0] - 2025-10-11
 
 ### Added

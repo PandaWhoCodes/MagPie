@@ -1,34 +1,27 @@
 """
-Email messaging service using Resend API
-Handles bulk email sending to event registrants
+Email messaging service for bulk email sending
+Handles bulk email sending to event registrants using configured provider
 """
 
-import os
 import logging
 from typing import List, Dict, Any, Optional
-import resend
 from app.core.database import db
-from dotenv import load_dotenv
-
-# Load environment variables
-load_dotenv()
+from app.providers import get_email_provider
 
 logger = logging.getLogger(__name__)
 
 
 class EmailMessagingService:
-    """Service for email messaging via Resend"""
+    """Service for email messaging using configured provider"""
 
     def __init__(self):
-        """Initialize Resend client"""
-        self.api_key = os.getenv('RESEND_API_KEY')
-        self.from_email = os.getenv('RESEND_FROM_EMAIL', 'onboarding@resend.dev')
-
-        if not self.api_key:
-            raise ValueError("Resend API key not found in environment variables")
-
-        resend.api_key = self.api_key
-        logger.info("Email messaging service initialized")
+        """Initialize email provider"""
+        try:
+            self.provider = get_email_provider()
+            logger.info(f"Email messaging service initialized with {self.provider.get_provider_name()} provider")
+        except ValueError as e:
+            logger.error(f"Failed to initialize email messaging service: {str(e)}")
+            raise
 
     def send_email(
         self,
@@ -48,27 +41,12 @@ class EmailMessagingService:
             Dict with status and error (if any)
         """
         try:
-            response = resend.Emails.send({
-                "from": self.from_email,
-                "to": to_email,
-                "subject": subject,
-                "html": html_content
-            })
-
-            if response and response.get('id'):
-                return {
-                    "success": True,
-                    "message_id": response['id'],
-                    "to": to_email,
-                    "error": None
-                }
-            else:
-                return {
-                    "success": False,
-                    "message_id": None,
-                    "to": to_email,
-                    "error": "Failed to send email"
-                }
+            result = self.provider.send_email(
+                to_email=to_email,
+                subject=subject,
+                html_content=html_content
+            )
+            return result
 
         except Exception as e:
             return {
