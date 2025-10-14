@@ -1,28 +1,21 @@
-"""Email service using Resend for sending registration confirmation emails"""
+"""Email service for sending registration confirmation emails"""
 
-import resend
 import logging
 from typing import Optional, Dict, Any
-import os
-from dotenv import load_dotenv
-
-# Load environment variables
-load_dotenv()
+from app.providers import get_email_provider
 
 # Configure logging
 logger = logging.getLogger(__name__)
 
 class EmailService:
     def __init__(self):
-        """Initialize the Resend email service"""
-        self.api_key = os.getenv('RESEND_API_KEY')
-        self.from_email = os.getenv('RESEND_FROM_EMAIL', 'onboarding@resend.dev')
-
-        if self.api_key:
-            resend.api_key = self.api_key
-            logger.info("Resend email service initialized")
-        else:
-            logger.warning("RESEND_API_KEY not found in environment variables")
+        """Initialize the email service with configured provider"""
+        try:
+            self.provider = get_email_provider()
+            logger.info(f"Email service initialized with {self.provider.get_provider_name()} provider")
+        except ValueError as e:
+            logger.error(f"Failed to initialize email service: {str(e)}")
+            self.provider = None
 
     def send_registration_confirmation(
         self,
@@ -43,27 +36,26 @@ class EmailService:
         Returns:
             bool: True if email sent successfully, False otherwise
         """
-        if not self.api_key:
-            logger.error("Cannot send email: RESEND_API_KEY not configured")
+        if not self.provider:
+            logger.error("Cannot send email: Email provider not configured")
             return False
 
         try:
             # Create email HTML content
             html_content = self._create_confirmation_html(name, event_name, registration_data)
 
-            # Send email using Resend
-            response = resend.Emails.send({
-                "from": self.from_email,
-                "to": to_email,
-                "subject": f"Registration Confirmed - {event_name}",
-                "html": html_content
-            })
+            # Send email using configured provider
+            result = self.provider.send_email(
+                to_email=to_email,
+                subject=f"Registration Confirmed - {event_name}",
+                html_content=html_content
+            )
 
-            if response.get('id'):
-                logger.info(f"Email sent successfully to {to_email}. Message ID: {response['id']}")
+            if result['success']:
+                logger.info(f"Email sent successfully to {to_email}. Message ID: {result['message_id']}")
                 return True
             else:
-                logger.error(f"Failed to send email to {to_email}: {response}")
+                logger.error(f"Failed to send email to {to_email}: {result['error']}")
                 return False
 
         except Exception as e:
@@ -81,8 +73,8 @@ class EmailService:
         Returns:
             bool: True if email sent successfully, False otherwise
         """
-        if not self.api_key:
-            logger.error("Cannot send email: RESEND_API_KEY not configured")
+        if not self.provider:
+            logger.error("Cannot send email: Email provider not configured")
             return False
 
         try:
@@ -105,18 +97,17 @@ class EmailService:
             </div>
             """
 
-            response = resend.Emails.send({
-                "from": self.from_email,
-                "to": to_email,
-                "subject": "Welcome to MagPie Events!",
-                "html": html_content
-            })
+            result = self.provider.send_email(
+                to_email=to_email,
+                subject="Welcome to MagPie Events!",
+                html_content=html_content
+            )
 
-            if response.get('id'):
-                logger.info(f"Welcome email sent to {to_email}. Message ID: {response['id']}")
+            if result['success']:
+                logger.info(f"Welcome email sent to {to_email}. Message ID: {result['message_id']}")
                 return True
             else:
-                logger.error(f"Failed to send welcome email to {to_email}: {response}")
+                logger.error(f"Failed to send welcome email to {to_email}: {result['error']}")
                 return False
 
         except Exception as e:

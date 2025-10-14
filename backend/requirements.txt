@@ -16,3 +16,4 @@ httpx==0.25.2
 pytest-cov==4.1.0
 requests==2.31.0
 resend==2.16.0
+brevo-python==1.2.0
