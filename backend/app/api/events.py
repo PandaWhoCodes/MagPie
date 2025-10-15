@@ -14,7 +14,7 @@ async def create_event(
 ):
     """Create a new event (protected)"""
     try:
-        return await EventService.create_event(event)
+        return await EventService.create_event(event, auth)
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -26,9 +26,9 @@ async def create_event(
 async def get_all_events(
     auth: AuthenticatedUser = Depends(clerk_auth)
 ):
-    """Get all events (protected)"""
+    """Get all events for the authenticated admin (protected)"""
     try:
-        return await EventService.get_all_events()
+        return await EventService.get_all_events(auth)
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -38,9 +38,9 @@ async def get_all_events(
 
 @router.get("/active", response_model=EventResponse)
 async def get_active_event():
-    """Get currently active event"""
+    """Get currently active event for the authenticated admin (protected)"""
     try:
-        event = await EventService.get_active_event()
+        event = await EventService.get_active_events()
         if not event:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -63,7 +63,7 @@ async def get_event(
 ):
     """Get event by ID (protected)"""
     try:
-        event = await EventService.get_event(event_id)
+        event = await EventService.get_event(event_id, auth)
         if not event:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -87,7 +87,7 @@ async def update_event(
 ):
     """Update event (protected)"""
     try:
-        updated_event = await EventService.update_event(event_id, event)
+        updated_event = await EventService.update_event(event_id, event, auth)
         if not updated_event:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -110,7 +110,7 @@ async def toggle_event_status(
 ):
     """Toggle event active status (protected)"""
     try:
-        event = await EventService.toggle_event_status(event_id)
+        event = await EventService.toggle_event_status(event_id, auth)
         if not event:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -134,7 +134,7 @@ async def clone_event(
 ):
     """Clone an existing event (protected)"""
     try:
-        event = await EventService.clone_event(event_id, new_name)
+        event = await EventService.clone_event(event_id, new_name, auth)
         if not event:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -157,7 +157,7 @@ async def delete_event(
 ):
     """Delete event (protected)"""
     try:
-        await EventService.delete_event(event_id)
+        await EventService.delete_event(event_id, auth)
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -172,7 +172,7 @@ async def get_event_registrations(
 ):
     """Get all registrations for an event (protected)"""
     try:
-        return await EventService.get_event_registrations(event_id)
+        return await EventService.get_event_registrations(event_id, auth)
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

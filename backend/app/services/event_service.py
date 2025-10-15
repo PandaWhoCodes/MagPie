@@ -2,6 +2,7 @@ import uuid
 import json
 from typing import List, Optional
 from app.core.database import db
+from app.core.auth import AuthenticatedUser
 from app.schemas.event import (
     EventCreate,
     EventUpdate,
@@ -14,7 +15,7 @@ class EventService:
     """Service for event management"""
 
     @staticmethod
-    async def create_event(event_data: EventCreate) -> EventResponse:
+    async def create_event(event_data: EventCreate, auth: AuthenticatedUser) -> EventResponse:
         """Create a new event"""
         event_id = str(uuid.uuid4())
 
@@ -22,8 +23,8 @@ class EventService:
         await db.execute(
             """
             INSERT INTO events (id, name, description, date, time, venue,
-                              venue_address, venue_map_link, is_active)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                              venue_address, venue_map_link, is_active, admin_user_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
             [
                 event_id,
@@ -35,6 +36,7 @@ class EventService:
                 event_data.venue_address,
                 event_data.venue_map_link,
                 1 if event_data.is_active else 0,
+                auth.user_id,
             ],
         )
 
@@ -44,8 +46,8 @@ class EventService:
             await db.execute(
                 """
                 INSERT INTO event_fields (id, event_id, field_name, field_type,
-                                        field_label, is_required, field_options, field_order)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                                        field_label, is_required, field_options, field_order, admin_user_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
                 [
                     field_id,
@@ -56,14 +58,59 @@ class EventService:
                     1 if field.is_required else 0,
                     field.field_options,
                     field.field_order,
+                    auth.user_id,
                 ],
             )
 
-        return await EventService.get_event(event_id)
+        return await EventService.get_event(event_id, auth)
 
     @staticmethod
-    async def get_event(event_id: str) -> Optional[EventResponse]:
+    async def get_event(event_id: str, auth: AuthenticatedUser) -> Optional[EventResponse]:
         """Get event by ID"""
+        event = await db.fetch_one("SELECT * FROM events WHERE id = ? AND admin_user_id = ?", [event_id, auth.user_id])
+        if not event:
+            return None
+
+        # Get event fields
+        fields_rows = await db.fetch_all(
+            "SELECT * FROM event_fields WHERE event_id = ? ORDER BY field_order",
+            [event_id],
+        )
+
+        fields = [
+            EventFieldResponse(
+                id=row["id"],
+                event_id=row["event_id"],
+                field_name=row["field_name"],
+                field_type=row["field_type"],
+                field_label=row["field_label"],
+                is_required=bool(row["is_required"]),
+                field_options=row["field_options"],
+                field_order=row["field_order"],
+                admin_user_id=row["admin_user_id"],
+            )
+            for row in fields_rows
+        ]
+
+        return EventResponse(
+            id=event["id"],
+            name=event["name"],
+            description=event["description"],
+            date=event["date"],
+            time=event["time"],
+            venue=event["venue"],
+            venue_address=event["venue_address"],
+            venue_map_link=event["venue_map_link"],
+            is_active=bool(event["is_active"]),
+            admin_user_id=event["admin_user_id"],
+            created_at=event["created_at"],
+            updated_at=event["updated_at"],
+            fields=fields,
+        )
+
+    @staticmethod
+    async def get_event_without_admin_id(event_id: str) -> Optional[EventResponse]:
+
         event = await db.fetch_one("SELECT * FROM events WHERE id = ?", [event_id])
         if not event:
             return None
@@ -84,6 +131,7 @@ class EventService:
                 is_required=bool(row["is_required"]),
                 field_options=row["field_options"],
                 field_order=row["field_order"],
+                admin_user_id=row["admin_user_id"],
             )
             for row in fields_rows
         ]
@@ -98,34 +146,52 @@ class EventService:
             venue_address=event["venue_address"],
             venue_map_link=event["venue_map_link"],
             is_active=bool(event["is_active"]),
+            admin_user_id=event["admin_user_id"],
             created_at=event["created_at"],
             updated_at=event["updated_at"],
             fields=fields,
         )
 
     @staticmethod
-    async def get_all_events() -> List[EventResponse]:
-        """Get all events"""
-        events = await db.fetch_all("SELECT * FROM events ORDER BY created_at DESC")
+    async def get_all_events(auth: AuthenticatedUser) -> List[EventResponse]:
+        """Get all events for a specific admin"""
+        events = await db.fetch_all(
+            "SELECT * FROM events WHERE admin_user_id = ? ORDER BY created_at DESC",
+            [auth.user_id]
+        )
         result = []
         for event in events:
-            event_response = await EventService.get_event(event["id"])
+            event_response = await EventService.get_event(event["id"], auth)
             if event_response:
                 result.append(event_response)
         return result
 
+
+
     @staticmethod
-    async def get_active_event() -> Optional[EventResponse]:
-        """Get currently active event"""
-        event = await db.fetch_one(
-            "SELECT * FROM events WHERE is_active = 1 ORDER BY created_at DESC LIMIT 1"
+    async def get_active_events() -> List[EventResponse]:
+        """Get all active events for a specific admin"""
+        event = await db.fetch_all(
+            "SELECT * FROM events WHERE is_active = 1 ORDER BY created_at DESC LIMIT 1",
         )
         if not event:
             return None
-        return await EventService.get_event(event["id"])
+        return await EventService.get_event_without_admin_id(event[0]["id"])
+
+    # we are not using now but will come handy
+    @staticmethod
+    async def get_active_events_by_admin_id(auth: AuthenticatedUser) -> List[EventResponse]:
+        """Get all active events for a specific admin"""
+        event = await db.fetch_all(
+            "SELECT * FROM events WHERE admin_user_id = ? AND is_active = 1 ORDER BY created_at DESC LIMIT 1",
+            [auth.user_id]
+        )
+        if not event:
+            return None
+        return await EventService.get_event(event[0]["id"], auth)
 
     @staticmethod
-    async def update_event(event_id: str, event_data: EventUpdate) -> Optional[EventResponse]:
+    async def update_event(event_id: str, event_data: EventUpdate, auth: AuthenticatedUser) -> Optional[EventResponse]:
         """Update event"""
         # Build update query dynamically
         update_fields = []
@@ -159,38 +225,39 @@ class EventService:
         if update_fields:
             update_fields.append("updated_at = CURRENT_TIMESTAMP")
             params.append(event_id)
-            query = f"UPDATE events SET {', '.join(update_fields)} WHERE id = ?"
+            params.append(auth.user_id)
+            query = f"UPDATE events SET {', '.join(update_fields)} WHERE id = ? AND admin_user_id = ?"
             await db.execute(query, params)
 
-        return await EventService.get_event(event_id)
+        return await EventService.get_event(event_id, auth)
 
     @staticmethod
-    async def toggle_event_status(event_id: str) -> Optional[EventResponse]:
+    async def toggle_event_status(event_id: str, auth: AuthenticatedUser) -> Optional[EventResponse]:
         """Toggle event active status"""
-        event = await db.fetch_one("SELECT is_active FROM events WHERE id = ?", [event_id])
+        event = await db.fetch_one("SELECT is_active FROM events WHERE id = ? AND admin_user_id = ?", [event_id, auth.user_id])
         if not event:
             return None
 
         new_status = 0 if event["is_active"] else 1
 
-        # If activating, deactivate all other events
+        # If activating, deactivate all other events for this admin
         if new_status == 1:
-            await db.execute("UPDATE events SET is_active = 0 WHERE id != ?", [event_id])
+            await db.execute("UPDATE events SET is_active = 0 WHERE id != ? AND admin_user_id = ?", [event_id, auth.user_id])
 
-        await db.execute("UPDATE events SET is_active = ? WHERE id = ?", [new_status, event_id])
+        await db.execute("UPDATE events SET is_active = ? WHERE id = ? AND admin_user_id = ?", [new_status, event_id, auth.user_id])
 
-        return await EventService.get_event(event_id)
+        return await EventService.get_event(event_id, auth)
 
     @staticmethod
-    async def delete_event(event_id: str) -> bool:
+    async def delete_event(event_id: str, auth: AuthenticatedUser) -> bool:
         """Delete event"""
-        await db.execute("DELETE FROM events WHERE id = ?", [event_id])
+        await db.execute("DELETE FROM events WHERE id = ? AND admin_user_id = ?", [event_id, auth.user_id])
         return True
 
     @staticmethod
-    async def clone_event(event_id: str, new_name: str) -> Optional[EventResponse]:
+    async def clone_event(event_id: str, new_name: str, auth: AuthenticatedUser) -> Optional[EventResponse]:
         """Clone an existing event"""
-        source_event = await EventService.get_event(event_id)
+        source_event = await EventService.get_event(event_id, auth)
         if not source_event:
             return None
 
@@ -217,11 +284,16 @@ class EventService:
             ],
         )
 
-        return await EventService.create_event(new_event_data)
+        return await EventService.create_event(new_event_data, auth)
 
     @staticmethod
-    async def get_event_registrations(event_id: str) -> List[dict]:
+    async def get_event_registrations(event_id: str, auth: AuthenticatedUser) -> List[dict]:
         """Get all registrations for an event"""
+        # First verify the event belongs to the admin
+        event = await db.fetch_one("SELECT id FROM events WHERE id = ? AND admin_user_id = ?", [event_id, auth.user_id])
+        if not event:
+            return []
+
         registrations = await db.fetch_all(
             "SELECT * FROM registrations WHERE event_id = ? ORDER BY created_at DESC",
             [event_id],
@@ -241,7 +313,7 @@ class EventService:
         ]
 
     @staticmethod
-    async def update_event_fields(event_id: str, fields: List) -> Optional[List[EventFieldResponse]]:
+    async def update_event_fields(event_id: str, fields: List, auth: AuthenticatedUser) -> Optional[List[EventFieldResponse]]:
         """Replace all fields for an event"""
         event = await db.fetch_one("SELECT id FROM events WHERE id = ?", [event_id])
         if not event:
@@ -256,8 +328,8 @@ class EventService:
             await db.execute(
                 """
                 INSERT INTO event_fields (id, event_id, field_name, field_type,
-                                        field_label, is_required, field_options, field_order)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                                        field_label, is_required, field_options, field_order, admin_user_id)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """,
                 [
                     field_id,
@@ -268,17 +340,18 @@ class EventService:
                     1 if field.is_required else 0,
                     field.field_options,
                     field.field_order,
+                    auth.user_id,
                 ],
             )
 
         # Return updated fields
-        event = await EventService.get_event(event_id)
+        event = await EventService.get_event(event_id, auth)
         return event.fields if event else []
 
     @staticmethod
-    async def add_event_field(event_id: str, field) -> Optional[EventFieldResponse]:
+    async def add_event_field(event_id: str, field, auth: AuthenticatedUser) -> Optional[EventFieldResponse]:
         """Add a single field to an event"""
-        event = await db.fetch_one("SELECT id FROM events WHERE id = ?", [event_id])
+        event = await db.fetch_one("SELECT id FROM events WHERE id = ? AND admin_user_id = ?", [event_id, auth.user_id])
         if not event:
             return None
 
@@ -294,8 +367,8 @@ class EventService:
         await db.execute(
             """
             INSERT INTO event_fields (id, event_id, field_name, field_type,
-                                    field_label, is_required, field_options, field_order)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                                    field_label, is_required, field_options, field_order, admin_user_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
             [
                 field_id,
@@ -306,6 +379,7 @@ class EventService:
                 1 if field.is_required else 0,
                 field.field_options,
                 next_order,
+                auth.user_id,
             ],
         )
 
@@ -318,13 +392,14 @@ class EventService:
             is_required=field.is_required,
             field_options=field.field_options,
             field_order=next_order,
+            admin_user_id=auth.user_id,
         )
 
     @staticmethod
-    async def delete_event_field(event_id: str, field_id: str) -> bool:
+    async def delete_event_field(event_id: str, field_id: str, auth: AuthenticatedUser) -> bool:
         """Delete a field from an event"""
         result = await db.execute(
-            "DELETE FROM event_fields WHERE id = ? AND event_id = ?",
-            [field_id, event_id]
+            "DELETE FROM event_fields WHERE id = ? AND event_id = ? AND admin_user_id = ?",
+            [field_id, event_id, auth.user_id]
         )
         return True

@@ -2,6 +2,7 @@ import uuid
 import re
 from typing import List, Optional
 from app.core.database import db
+from app.core.auth import AuthenticatedUser
 from app.models.message_template import MessageTemplate, MessageTemplateCreate, MessageTemplateUpdate
 
 
@@ -23,32 +24,34 @@ class MessageTemplateService:
             result = result.replace(f"{{{{{var_name}}}}}", str(var_value))
         return result
 
-    async def create_template(self, template_data: MessageTemplateCreate) -> MessageTemplate:
+    async def create_template(self, template_data: MessageTemplateCreate, auth) -> MessageTemplate:
         """Create a new message template"""
         template_id = str(uuid.uuid4())
 
         query = """
-            INSERT INTO message_templates (id, template_name, template_text)
-            VALUES (?, ?, ?)
+            INSERT INTO message_templates (id, template_name, template_text, admin_user_id)
+            VALUES (?, ?, ?, ?)
         """
 
         await db.execute(query, [
             template_id,
             template_data.template_name,
-            template_data.template_text
+            template_data.template_text,
+            auth.user_id
         ])
 
-        return await self.get_template(template_id)
+        return await self.get_template(template_id, auth)
 
-    async def get_all_templates(self) -> List[MessageTemplate]:
-        """Get all message templates"""
+    async def get_all_templates(self, auth: AuthenticatedUser) -> List[MessageTemplate]:
+        """Get all message templates for the authenticated admin"""
         query = """
-            SELECT id, template_name, template_text, created_at, updated_at
+            SELECT id, template_name, template_text, admin_user_id, created_at, updated_at
             FROM message_templates
+            WHERE admin_user_id = ?
             ORDER BY template_name ASC
         """
 
-        rows = await db.fetch_all(query)
+        rows = await db.fetch_all(query, [auth.user_id])
 
         templates = []
         for row in rows:
@@ -57,6 +60,7 @@ class MessageTemplateService:
                 id=row['id'],
                 template_name=row['template_name'],
                 template_text=row['template_text'],
+                admin_user_id=row['admin_user_id'],
                 created_at=row['created_at'],
                 updated_at=row['updated_at'],
                 variables=variables
@@ -64,15 +68,15 @@ class MessageTemplateService:
 
         return templates
 
-    async def get_template(self, template_id: str) -> Optional[MessageTemplate]:
+    async def get_template(self, template_id: str, auth: AuthenticatedUser) -> Optional[MessageTemplate]:
         """Get a specific message template"""
         query = """
-            SELECT id, template_name, template_text, created_at, updated_at
+            SELECT id, template_name, template_text, admin_user_id, created_at, updated_at
             FROM message_templates
-            WHERE id = ?
+            WHERE id = ? AND admin_user_id = ?
         """
 
-        row = await db.fetch_one(query, [template_id])
+        row = await db.fetch_one(query, [template_id, auth.user_id])
 
         if not row:
             return None
@@ -82,12 +86,13 @@ class MessageTemplateService:
             id=row['id'],
             template_name=row['template_name'],
             template_text=row['template_text'],
+            admin_user_id=row['admin_user_id'],
             created_at=row['created_at'],
             updated_at=row['updated_at'],
             variables=variables
         )
 
-    async def update_template(self, template_id: str, template_data: MessageTemplateUpdate) -> Optional[MessageTemplate]:
+    async def update_template(self, template_id: str, template_data: MessageTemplateUpdate, auth: AuthenticatedUser) -> Optional[MessageTemplate]:
         """Update a message template"""
         # Build update query dynamically based on provided fields
         update_fields = []
@@ -102,24 +107,25 @@ class MessageTemplateService:
             params.append(template_data.template_text)
 
         if not update_fields:
-            return await self.get_template(template_id)
+            return await self.get_template(template_id, auth)
 
         update_fields.append("updated_at = CURRENT_TIMESTAMP")
         params.append(template_id)
+        params.append(auth.user_id)
 
         query = f"""
             UPDATE message_templates
             SET {', '.join(update_fields)}
-            WHERE id = ?
+            WHERE id = ? AND admin_user_id = ?
         """
 
         await db.execute(query, params)
-        return await self.get_template(template_id)
+        return await self.get_template(template_id, auth)
 
-    async def delete_template(self, template_id: str) -> bool:
+    async def delete_template(self, template_id: str, auth: AuthenticatedUser) -> bool:
         """Delete a message template"""
-        query = "DELETE FROM message_templates WHERE id = ?"
-        await db.execute(query, [template_id])
+        query = "DELETE FROM message_templates WHERE id = ? AND admin_user_id = ?"
+        await db.execute(query, [template_id, auth.user_id])
         return True
 
 
