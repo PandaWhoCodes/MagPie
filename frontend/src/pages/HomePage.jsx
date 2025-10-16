@@ -4,13 +4,14 @@ import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
-import { eventsApi, registrationsApi, brandingApi } from '../services/api';
+import { eventsApi, registrationsApi } from '../services/api';
 import { Calendar, Clock, MapPin, ExternalLink, Sparkles, CheckCircle2, ArrowRight } from 'lucide-react';
 import StylizedText from '../components/StylizedText';
 import Footer from '../components/Footer';
 import ThemeToggle from '../components/ThemeToggle';
 import { AnimatedBackground } from '../components/themes/AnimatedBackground';
 import { getThemeConfig } from '../config/themes';
+import { useBranding } from '../contexts/BrandingContext';
 
 export default function HomePage() {
   const navigate = useNavigate();
@@ -30,19 +31,8 @@ export default function HomePage() {
     retry: false,
   });
 
-  // Fetch branding settings
-  const { data: branding } = useQuery({
-    queryKey: ['branding'],
-    queryFn: async () => {
-      const response = await brandingApi.get();
-      console.log('Branding API response:', response.data);
-      return response.data;
-    },
-    staleTime: 0,
-    cacheTime: 0,
-    retry: false,
-  });
-
+  // Get branding from context (already preloaded at app level - no theme flash!)
+  const branding = useBranding();
   const theme = branding?.theme || 'default';
   const themeConfig = getThemeConfig(theme);
 

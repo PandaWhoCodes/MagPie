@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 import { SignedIn, SignedOut, SignIn, RedirectToSignIn, useAuth } from '@clerk/clerk-react';
 import { ThemeProvider } from './contexts/ThemeContext';
-import ThemeToggle from './components/ThemeToggle';
+import { BrandingProvider } from './contexts/BrandingContext';
 import { useTheme } from './hooks/useTheme';
 import { setAuthTokenGetter } from './services/api';
 
@@ -20,6 +20,7 @@ const queryClient = new QueryClient({
     queries: {
       refetchOnWindowFocus: false,
       retry: 1,
+      staleTime: 5 * 60 * 1000, // Cache for 5 minutes by default
     },
   },
 });
@@ -93,14 +94,16 @@ function AppContent() {
 
 function App() {
   return (
-    <ThemeProvider>
-      <QueryClientProvider client={queryClient}>
-        <Router>
-          <AppContent />
-        </Router>
-        <Toaster position="top-right" />
-      </QueryClientProvider>
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <BrandingProvider>
+        <ThemeProvider>
+          <Router>
+            <AppContent />
+          </Router>
+          <Toaster position="top-right" />
+        </ThemeProvider>
+      </BrandingProvider>
+    </QueryClientProvider>
   );
 }
 

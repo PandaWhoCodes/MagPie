@@ -1,4 +1,4 @@
-import { motion } from 'motion/react';
+import { motion } from 'framer-motion';
 
 export function AnimatedBackground({ theme = 'default' }) {
   if (theme === 'midnight_black') {
@@ -47,8 +47,8 @@ export function AnimatedBackground({ theme = 'default' }) {
           className="absolute bottom-0 left-1/3 w-96 h-96 bg-indigo-500/8 rounded-full blur-3xl"
         />
 
-        {/* Floating particles - more subtle */}
-        {[...Array(15)].map((_, i) => (
+        {/* Floating particles - reduced for performance */}
+        {[...Array(6)].map((_, i) => (
           <motion.div
             key={i}
             initial={{
@@ -66,7 +66,7 @@ export function AnimatedBackground({ theme = 'default' }) {
               ease: "linear",
               delay: Math.random() * 5,
             }}
-            className="absolute w-0.5 h-0.5 bg-white rounded-full"
+            className="absolute w-0.5 h-0.5 bg-white rounded-full will-change-transform"
             style={{
               left: `${Math.random() * 100}%`,
             }}

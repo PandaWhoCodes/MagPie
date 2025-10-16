@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle, Calendar, Clock, MapPin, ExternalLink, Sparkles, PartyPopper, Heart } from 'lucide-react';
 import Footer from '../components/Footer';
 import ThemeToggle from '../components/ThemeToggle';
 import { AnimatedBackground } from '../components/themes/AnimatedBackground';
-import { brandingApi } from '../services/api';
 import { getThemeConfig } from '../config/themes';
+import { useBranding } from '../contexts/BrandingContext';
 
 // Confetti particle component
 const ConfettiPiece = ({ delay = 0 }) => {
@@ -87,18 +86,8 @@ export default function ThankYouPage() {
   const { event, registration } = location.state || {};
   const [showConfetti, setShowConfetti] = useState(true);
 
-  // Fetch branding settings
-  const { data: branding } = useQuery({
-    queryKey: ['branding'],
-    queryFn: async () => {
-      const response = await brandingApi.get();
-      return response.data;
-    },
-    staleTime: 0,
-    cacheTime: 0,
-    retry: false,
-  });
-
+  // Get branding from context (preloaded)
+  const branding = useBranding();
   const theme = branding?.theme || 'default';
   const themeConfig = getThemeConfig(theme);
 
