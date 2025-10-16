@@ -251,6 +251,18 @@ MagPies are social birds, and so are we! Contributions are welcome:
 
 ---
 
+## 👥 Contributors
+
+Thanks to these wonderful people who have contributed to MagPie! 🐦‍⬛
+
+<a href="https://github.com/PandaWhoCodes/magpie/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=PandaWhoCodes/magpie" />
+</a>
+
+*Made with [contrib.rocks](https://contrib.rocks)*
+
+---
+
 ## 📜 License
 
 MIT License - Feel free to use and modify for your needs.

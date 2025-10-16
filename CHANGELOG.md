@@ -8,6 +8,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Contributors Section in README**
+  - `README.md:254-265` - Added contributors section with automatic GitHub contributor avatars
+  - Uses [contrib.rocks](https://contrib.rocks) service to display all contributors dynamically
+  - Shows circular profile pictures with names below
+  - Auto-updates when new contributors join the project
+  - Positioned above License section with link to Contributing Guide
+
+### Added
 - **Email Provider System with Brevo Support**
   - `backend/app/providers/email_provider.py` - NEW FILE: Abstract base class for email providers
   - `backend/app/providers/resend_provider.py` - NEW FILE: Resend email provider implementation
