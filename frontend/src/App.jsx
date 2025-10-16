@@ -1,19 +1,21 @@
 import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
-import { SignedIn, SignedOut, SignIn, RedirectToSignIn, useAuth } from '@clerk/clerk-react';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { BrandingProvider } from './contexts/BrandingContext';
 import { useTheme } from './hooks/useTheme';
-import { setAuthTokenGetter } from './services/api';
 
 // Pages
 import HomePage from './pages/HomePage';
-import Dashboard from './pages/Dashboard';
 import CheckInPage from './pages/CheckInPage';
 import NoEventPage from './pages/NoEventPage';
 import ThankYouPage from './pages/ThankYouPage';
+
+// Lazy load dashboard and auth components (only loaded when needed)
+import { DashboardLayout } from './components/DashboardLayout';
+import { SignInLayout } from './components/SignInLayout';
+const Dashboard = React.lazy(() => import('./pages/Dashboard'));
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -25,19 +27,10 @@ const queryClient = new QueryClient({
   },
 });
 
-// Component to conditionally show ThemeToggle
+// Component to handle theme switching based on route
 function AppContent() {
   const location = useLocation();
   const { setLightTheme } = useTheme();
-  const { getToken } = useAuth();
-
-  // Set up auth token getter for API calls
-  useEffect(() => {
-    setAuthTokenGetter(getToken);
-  }, [getToken]);
-
-  // Only show theme toggle on user-facing pages (not dashboard)
-  const isUserFacingPage = !location.pathname.includes('dashboard');
   const isDashboardPage = location.pathname.includes('dashboard');
 
   // Force light mode for dashboard
@@ -51,40 +44,31 @@ function AppContent() {
     <div className="min-h-screen transition-colors duration-300">
       {/* ThemeToggle will be conditionally rendered inside pages based on branding theme */}
       <Routes>
+        {/* Public routes - NO Clerk loaded, fast and lightweight */}
         <Route path="/" element={<HomePage />} />
         <Route path="/thank-you" element={<ThankYouPage />} />
         <Route path="/check-in/:eventId/:qrId" element={<CheckInPage />} />
         <Route path="/no-events" element={<NoEventPage />} />
 
-        {/* Sign In Route */}
-        <Route
-          path="/sign-in"
-          element={
-            <>
-              <SignedIn>
-                <Navigate to="/dashboard" replace />
-              </SignedIn>
-              <SignedOut>
-                <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                  <SignIn routing="path" path="/sign-in" />
-                </div>
-              </SignedOut>
-            </>
-          }
-        />
+        {/* Sign In Route - Clerk loaded only when accessing this route */}
+        <Route path="/sign-in" element={<SignInLayout />} />
 
-        {/* Protected Dashboard Route */}
+        {/* Protected Dashboard Route - Clerk loaded only when accessing this route */}
         <Route
           path="/dashboard"
           element={
-            <>
-              <SignedIn>
+            <DashboardLayout>
+              <React.Suspense fallback={
+                <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                  <div className="text-center">
+                    <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                    <p className="mt-4 text-gray-600 font-medium">Loading dashboard...</p>
+                  </div>
+                </div>
+              }>
                 <Dashboard />
-              </SignedIn>
-              <SignedOut>
-                <RedirectToSignIn />
-              </SignedOut>
-            </>
+              </React.Suspense>
+            </DashboardLayout>
           }
         />
       </Routes>

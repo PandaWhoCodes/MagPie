@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { UserButton, useUser } from '@clerk/clerk-react';
+import { UserButton, useUser, useAuth } from '@clerk/clerk-react';
 import toast from 'react-hot-toast';
-import { eventsApi, qrCodesApi } from '../services/api';
+import { eventsApi, qrCodesApi, setAuthTokenGetter } from '../services/api';
 import {
   Plus,
   Edit,
@@ -25,12 +25,18 @@ import Footer from '../components/Footer';
 export default function Dashboard() {
   const queryClient = useQueryClient();
   const { user } = useUser();
+  const { getToken } = useAuth();
   const [showEventForm, setShowEventForm] = useState(false);
   const [editingEvent, setEditingEvent] = useState(null);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [showRegistrations, setShowRegistrations] = useState(false);
   const [showQRModal, setShowQRModal] = useState(false);
   const [activeTab, setActiveTab] = useState('events'); // 'events', 'branding', or 'templates'
+
+  // Set up auth token getter for API calls
+  useEffect(() => {
+    setAuthTokenGetter(getToken);
+  }, [getToken]);
 
   // Fetch all events
   const { data: events = [], isLoading } = useQuery({
