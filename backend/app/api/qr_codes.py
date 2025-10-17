@@ -29,7 +29,7 @@ async def get_qr_code(
 ):
     """Get QR code details (protected)"""
     try:
-        qr_code = await QRService.get_qr_code(qr_id, auth)
+        qr_code = await QRService.get_qr_code(qr_id)
         if not qr_code:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -52,7 +52,7 @@ async def get_event_qr_codes(
 ):
     """Get all QR codes for an event (protected)"""
     try:
-        return await QRService.get_event_qr_codes(event_id, auth)
+        return await QRService.get_event_qr_codes(event_id)
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -67,7 +67,7 @@ async def delete_qr_code(
 ):
     """Delete QR code (protected)"""
     try:
-        await QRService.delete_qr_code(qr_id, auth)
+        await QRService.delete_qr_code(qr_id)
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

@@ -28,7 +28,7 @@ async def get_all_events(
 ):
     """Get all events for the authenticated admin (protected)"""
     try:
-        return await EventService.get_all_events(auth)
+        return await EventService.get_all_events()
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -40,7 +40,7 @@ async def get_all_events(
 async def get_active_event():
     """Get currently active event for the authenticated admin (protected)"""
     try:
-        event = await EventService.get_active_events()
+        event = await EventService.get_active_event()
         if not event:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -63,7 +63,7 @@ async def get_event(
 ):
     """Get event by ID (protected)"""
     try:
-        event = await EventService.get_event(event_id, auth)
+        event = await EventService.get_event(event_id)
         if not event:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -87,7 +87,7 @@ async def update_event(
 ):
     """Update event (protected)"""
     try:
-        updated_event = await EventService.update_event(event_id, event, auth)
+        updated_event = await EventService.update_event(event_id, event)
         if not updated_event:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -110,7 +110,7 @@ async def toggle_event_status(
 ):
     """Toggle event active status (protected)"""
     try:
-        event = await EventService.toggle_event_status(event_id, auth)
+        event = await EventService.toggle_event_status(event_id)
         if not event:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -157,7 +157,7 @@ async def delete_event(
 ):
     """Delete event (protected)"""
     try:
-        await EventService.delete_event(event_id, auth)
+        await EventService.delete_event(event_id)
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -172,7 +172,7 @@ async def get_event_registrations(
 ):
     """Get all registrations for an event (protected)"""
     try:
-        return await EventService.get_event_registrations(event_id, auth)
+        return await EventService.get_event_registrations(event_id)
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

@@ -14,7 +14,7 @@ async def get_event_fields(
 ):
     """Get all fields for an event"""
     try:
-        event = await EventService.get_event(event_id, auth)
+        event = await EventService.get_event(event_id)
         if not event:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -38,7 +38,7 @@ async def update_event_fields(
 ):
     """Replace all fields for an event (protected)"""
     try:
-        updated_fields = await EventService.update_event_fields(event_id, fields, auth)
+        updated_fields = await EventService.update_event_fields(event_id, fields)
         if updated_fields is None:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -62,7 +62,7 @@ async def add_event_field(
 ):
     """Add a new field to an event (protected)"""
     try:
-        new_field = await EventService.add_event_field(event_id, field, auth)
+        new_field = await EventService.add_event_field(event_id, field)
         if not new_field:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
@@ -86,7 +86,7 @@ async def delete_event_field(
 ):
     """Delete a field from an event (protected)"""
     try:
-        success = await EventService.delete_event_field(event_id, field_id, auth)
+        success = await EventService.delete_event_field(event_id, field_id)
         if not success:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,

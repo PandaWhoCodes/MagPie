@@ -58,9 +58,9 @@ class QRService:
         )
 
     @staticmethod
-    async def get_qr_code(qr_id: str, auth: AuthenticatedUser) -> dict:
+    async def get_qr_code(qr_id: str) -> dict:
         """Get QR code details"""
-        qr_code = await db.fetch_one("SELECT * FROM qr_codes WHERE id = ? AND admin_user_id = ?", [qr_id, auth.user_id])
+        qr_code = await db.fetch_one("SELECT * FROM qr_codes WHERE id = ?", [qr_id])
         if not qr_code:
             return None
 
@@ -74,10 +74,10 @@ class QRService:
         }
 
     @staticmethod
-    async def get_event_qr_codes(event_id: str, auth: AuthenticatedUser) -> list:
+    async def get_event_qr_codes(event_id: str) -> list:
         """Get all QR codes for an event"""
-        # First verify the event belongs to the admin
-        event = await db.fetch_one("SELECT id FROM events WHERE id = ? AND admin_user_id = ?", [event_id, auth.user_id])
+        # First verify the event exists
+        event = await db.fetch_one("SELECT id FROM events WHERE id = ?", [event_id])
         if not event:
             return []
 
@@ -99,7 +99,7 @@ class QRService:
         ]
 
     @staticmethod
-    async def delete_qr_code(qr_id: str, auth: AuthenticatedUser) -> bool:
+    async def delete_qr_code(qr_id: str) -> bool:
         """Delete QR code"""
-        await db.execute("DELETE FROM qr_codes WHERE id = ? AND admin_user_id = ?", [qr_id, auth.user_id])
+        await db.execute("DELETE FROM qr_codes WHERE id = ?", [qr_id])
         return True

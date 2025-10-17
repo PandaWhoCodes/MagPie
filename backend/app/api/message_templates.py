@@ -25,7 +25,7 @@ async def get_all_templates(
 ):
     """Get all message templates (protected)"""
     try:
-        return await message_template_service.get_all_templates(auth)
+        return await message_template_service.get_all_templates()
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -36,7 +36,7 @@ async def get_template(
     auth: AuthenticatedUser = Depends(clerk_auth)
 ):
     """Get a specific message template (protected)"""
-    template = await message_template_service.get_template(template_id, auth)
+    template = await message_template_service.get_template(template_id)
     if not template:
         raise HTTPException(status_code=404, detail="Template not found")
     return template
@@ -49,7 +49,7 @@ async def update_template(
     auth: AuthenticatedUser = Depends(clerk_auth)
 ):
     """Update a message template (protected)"""
-    template = await message_template_service.update_template(template_id, template_data, auth)
+    template = await message_template_service.update_template(template_id, template_data)
     if not template:
         raise HTTPException(status_code=404, detail="Template not found")
     return template
@@ -62,7 +62,7 @@ async def delete_template(
 ):
     """Delete a message template (protected)"""
     try:
-        await message_template_service.delete_template(template_id, auth)
+        await message_template_service.delete_template(template_id )
         return {"message": "Template deleted successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
