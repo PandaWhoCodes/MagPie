@@ -26,7 +26,7 @@ async def create_event(
 async def get_all_events(
     auth: AuthenticatedUser = Depends(clerk_auth)
 ):
-    """Get all events for the authenticated admin (protected)"""
+    """Get all events (protected)"""
     try:
         return await EventService.get_all_events()
     except Exception as e:
@@ -38,7 +38,7 @@ async def get_all_events(
 
 @router.get("/active", response_model=EventResponse)
 async def get_active_event():
-    """Get currently active event for the authenticated admin (protected)"""
+    """Get currently active event. currently one event can be active (protected)"""
     try:
         event = await EventService.get_active_event()
         if not event:
@@ -61,7 +61,7 @@ async def get_event(
     event_id: str,
     auth: AuthenticatedUser = Depends(clerk_auth)
 ):
-    """Get event by ID (protected)"""
+    """Get event by event ID (protected)"""
     try:
         event = await EventService.get_event(event_id)
         if not event:
@@ -85,7 +85,7 @@ async def update_event(
     event: EventUpdate,
     auth: AuthenticatedUser = Depends(clerk_auth)
 ):
-    """Update event (protected)"""
+    """Update event details (protected)"""
     try:
         updated_event = await EventService.update_event(event_id, event)
         if not updated_event:

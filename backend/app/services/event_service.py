@@ -108,49 +108,6 @@ class EventService:
             fields=fields,
         )
 
-    @staticmethod
-    async def get_event_without_admin_id(event_id: str) -> Optional[EventResponse]:
-
-        event = await db.fetch_one("SELECT * FROM events WHERE id = ?", [event_id])
-        if not event:
-            return None
-
-        # Get event fields
-        fields_rows = await db.fetch_all(
-            "SELECT * FROM event_fields WHERE event_id = ? ORDER BY field_order",
-            [event_id],
-        )
-
-        fields = [
-            EventFieldResponse(
-                id=row["id"],
-                event_id=row["event_id"],
-                field_name=row["field_name"],
-                field_type=row["field_type"],
-                field_label=row["field_label"],
-                is_required=bool(row["is_required"]),
-                field_options=row["field_options"],
-                field_order=row["field_order"],
-                admin_user_id=row["admin_user_id"],
-            )
-            for row in fields_rows
-        ]
-
-        return EventResponse(
-            id=event["id"],
-            name=event["name"],
-            description=event["description"],
-            date=event["date"],
-            time=event["time"],
-            venue=event["venue"],
-            venue_address=event["venue_address"],
-            venue_map_link=event["venue_map_link"],
-            is_active=bool(event["is_active"]),
-            admin_user_id=event["admin_user_id"],
-            created_at=event["created_at"],
-            updated_at=event["updated_at"],
-            fields=fields,
-        )
 
     @staticmethod
     async def get_all_events() -> List[EventResponse]:
@@ -169,13 +126,13 @@ class EventService:
 
     @staticmethod
     async def get_active_event() -> List[EventResponse]:
-        """Get all active events for a specific admin"""
+        """Get active event. at this point only 1 event can be active"""
         event = await db.fetch_all(
             "SELECT * FROM events WHERE is_active = 1 ORDER BY created_at DESC LIMIT 1",
         )
         if not event:
             return None
-        return await EventService.get_event_without_admin_id(event[0]["id"])
+        return await EventService.get_event(event[0]["id"])
 
     # we are not using now but will come handy
     @staticmethod
@@ -312,7 +269,7 @@ class EventService:
 
     @staticmethod
     async def update_event_fields(event_id: str, fields: List, auth: AuthenticatedUser) -> Optional[List[EventFieldResponse]]:
-        """Replace all fields for an event"""
+        """Replace fields for an event"""
         event = await db.fetch_one("SELECT id FROM events WHERE id = ?", [event_id])
         if not event:
             return None

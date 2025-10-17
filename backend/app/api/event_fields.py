@@ -12,7 +12,7 @@ async def get_event_fields(
     event_id: str,
     auth: AuthenticatedUser = Depends(clerk_auth)
 ):
-    """Get all fields for an event"""
+    """Get all fields for an event (protected)"""
     try:
         event = await EventService.get_event(event_id)
         if not event:

@@ -43,7 +43,7 @@ class MessageTemplateService:
         return await self.get_template(template_id, auth)
 
     async def get_all_templates(self) -> List[MessageTemplate]:
-        """Get all message templates for the authenticated admin"""
+        """Get all message templates"""
         query = """
             SELECT id, template_name, template_text, admin_user_id, created_at, updated_at
             FROM message_templates
