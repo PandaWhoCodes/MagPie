@@ -75,6 +75,7 @@ FRONTEND_URL=http://localhost:3000
 
 # Authentication (Required - see Authentication Setup section)
 CLERK_SECRET_KEY=sk_test_your_clerk_secret_key_here
+CLERK_JWKS_URL=https://your-app-domain.clerk.accounts.dev/.well-known/jwks.json
 
 # WhatsApp Integration (Optional - see WHATSAPP_SETUP.md)
 TWILIO_ACCOUNT_SID=your_account_sid_here
@@ -229,9 +230,10 @@ The dashboard is protected with Clerk authentication. You'll need a Clerk accoun
 - Create/edit/delete events
 - View all registrations
 - Generate QR codes
-- Send WhatsApp messages
+- Send WhatsApp messages (with templates)
 - Export CSV data
 - Configure branding/themes
+- Manage message templates
 
 **Public Features (No Authentication)**:
 - Event registration form

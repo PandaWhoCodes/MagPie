@@ -17,5 +17,6 @@ class QRCodeResponse(BaseModel):
     event_id: str
     message: str
     qr_type: str
+    admin_user_id: str
     qr_image: str  # Base64 encoded image
     created_at: str

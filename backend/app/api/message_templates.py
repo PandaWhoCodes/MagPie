@@ -14,7 +14,7 @@ async def create_template(
 ):
     """Create a new message template (protected)"""
     try:
-        return await message_template_service.create_template(template_data)
+        return await message_template_service.create_template(template_data, auth)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -62,7 +62,7 @@ async def delete_template(
 ):
     """Delete a message template (protected)"""
     try:
-        await message_template_service.delete_template(template_id)
+        await message_template_service.delete_template(template_id )
         return {"message": "Template deleted successfully"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

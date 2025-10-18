@@ -14,7 +14,7 @@ async def create_event(
 ):
     """Create a new event (protected)"""
     try:
-        return await EventService.create_event(event)
+        return await EventService.create_event(event, auth)
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -38,7 +38,7 @@ async def get_all_events(
 
 @router.get("/active", response_model=EventResponse)
 async def get_active_event():
-    """Get currently active event"""
+    """Get currently active event. currently one event can be active (protected)"""
     try:
         event = await EventService.get_active_event()
         if not event:
@@ -61,7 +61,7 @@ async def get_event(
     event_id: str,
     auth: AuthenticatedUser = Depends(clerk_auth)
 ):
-    """Get event by ID (protected)"""
+    """Get event by event ID (protected)"""
     try:
         event = await EventService.get_event(event_id)
         if not event:
@@ -85,7 +85,7 @@ async def update_event(
     event: EventUpdate,
     auth: AuthenticatedUser = Depends(clerk_auth)
 ):
-    """Update event (protected)"""
+    """Update event details (protected)"""
     try:
         updated_event = await EventService.update_event(event_id, event)
         if not updated_event:
@@ -134,7 +134,7 @@ async def clone_event(
 ):
     """Clone an existing event (protected)"""
     try:
-        event = await EventService.clone_event(event_id, new_name)
+        event = await EventService.clone_event(event_id, new_name, auth)
         if not event:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,

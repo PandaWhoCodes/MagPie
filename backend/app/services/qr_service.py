@@ -3,6 +3,7 @@ import qrcode
 import io
 import base64
 from app.core.database import db
+from app.core.auth import AuthenticatedUser
 from app.schemas.qr_code import QRCodeCreate, QRCodeResponse
 
 
@@ -10,7 +11,7 @@ class QRService:
     """Service for QR code management"""
 
     @staticmethod
-    async def create_qr_code(qr_data: QRCodeCreate) -> QRCodeResponse:
+    async def create_qr_code(qr_data: QRCodeCreate, auth) -> QRCodeResponse:
         """Create a QR code for an event"""
         qr_id = str(uuid.uuid4())
 
@@ -38,10 +39,10 @@ class QRService:
         # Save to database
         await db.execute(
             """
-            INSERT INTO qr_codes (id, event_id, message, qr_type)
-            VALUES (?, ?, ?, ?)
+            INSERT INTO qr_codes (id, event_id, message, qr_type, admin_user_id)
+            VALUES (?, ?, ?, ?, ?)
         """,
-            [qr_id, qr_data.event_id, qr_data.message, qr_data.qr_type],
+            [qr_id, qr_data.event_id, qr_data.message, qr_data.qr_type, auth.user_id],
         )
 
         qr_code = await db.fetch_one("SELECT * FROM qr_codes WHERE id = ?", [qr_id])
@@ -51,6 +52,7 @@ class QRService:
             event_id=qr_code["event_id"],
             message=qr_code["message"],
             qr_type=qr_code["qr_type"],
+            admin_user_id=qr_code["admin_user_id"],
             qr_image=img_base64,
             created_at=qr_code["created_at"],
         )
@@ -67,12 +69,18 @@ class QRService:
             "event_id": qr_code["event_id"],
             "message": qr_code["message"],
             "qr_type": qr_code["qr_type"],
+            "admin_user_id": qr_code["admin_user_id"],
             "created_at": qr_code["created_at"],
         }
 
     @staticmethod
     async def get_event_qr_codes(event_id: str) -> list:
         """Get all QR codes for an event"""
+        # First verify the event exists
+        event = await db.fetch_one("SELECT id FROM events WHERE id = ?", [event_id])
+        if not event:
+            return []
+
         qr_codes = await db.fetch_all(
             "SELECT * FROM qr_codes WHERE event_id = ? ORDER BY created_at DESC",
             [event_id],
@@ -84,6 +92,7 @@ class QRService:
                 "event_id": qr["event_id"],
                 "message": qr["message"],
                 "qr_type": qr["qr_type"],
+                "admin_user_id": qr["admin_user_id"],
                 "created_at": qr["created_at"],
             }
             for qr in qr_codes

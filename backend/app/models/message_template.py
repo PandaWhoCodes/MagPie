@@ -19,6 +19,7 @@ class MessageTemplateUpdate(BaseModel):
 
 class MessageTemplate(MessageTemplateBase):
     id: str
+    admin_user_id: str
     created_at: str
     updated_at: str
     variables: List[str] = Field(default_factory=list, description="Extracted variables from template")

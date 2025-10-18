@@ -60,11 +60,13 @@ class SchemaManager:
                     Column('venue_address', 'TEXT', nullable=True),
                     Column('venue_map_link', 'TEXT', nullable=True),
                     Column('is_active', 'INTEGER', nullable=True, default='0'),
+                    Column('admin_user_id', 'TEXT', nullable=False),
                     Column('created_at', 'TEXT', nullable=True, default='CURRENT_TIMESTAMP'),
                     Column('updated_at', 'TEXT', nullable=True, default='CURRENT_TIMESTAMP'),
                 ],
                 indexes=[
-                    Index('idx_events_active', 'events', ['is_active'])
+                    Index('idx_events_active', 'events', ['is_active']),
+                    Index('idx_events_admin', 'events', ['admin_user_id'])
                 ]
             ),
 
@@ -79,6 +81,7 @@ class SchemaManager:
                     Column('is_required', 'INTEGER', nullable=True, default='0'),
                     Column('field_options', 'TEXT', nullable=True),
                     Column('field_order', 'INTEGER', nullable=True, default='0'),
+                    Column('admin_user_id', 'TEXT', nullable=False)
                 ]
             ),
 
@@ -121,6 +124,7 @@ class SchemaManager:
                     Column('event_id', 'TEXT', nullable=False, foreign_key='events(id) ON DELETE CASCADE'),
                     Column('message', 'TEXT', nullable=False),
                     Column('qr_type', 'TEXT', nullable=True, default="'message'"),
+                    Column('admin_user_id', 'TEXT', nullable=False),
                     Column('created_at', 'TEXT', nullable=True, default='CURRENT_TIMESTAMP'),
                 ]
             ),
@@ -144,11 +148,13 @@ class SchemaManager:
                     Column('id', 'TEXT', nullable=False, primary_key=True),
                     Column('template_name', 'TEXT', nullable=False),
                     Column('template_text', 'TEXT', nullable=False),
+                    Column('admin_user_id', 'TEXT', nullable=False),
                     Column('created_at', 'TEXT', nullable=True, default='CURRENT_TIMESTAMP'),
                     Column('updated_at', 'TEXT', nullable=True, default='CURRENT_TIMESTAMP'),
                 ],
                 indexes=[
-                    Index('idx_message_templates_name', 'message_templates', ['template_name'])
+                    Index('idx_message_templates_name', 'message_templates', ['template_name']),
+                    Index('idx_message_templates_admin', 'message_templates', ['admin_user_id'])
                 ]
             ),
 

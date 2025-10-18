@@ -14,7 +14,7 @@ async def create_qr_code(
 ):
     """Create a QR code for an event (protected)"""
     try:
-        return await QRService.create_qr_code(qr_data)
+        return await QRService.create_qr_code(qr_data, auth)
     except Exception as e:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

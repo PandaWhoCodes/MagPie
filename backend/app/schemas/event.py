@@ -19,6 +19,7 @@ class EventFieldResponse(EventFieldCreate):
 
     id: str
     event_id: str
+    admin_user_id:str #this can be useful in the future
 
 
 class EventCreate(BaseModel):
@@ -60,6 +61,7 @@ class EventResponse(BaseModel):
     venue_address: Optional[str]
     venue_map_link: Optional[str]
     is_active: bool
+    admin_user_id:str
     created_at: str
     updated_at: str
     fields: List[EventFieldResponse] = []

@@ -25,7 +25,10 @@ if not CLERK_SECRET_KEY:
 logger.info(f"✅ CLERK_SECRET_KEY loaded: {CLERK_SECRET_KEY[:20]}...")
 
 # JWKS URL for Clerk
-JWKS_URL = "https://steady-hawk-55.clerk.accounts.dev/.well-known/jwks.json"
+JWKS_URL = os.getenv("CLERK_JWKS_URL")
+if not JWKS_URL:
+    raise ValueError("CLERK_JWKS_URL environment variable is required")
+
 logger.info(f"🔑 Using JWKS URL: {JWKS_URL}")
 
 # Initialize PyJWKClient with SSL verification disabled for localhost

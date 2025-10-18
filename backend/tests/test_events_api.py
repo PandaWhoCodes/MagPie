@@ -15,6 +15,7 @@ class TestEventsAPI:
         assert data["description"] == sample_event_data["description"]
         assert data["venue"] == sample_event_data["venue"]
         assert data["time"] == sample_event_data["time"]
+        assert data["admin_user_id"] == "test_user_12345"  # Mock user ID
         assert "id" in data
 
     def test_create_event_with_missing_fields(self, client):
