@@ -8,6 +8,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Changed
+- **Lazy-loaded Midnight Black Theme for Optimal Performance**
+  - `frontend/src/components/themes/MidnightBlackTheme.jsx` - NEW FILE: Extracted Midnight Black theme into separate component
+    - Imports framer-motion only when Midnight Black theme is selected
+    - Contains all motion animations and AnimatePresence logic
+    - Receives all necessary props from HomePage (event, branding, form handlers, state)
+  - `frontend/src/pages/HomePage.jsx:348-373` - Replaced 309 lines of Midnight Black theme code with lazy-loaded component
+    - Wrapped MidnightBlackTheme with Suspense for code splitting
+    - Added loading spinner fallback (black background with white spinner)
+    - Pure White theme no longer loads framer-motion at all
+  - **Performance Impact**:
+    - framer-motion (381KB) now only loads when Midnight Black theme is selected
+    - Pure White theme bundle reduced further (already optimized)
+    - Code splitting ensures minimal initial bundle size
+    - Theme switching triggers lazy component load on demand
+    - Loading fallback provides smooth UX during chunk load
+
+### Changed
 - **MAJOR PERFORMANCE OPTIMIZATION: Removed framer-motion from Pure White Theme**
   - `frontend/src/pages/HomePage.jsx:1-350` - Replaced ALL framer-motion components with CSS animations for Pure White theme
   - `frontend/src/pages/HomePage.jsx:6` - Removed `import { motion, AnimatePresence } from 'framer-motion'` (381KB saved!)
