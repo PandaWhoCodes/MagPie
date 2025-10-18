@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { brandingApi } from '../services/api';
-import { Save, Image } from 'lucide-react';
+import { Save, Image } from './SimpleIcons';
 
 export default function BrandingSettings() {
   const queryClient = useQueryClient();

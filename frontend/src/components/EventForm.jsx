@@ -3,7 +3,7 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { useMutation } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
 import { eventsApi } from '../services/api';
-import { Plus, Trash2, GripVertical } from 'lucide-react';
+import { Plus, Trash2, GripVertical } from './SimpleIcons';
 
 const FIELD_TYPES = [
   { value: 'text', label: 'Text' },

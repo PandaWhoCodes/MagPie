@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { qrCodesApi } from '../services/api';
-import { X, Download, Trash2 } from 'lucide-react';
+import { X, Download, Trash2 } from './SimpleIcons';
 
 export default function QRCodeModal({ event, onClose }) {
   const queryClient = useQueryClient();

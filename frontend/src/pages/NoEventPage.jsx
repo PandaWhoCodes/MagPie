@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar } from 'lucide-react';
+import { Calendar } from '../components/SimpleIcons';
 import Footer from '../components/Footer';
 
 export default function NoEventPage() {

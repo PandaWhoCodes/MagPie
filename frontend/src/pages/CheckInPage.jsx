@@ -5,7 +5,7 @@ import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
 import { qrCodesApi, registrationsApi } from '../services/api';
-import { CheckCircle, Wifi, Link as LinkIcon, Sparkles, Zap } from 'lucide-react';
+import { CheckCircle, Wifi, Link as LinkIcon, Sparkles, Zap } from '../components/SimpleIcons';
 import Footer from '../components/Footer';
 
 // Ripple effect component

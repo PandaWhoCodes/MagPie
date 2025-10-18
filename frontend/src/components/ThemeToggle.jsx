@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sun, Moon } from 'lucide-react';
+import { Sun, Moon } from './SimpleIcons';
 import { useTheme } from '../hooks/useTheme';
 
 const ThemeToggle = () => {

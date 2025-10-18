@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Mail, Users, AlertCircle } from 'lucide-react';
+import { X, Mail, Users, AlertCircle } from './SimpleIcons';
 import { emailApi, messageTemplatesApi } from '../services/api';
 import toast from 'react-hot-toast';
 
