@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle, Calendar, Clock, MapPin, ExternalLink, Sparkles, PartyPopper, Heart } from 'lucide-react';
+import { CheckCircle, Calendar, Clock, MapPin, ExternalLink, Sparkles, PartyPopper, Heart } from '../components/SimpleIcons';
 import Footer from '../components/Footer';
 import ThemeToggle from '../components/ThemeToggle';
 import { AnimatedBackground } from '../components/themes/AnimatedBackground';

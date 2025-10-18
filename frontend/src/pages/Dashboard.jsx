@@ -14,7 +14,7 @@ import {
   QrCode,
   Calendar,
   X,
-} from 'lucide-react';
+} from '../components/SimpleIcons';
 import EventForm from '../components/EventForm';
 import RegistrationsList from '../components/RegistrationsList';
 import QRCodeModal from '../components/QRCodeModal';

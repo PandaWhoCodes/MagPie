@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { eventsApi } from '../services/api';
-import { Download, Search, CheckCircle, XCircle, MessageCircle, Mail } from 'lucide-react';
+import { Download, Search, CheckCircle, XCircle, MessageCircle, Mail } from './SimpleIcons';
 import WhatsAppModal from './WhatsAppModal';
 import EmailModal from './EmailModal';
 
