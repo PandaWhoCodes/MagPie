@@ -1,0 +1,252 @@
+/* Pure White Theme Styles - Minimal and Fast */
+
+.theme-pure-white {
+  /* Base styles */
+  background: #ffffff;
+  color: #111827;
+}
+
+.theme-pure-white h1 {
+  color: #111827;
+  font-size: 2rem;
+  font-weight: 600;
+}
+
+.theme-pure-white h2 {
+  color: #1f2937;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.theme-pure-white h3 {
+  color: #1f2937;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.theme-pure-white p {
+  color: #6b7280;
+  font-size: 1rem;
+}
+
+/* Form elements - minimal styling for fast render */
+.theme-pure-white input,
+.theme-pure-white textarea,
+.theme-pure-white select {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  color: #111827;
+  border-radius: 0.75rem;
+  padding: 0.875rem 1rem;
+  height: 3.5rem;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.theme-pure-white input:focus,
+.theme-pure-white textarea:focus,
+.theme-pure-white select:focus {
+  border-color: #60a5fa;
+  background: #ffffff;
+  outline: none;
+}
+
+.theme-pure-white input:hover,
+.theme-pure-white textarea:hover,
+.theme-pure-white select:hover {
+  border-color: #d1d5db;
+}
+
+.theme-pure-white input::placeholder,
+.theme-pure-white textarea::placeholder {
+  color: #9ca3af;
+}
+
+.theme-pure-white textarea {
+  height: auto;
+  min-height: 6rem;
+}
+
+/* Labels */
+.theme-pure-white label {
+  color: #374151;
+  font-size: 0.875rem;
+  font-weight: 500;
+  margin-bottom: 0.75rem;
+  display: block;
+}
+
+/* Buttons - simple, fast */
+.theme-pure-white button[type="submit"] {
+  background: #2563eb;
+  color: white;
+  font-weight: 600;
+  border-radius: 0.75rem;
+  height: 3.5rem;
+  margin-top: 2rem;
+  transition: background-color 0.2s ease;
+}
+
+.theme-pure-white button[type="submit"]:hover:not(:disabled) {
+  background: #1d4ed8;
+}
+
+.theme-pure-white button[type="submit"]:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Cards - minimal shadow */
+.theme-pure-white .card-container {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 1.5rem;
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Event info cards */
+.theme-pure-white .event-info-item {
+  background: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 1rem;
+  padding: 1rem;
+  transition: box-shadow 0.2s ease;
+}
+
+.theme-pure-white .event-info-item:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+}
+
+/* Icons */
+.theme-pure-white .icon-container {
+  background: #2563eb;
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  color: white;
+}
+
+/* Error messages */
+.theme-pure-white .error-message {
+  color: #dc2626;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+  font-weight: 500;
+}
+
+/* Success state */
+.theme-pure-white .success-button {
+  background: #10b981;
+}
+
+.theme-pure-white .success-button:hover:not(:disabled) {
+  background: #059669;
+}
+
+/* Checkbox styles */
+.theme-pure-white input[type="checkbox"] {
+  width: 1.25rem;
+  height: 1.25rem;
+  accent-color: #2563eb;
+  border: 1px solid #d1d5db;
+}
+
+/* Select dropdown */
+.theme-pure-white select option {
+  background: #ffffff;
+  color: #111827;
+}
+
+/* Animation utilities - minimal */
+.theme-pure-white .scale-on-focus {
+  transition: transform 0.2s ease;
+}
+
+.theme-pure-white .scale-on-focus:focus-within {
+  transform: scale(1.005);
+}
+
+/* CSS Animations (replaces framer-motion) */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float-slow {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  33% {
+    transform: translate(60px, -40px) scale(1.1);
+  }
+  66% {
+    transform: translate(-30px, 20px) scale(0.95);
+  }
+}
+
+@keyframes float-slower {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+  }
+  50% {
+    transform: translate(-40px, 30px) scale(1.05);
+  }
+}
+
+@keyframes float-particle {
+  0%, 100% {
+    transform: translate(0, 0);
+    opacity: 0.2;
+  }
+  50% {
+    transform: translate(20px, -30px);
+    opacity: 0.4;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Animation classes */
+.fade-in {
+  animation: fadeIn 0.4s ease-out forwards;
+}
+
+.fade-in-up {
+  animation: fadeInUp 0.4s ease-out forwards;
+}
+
+.fade-in-delay-100 {
+  animation: fadeInUp 0.4s ease-out 0.1s forwards;
+  opacity: 0;
+}
+
+.fade-in-delay-200 {
+  animation: fadeIn 0.4s ease-out 0.2s forwards;
+  opacity: 0;
+}
+
+.fade-in-delay-300 {
+  animation: fadeIn 0.4s ease-out 0.3s forwards;
+  opacity: 0;
+}

@@ -1,6 +1,69 @@
 import { motion } from 'framer-motion';
 
-export function AnimatedBackground({ theme = 'default' }) {
+export function AnimatedBackground({ theme = 'pure_white' }) {
+  // Pure White Theme - Minimal and Fast
+  if (theme === 'pure_white') {
+    return (
+      <div className="fixed inset-0 overflow-hidden pointer-events-none">
+        {/* Subtle gradient orbs - very minimal */}
+        <motion.div
+          animate={{
+            x: [0, 60, 0],
+            y: [0, -40, 0],
+            scale: [1, 1.1, 1],
+          }}
+          transition={{
+            duration: 25,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="absolute top-0 right-0 w-[400px] h-[400px] bg-blue-50/30 rounded-full blur-3xl"
+        />
+
+        <motion.div
+          animate={{
+            x: [0, -50, 0],
+            y: [0, 50, 0],
+            scale: [1, 1.15, 1],
+          }}
+          transition={{
+            duration: 30,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+          className="absolute bottom-0 left-0 w-[350px] h-[350px] bg-indigo-50/25 rounded-full blur-3xl"
+        />
+
+        {/* Minimal floating particles - only 4 */}
+        {[...Array(4)].map((_, i) => (
+          <motion.div
+            key={i}
+            initial={{
+              x: Math.random() * (typeof window !== 'undefined' ? window.innerWidth : 1000),
+              y: Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1000),
+              opacity: 0,
+            }}
+            animate={{
+              y: [null, Math.random() * (typeof window !== 'undefined' ? window.innerHeight : 1000)],
+              opacity: [0, Math.random() * 0.08, 0],
+            }}
+            transition={{
+              duration: Math.random() * 20 + 20,
+              repeat: Infinity,
+              ease: "linear",
+              delay: Math.random() * 5,
+            }}
+            className="absolute w-0.5 h-0.5 bg-blue-300 rounded-full will-change-transform"
+            style={{
+              left: `${Math.random() * 100}%`,
+            }}
+          />
+        ))}
+      </div>
+    );
+  }
+
+  // Midnight Black Theme
   if (theme === 'midnight_black') {
     return (
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
@@ -82,87 +145,6 @@ export function AnimatedBackground({ theme = 'default' }) {
     );
   }
 
-  // Default theme background
-  return (
-    <div className="absolute inset-0 bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 dark:from-purple-950 dark:via-blue-950 dark:to-pink-950 transition-colors duration-300">
-      <motion.div
-        className="absolute top-20 -left-20 w-72 h-72 bg-purple-300 dark:bg-purple-600/30 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-xl opacity-70 dark:opacity-40"
-        animate={{
-          x: [0, 100, 0],
-          y: [0, 50, 0],
-        }}
-        transition={{
-          duration: 20,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-      />
-      <motion.div
-        className="absolute top-40 -right-20 w-72 h-72 bg-blue-300 dark:bg-blue-600/30 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-xl opacity-70 dark:opacity-40"
-        animate={{
-          x: [0, -100, 0],
-          y: [0, 100, 0],
-        }}
-        transition={{
-          duration: 15,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-      />
-      <motion.div
-        className="absolute -bottom-20 left-1/2 w-72 h-72 bg-pink-300 dark:bg-pink-600/30 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-xl opacity-70 dark:opacity-40"
-        animate={{
-          x: [0, 50, 0],
-          y: [0, -50, 0],
-        }}
-        transition={{
-          duration: 18,
-          repeat: Infinity,
-          ease: "easeInOut"
-        }}
-      />
-
-      {/* Additional dark mode particles */}
-      <div className="dark:block hidden">
-        <motion.div
-          className="absolute top-1/4 left-1/4 w-2 h-2 bg-purple-400 rounded-full"
-          animate={{
-            scale: [1, 1.5, 1],
-            opacity: [0.3, 0.7, 0.3],
-          }}
-          transition={{
-            duration: 3,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-        <motion.div
-          className="absolute bottom-1/3 right-1/3 w-1 h-1 bg-blue-400 rounded-full"
-          animate={{
-            scale: [1, 2, 1],
-            opacity: [0.2, 0.6, 0.2],
-          }}
-          transition={{
-            duration: 4,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 1
-          }}
-        />
-        <motion.div
-          className="absolute top-1/2 right-1/4 w-1.5 h-1.5 bg-pink-400 rounded-full"
-          animate={{
-            scale: [1, 1.8, 1],
-            opacity: [0.3, 0.5, 0.3],
-          }}
-          transition={{
-            duration: 3.5,
-            repeat: Infinity,
-            ease: "easeInOut",
-            delay: 2
-          }}
-        />
-      </div>
-    </div>
-  );
+  // Fallback to pure_white for any unknown theme
+  return <AnimatedBackground theme="pure_white" />;
 }
