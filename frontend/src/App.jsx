@@ -1,19 +1,33 @@
-import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import React, { lazy, Suspense } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
-import { SignedIn, SignedOut, SignIn, RedirectToSignIn, useAuth } from '@clerk/clerk-react';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { BrandingProvider } from './contexts/BrandingContext';
-import { useTheme } from './hooks/useTheme';
-import { setAuthTokenGetter } from './services/api';
 
-// Pages
+// HomePage - load immediately (first page user sees)
 import HomePage from './pages/HomePage';
-import Dashboard from './pages/Dashboard';
-import CheckInPage from './pages/CheckInPage';
-import NoEventPage from './pages/NoEventPage';
-import ThankYouPage from './pages/ThankYouPage';
+
+// Secondary public pages - lazy-loaded (only when user navigates to them)
+const ThankYouPage = lazy(() => import('./pages/ThankYouPage'));
+const CheckInPage = lazy(() => import('./pages/CheckInPage'));
+const NoEventPage = lazy(() => import('./pages/NoEventPage'));
+
+// Protected pages - lazy-loaded (only when user visits these routes)
+// This ensures Clerk and Dashboard code ONLY loads when needed
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const ProtectedRoute = lazy(() => import('./components/ProtectedRoute').then(module => ({ default: module.ProtectedRoute })));
+const SignInPage = lazy(() => import('./components/SignInPage').then(module => ({ default: module.SignInPage })));
+
+// Loading fallback component
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center bg-gray-50">
+    <div className="text-center">
+      <div className="w-16 h-16 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+      <p className="text-gray-600 font-medium">Loading...</p>
+    </div>
+  </div>
+);
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -25,66 +39,49 @@ const queryClient = new QueryClient({
   },
 });
 
-// Component to conditionally show ThemeToggle
+// Main app content
 function AppContent() {
-  const location = useLocation();
-  const { setLightTheme } = useTheme();
-  const { getToken } = useAuth();
-
-  // Set up auth token getter for API calls
-  useEffect(() => {
-    setAuthTokenGetter(getToken);
-  }, [getToken]);
-
-  // Only show theme toggle on user-facing pages (not dashboard)
-  const isUserFacingPage = !location.pathname.includes('dashboard');
-  const isDashboardPage = location.pathname.includes('dashboard');
-
-  // Force light mode for dashboard
-  useEffect(() => {
-    if (isDashboardPage) {
-      setLightTheme();
-    }
-  }, [isDashboardPage, setLightTheme]);
 
   return (
     <div className="min-h-screen transition-colors duration-300">
       {/* ThemeToggle will be conditionally rendered inside pages based on branding theme */}
       <Routes>
+        {/* Public Routes - No Clerk, no auth, fast loading */}
         <Route path="/" element={<HomePage />} />
-        <Route path="/thank-you" element={<ThankYouPage />} />
-        <Route path="/check-in/:eventId/:qrId" element={<CheckInPage />} />
-        <Route path="/no-events" element={<NoEventPage />} />
+        <Route path="/thank-you" element={
+          <Suspense fallback={<PageLoader />}>
+            <ThankYouPage />
+          </Suspense>
+        } />
+        <Route path="/check-in/:eventId/:qrId" element={
+          <Suspense fallback={<PageLoader />}>
+            <CheckInPage />
+          </Suspense>
+        } />
+        <Route path="/no-events" element={
+          <Suspense fallback={<PageLoader />}>
+            <NoEventPage />
+          </Suspense>
+        } />
 
-        {/* Sign In Route */}
+        {/* Protected Routes - Clerk lazy-loaded only when accessed */}
         <Route
           path="/sign-in"
           element={
-            <>
-              <SignedIn>
-                <Navigate to="/dashboard" replace />
-              </SignedIn>
-              <SignedOut>
-                <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                  <SignIn routing="path" path="/sign-in" />
-                </div>
-              </SignedOut>
-            </>
+            <Suspense fallback={<PageLoader />}>
+              <SignInPage />
+            </Suspense>
           }
         />
 
-        {/* Protected Dashboard Route */}
         <Route
           path="/dashboard"
           element={
-            <>
-              <SignedIn>
+            <Suspense fallback={<PageLoader />}>
+              <ProtectedRoute>
                 <Dashboard />
-              </SignedIn>
-              <SignedOut>
-                <RedirectToSignIn />
-              </SignedOut>
-            </>
+              </ProtectedRoute>
+            </Suspense>
           }
         />
       </Routes>

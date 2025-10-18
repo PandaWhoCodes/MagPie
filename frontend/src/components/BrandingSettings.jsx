@@ -122,7 +122,7 @@ export default function BrandingSettings() {
             {...register('theme')}
             className="input-field"
           >
-            <option value="default">Default (Colorful Gradients)</option>
+            <option value="pure_white">Pure White (Clean & Fast)</option>
             <option value="midnight_black">Midnight Black (Sleek Dark)</option>
           </select>
           <p className="mt-1 text-xs text-gray-500">
