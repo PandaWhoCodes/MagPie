@@ -6,14 +6,15 @@ const BrandingContext = createContext(null);
 
 export function BrandingProvider({ children }) {
   // Prefetch branding data immediately at app level
+  // Backend has 6-hour cache, so we can cache aggressively on frontend
   const { data: branding, isLoading } = useQuery({
     queryKey: ['branding'],
     queryFn: async () => {
       const response = await brandingApi.get();
       return response.data;
     },
-    staleTime: 10 * 60 * 1000, // Cache for 10 minutes
-    cacheTime: 30 * 60 * 1000, // Keep in cache for 30 minutes
+    staleTime: 6 * 60 * 60 * 1000, // Cache for 6 hours
+    gcTime: 6 * 60 * 60 * 1000, // Keep in cache for 6 hours (gcTime replaces cacheTime)
     retry: 2,
     refetchOnMount: false, // Don't refetch if data exists
     refetchOnWindowFocus: false,
