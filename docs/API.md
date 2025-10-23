@@ -9,7 +9,18 @@ Complete API reference for all endpoints with request/response examples.
 
 ## Authentication
 
-Currently, no authentication is required (as per requirements).
+All admin endpoints require Clerk authentication. Public endpoints (registration forms, QR check-in) do not require authentication.
+
+**Authentication Headers:**
+```
+Authorization: Bearer <clerk_jwt_token>
+```
+
+**Protected Endpoints:** All endpoints except:
+- `POST /api/registrations/` (public registration)
+- `GET /api/events/active/` (public active event view)
+- `POST /api/registrations/check-in/{event_id}` (QR check-in)
+- `GET /api/registrations/profile/autofill` (auto-fill functionality)
 
 ---
 
@@ -33,7 +44,10 @@ GET /api/events/
     "venue": "Tech Hub, Building A",
     "venue_map_link": "https://maps.google.com/...",
     "is_active": true,
-    "created_at": "2025-10-01T10:00:00Z"
+    "admin_user_id": "user_12345",
+    "created_at": "2025-10-01T10:00:00Z",
+    "updated_at": "2025-10-01T10:00:00Z",
+    "fields": []
   }
 ]
 ```
@@ -50,13 +64,17 @@ GET /api/events/active/
   "id": "550e8400-e29b-41d4-a716-446655440000",
   "name": "Tech Workshop 2025",
   "is_active": true,
+  "admin_user_id": "user_12345",
   "fields": [
     {
       "id": "field-001",
-      "label": "Full Name",
-      "type": "text",
-      "required": true,
-      "field_order": 0
+      "event_id": "550e8400-e29b-41d4-a716-446655440000",
+      "field_name": "fullname",
+      "field_type": "text",
+      "field_label": "Full Name",
+      "is_required": true,
+      "field_order": 0,
+      "admin_user_id": "user_12345"
     }
   ]
 }
@@ -101,7 +119,10 @@ POST /api/events/
   "id": "550e8400-e29b-41d4-a716-446655440000",
   "name": "Tech Workshop 2025",
   "is_active": false,
-  "created_at": "2025-10-01T10:00:00Z"
+  "admin_user_id": "user_12345",
+  "created_at": "2025-10-01T10:00:00Z",
+  "updated_at": "2025-10-01T10:00:00Z",
+  "fields": []
 }
 ```
 
@@ -138,7 +159,11 @@ POST /api/events/{id}/clone?new_name=Cloned Event Name
 {
   "id": "new-event-id",
   "name": "Cloned Event Name",
-  "is_active": false
+  "is_active": false,
+  "admin_user_id": "user_12345",
+  "created_at": "2025-10-01T10:00:00Z",
+  "updated_at": "2025-10-01T10:00:00Z",
+  "fields": []
 }
 ```
 
@@ -276,8 +301,8 @@ POST /api/qr-codes/
 ```json
 {
   "event_id": "550e8400-e29b-41d4-a716-446655440000",
-  "qr_type": "text",
-  "qr_content": "WiFi Password: SecurePass123"
+  "message": "WiFi Password: SecurePass123",
+  "qr_type": "message"
 }
 ```
 
@@ -286,8 +311,8 @@ or
 ```json
 {
   "event_id": "550e8400-e29b-41d4-a716-446655440000",
-  "qr_type": "url",
-  "qr_content": "https://example.com/resources"
+  "message": "https://example.com/resources",
+  "qr_type": "url"
 }
 ```
 
@@ -296,8 +321,9 @@ or
 {
   "id": "qr-code-id",
   "event_id": "550e8400-e29b-41d4-a716-446655440000",
+  "message": "WiFi Password: SecurePass123",
   "qr_type": "text",
-  "qr_content": "WiFi Password: SecurePass123",
+  "admin_user_id": "user_12345",
   "qr_image": "base64_encoded_image_data",
   "created_at": "2025-10-01T10:00:00Z"
 }
@@ -323,6 +349,131 @@ DELETE /api/qr-codes/{id}
 
 ---
 
+## Message Templates API
+
+### Create Message Template
+
+```http
+POST /api/message-templates/
+```
+
+**Request Body**:
+```json
+{
+  "template_name": "Event Reminder",
+  "template_text": "Hi {{name}}! Don't forget about our event on {{date}} at {{venue}}. See you there! 🎉"
+}
+```
+
+**Response** (201):
+```json
+{
+  "id": "template-id",
+  "template_name": "Event Reminder",
+  "template_text": "Hi {{name}}! Don't forget about our event on {{date}} at {{venue}}. See you there! 🎉",
+  "admin_user_id": "user_12345",
+  "created_at": "2025-10-01T10:00:00Z",
+  "updated_at": "2025-10-01T10:00:00Z",
+  "variables": ["name", "date", "venue"]
+}
+```
+
+### Get All Message Templates
+
+```http
+GET /api/message-templates/
+```
+
+**Response** (200):
+```json
+[
+  {
+    "id": "template-id",
+    "template_name": "Event Reminder",
+    "template_text": "Hi {{name}}! Don't forget about our event...",
+    "admin_user_id": "user_12345",
+    "created_at": "2025-10-01T10:00:00Z",
+    "updated_at": "2025-10-01T10:00:00Z",
+    "variables": ["name", "date", "venue"]
+  }
+]
+```
+
+### Get Message Template
+
+```http
+GET /api/message-templates/{template_id}
+```
+
+### Update Message Template
+
+```http
+PUT /api/message-templates/{template_id}
+```
+
+**Request Body** (partial update):
+```json
+{
+  "template_name": "Updated Reminder",
+  "template_text": "Hello {{name}}! Reminder for {{event_name}} on {{date}}."
+}
+```
+
+### Delete Message Template
+
+```http
+DELETE /api/message-templates/{template_id}
+```
+
+**Response** (200):
+```json
+{
+  "message": "Template deleted successfully"
+}
+```
+
+---
+
+## Branding API
+
+### Get Branding Settings
+
+```http
+GET /api/branding/
+```
+
+**Response** (200):
+```json
+{
+  "id": "default",
+  "site_title": "MagPie Events",
+  "site_headline": "Where Innovation Meets Community",
+  "logo_url": null,
+  "text_style": "gradient",
+  "theme": "default",
+  "updated_at": "2025-10-01T10:00:00Z"
+}
+```
+
+### Update Branding Settings
+
+```http
+PUT /api/branding/
+```
+
+**Request Body** (partial update):
+```json
+{
+  "site_title": "My Event Platform",
+  "site_headline": "Register for amazing events",
+  "logo_url": "https://example.com/logo.png",
+  "text_style": "solid",
+  "theme": "dark"
+}
+```
+
+---
+
 ## WhatsApp API
 
 ### Send Bulk Messages
@@ -335,7 +486,28 @@ POST /api/whatsapp/send-bulk/
 ```json
 {
   "event_id": "550e8400-e29b-41d4-a716-446655440000",
-  "message": "Hi! Reminder about our event tomorrow. See you there! 🎉"
+  "message": "Hi! Reminder about our event tomorrow. See you there! 🎉",
+  "template_id": null,
+  "template_variables": null,
+  "send_to": "all",
+  "filter_field": null,
+  "filter_value": null
+}
+```
+
+or using a template:
+
+```json
+{
+  "event_id": "550e8400-e29b-41d4-a716-446655440000",
+  "message": null,
+  "template_id": "template-id",
+  "template_variables": {
+    "name": "John",
+    "event_name": "Tech Workshop",
+    "date": "2025-10-15"
+  },
+  "send_to": "all"
 }
 ```
 

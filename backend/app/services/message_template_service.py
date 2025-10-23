@@ -2,6 +2,7 @@ import uuid
 import re
 from typing import List, Optional
 from app.core.database import db
+from app.core.auth import AuthenticatedUser
 from app.models.message_template import MessageTemplate, MessageTemplateCreate, MessageTemplateUpdate
 
 
@@ -23,27 +24,28 @@ class MessageTemplateService:
             result = result.replace(f"{{{{{var_name}}}}}", str(var_value))
         return result
 
-    async def create_template(self, template_data: MessageTemplateCreate) -> MessageTemplate:
+    async def create_template(self, template_data: MessageTemplateCreate, auth) -> MessageTemplate:
         """Create a new message template"""
         template_id = str(uuid.uuid4())
 
         query = """
-            INSERT INTO message_templates (id, template_name, template_text)
-            VALUES (?, ?, ?)
+            INSERT INTO message_templates (id, template_name, template_text, admin_user_id)
+            VALUES (?, ?, ?, ?)
         """
 
         await db.execute(query, [
             template_id,
             template_data.template_name,
-            template_data.template_text
+            template_data.template_text,
+            auth.user_id
         ])
 
-        return await self.get_template(template_id)
+        return await self.get_template(template_id, auth)
 
     async def get_all_templates(self) -> List[MessageTemplate]:
         """Get all message templates"""
         query = """
-            SELECT id, template_name, template_text, created_at, updated_at
+            SELECT id, template_name, template_text, admin_user_id, created_at, updated_at
             FROM message_templates
             ORDER BY template_name ASC
         """
@@ -57,6 +59,7 @@ class MessageTemplateService:
                 id=row['id'],
                 template_name=row['template_name'],
                 template_text=row['template_text'],
+                admin_user_id=row['admin_user_id'],
                 created_at=row['created_at'],
                 updated_at=row['updated_at'],
                 variables=variables
@@ -67,7 +70,7 @@ class MessageTemplateService:
     async def get_template(self, template_id: str) -> Optional[MessageTemplate]:
         """Get a specific message template"""
         query = """
-            SELECT id, template_name, template_text, created_at, updated_at
+            SELECT id, template_name, template_text, admin_user_id, created_at, updated_at
             FROM message_templates
             WHERE id = ?
         """
@@ -82,6 +85,7 @@ class MessageTemplateService:
             id=row['id'],
             template_name=row['template_name'],
             template_text=row['template_text'],
+            admin_user_id=row['admin_user_id'],
             created_at=row['created_at'],
             updated_at=row['updated_at'],
             variables=variables
