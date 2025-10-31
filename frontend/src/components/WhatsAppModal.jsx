@@ -1,15 +1,54 @@
 import React, { useState, useEffect } from 'react';
-import { X, Send, Users, AlertCircle } from './SimpleIcons';
-import { whatsappApi, messageTemplatesApi } from '../services/api';
 import toast from 'react-hot-toast';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { whatsappApi, messageTemplatesApi } from '../services/api';
+
+// Icons (inline SVG)
+const SendIcon = ({ className = "h-6 w-6" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <line x1="22" y1="2" x2="11" y2="13" />
+    <polygon points="22 2 15 22 11 13 2 9 22 2" />
+  </svg>
+);
+
+const UsersIcon = ({ className = "h-4 w-4" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+    <circle cx="9" cy="7" r="4" />
+    <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+    <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+  </svg>
+);
+
+const InfoIcon = ({ className = "h-5 w-5" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <circle cx="12" cy="12" r="10" />
+    <line x1="12" y1="16" x2="12" y2="12" />
+    <line x1="12" y1="8" x2="12.01" y2="8" />
+  </svg>
+);
+
+const LoaderIcon = ({ className = "h-4 w-4" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`${className} animate-spin`}>
+    <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+  </svg>
+);
 
 export default function WhatsAppModal({ eventId, eventFields, isOpen, onClose, registrantsCount }) {
-  const [messageMode, setMessageMode] = useState('direct'); // 'direct' or 'template'
+  const [messageMode, setMessageMode] = useState('direct');
   const [message, setMessage] = useState('');
   const [templates, setTemplates] = useState([]);
   const [selectedTemplateId, setSelectedTemplateId] = useState('');
   const [templateVariables, setTemplateVariables] = useState({});
-  const [sendTo, setSendTo] = useState('all'); // 'all' or 'subset'
+  const [sendTo, setSendTo] = useState('all');
   const [filterField, setFilterField] = useState('');
   const [filterValue, setFilterValue] = useState('');
   const [fieldValues, setFieldValues] = useState([]);
@@ -33,7 +72,6 @@ export default function WhatsAppModal({ eventId, eventFields, isOpen, onClose, r
       const template = templates.find(t => t.id === selectedTemplateId);
       if (template) {
         setMessage(template.template_text);
-        // Initialize template variables
         const vars = {};
         template.variables.forEach(v => {
           vars[v] = '';
@@ -133,300 +171,268 @@ export default function WhatsAppModal({ eventId, eventFields, isOpen, onClose, r
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b">
-          <div className="flex items-center space-x-3">
-            <div className="p-2 bg-green-100 rounded-lg">
-              <Send className="w-6 h-6 text-green-600" />
+    <Dialog open={isOpen} onOpenChange={handleClose}>
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-green-100 dark:bg-green-900/20 rounded-lg">
+              <SendIcon className="h-5 w-5 text-green-600 dark:text-green-400" />
             </div>
             <div>
-              <h2 className="text-xl font-bold text-gray-900">Send WhatsApp Messages</h2>
-              <div className="flex items-center space-x-2 mt-1">
-                <Users className="w-4 h-4 text-gray-500" />
-                <span className="text-sm text-gray-600">
+              <DialogTitle>Send WhatsApp Messages</DialogTitle>
+              <div className="flex items-center gap-2 mt-1">
+                <UsersIcon className="h-5 w-5 text-muted-foreground" />
+                <span className="text-sm text-muted-foreground">
                   {registrantsCount} {registrantsCount === 1 ? 'recipient' : 'recipients'}
                 </span>
               </div>
             </div>
           </div>
-          <button
-            onClick={handleClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-          >
-            <X className="w-5 h-5 text-gray-500" />
-          </button>
-        </div>
+        </DialogHeader>
 
-        {/* Content */}
-        <div className="p-6 space-y-6">
+        <div className="space-y-6">
           {/* Info Alert */}
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-start space-x-3">
-            <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-            <div className="text-sm text-blue-800">
+          <Alert>
+            <InfoIcon className="h-4 w-4" />
+            <AlertDescription>
               <p className="font-medium mb-1">Important Information:</p>
-              <ul className="list-disc list-inside space-y-1">
+              <ul className="list-disc list-inside space-y-1 text-sm">
                 <li>Phone numbers will automatically be formatted (+91 for India)</li>
                 <li>Recipients must have joined the Twilio sandbox to receive messages</li>
                 <li>Use {`{{fieldname}}`} to personalize with registration data</li>
               </ul>
-            </div>
-          </div>
+            </AlertDescription>
+          </Alert>
 
           {/* Send To Options */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Send To
-            </label>
-            <div className="flex gap-4">
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  value="all"
-                  checked={sendTo === 'all'}
-                  onChange={(e) => setSendTo(e.target.value)}
-                  className="mr-2"
-                  disabled={isSending}
-                />
-                <span>All Registrants</span>
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  value="subset"
-                  checked={sendTo === 'subset'}
-                  onChange={(e) => setSendTo(e.target.value)}
-                  className="mr-2"
-                  disabled={isSending}
-                />
-                <span>User Subset (Filter by Field)</span>
-              </label>
-            </div>
+          <div className="space-y-2">
+            <Label>Send To</Label>
+            <RadioGroup value={sendTo} onValueChange={setSendTo}>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="all" id="all" disabled={isSending} />
+                <Label htmlFor="all" className="font-normal cursor-pointer">All Registrants</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="subset" id="subset" disabled={isSending} />
+                <Label htmlFor="subset" className="font-normal cursor-pointer">User Subset (Filter by Field)</Label>
+              </div>
+            </RadioGroup>
           </div>
 
           {/* Subset Filter Options */}
           {sendTo === 'subset' && (
-            <div className="bg-gray-50 p-4 rounded-lg space-y-4">
-              <h3 className="font-medium text-gray-900">Filter Options</h3>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Select Field
-                  </label>
-                  <select
-                    value={filterField}
-                    onChange={(e) => {
-                      setFilterField(e.target.value);
-                      setFilterValue('');
-                    }}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                    disabled={isSending}
-                  >
-                    <option value="">Choose a field...</option>
-                    {eventFields && eventFields.map((field) => (
-                      <option key={field.field_name} value={field.field_name}>
-                        {field.field_label}
-                      </option>
-                    ))}
-                  </select>
+            <Card className="bg-muted/50">
+              <CardContent className="pt-6 space-y-4">
+                <h3 className="font-medium">Filter Options</h3>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Select Field</Label>
+                    <Select
+                      value={filterField}
+                      onValueChange={(value) => {
+                        setFilterField(value);
+                        setFilterValue('');
+                      }}
+                      disabled={isSending}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Choose a field..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {eventFields && eventFields.map((field) => (
+                          <SelectItem key={field.field_name} value={field.field_name}>
+                            {field.field_label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label>Select Value</Label>
+                    <Select
+                      value={filterValue}
+                      onValueChange={setFilterValue}
+                      disabled={isSending || !filterField}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Choose a value..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {fieldValues.map((value, idx) => (
+                          <SelectItem key={idx} value={value}>
+                            {value}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Select Value
-                  </label>
-                  <select
-                    value={filterValue}
-                    onChange={(e) => setFilterValue(e.target.value)}
-                    className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                    disabled={isSending || !filterField}
-                  >
-                    <option value="">Choose a value...</option>
-                    {fieldValues.map((value, idx) => (
-                      <option key={idx} value={value}>
-                        {value}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-            </div>
+              </CardContent>
+            </Card>
           )}
 
           {/* Message Mode Selection */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Message Mode
-            </label>
-            <div className="flex gap-4">
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  value="direct"
-                  checked={messageMode === 'direct'}
-                  onChange={(e) => setMessageMode(e.target.value)}
-                  className="mr-2"
-                  disabled={isSending}
-                />
-                <span>Direct Message</span>
-              </label>
-              <label className="flex items-center">
-                <input
-                  type="radio"
-                  value="template"
-                  checked={messageMode === 'template'}
-                  onChange={(e) => setMessageMode(e.target.value)}
-                  className="mr-2"
-                  disabled={isSending}
-                />
-                <span>Use Template</span>
-              </label>
-            </div>
+          <div className="space-y-2">
+            <Label>Message Mode</Label>
+            <RadioGroup value={messageMode} onValueChange={setMessageMode}>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="direct" id="direct" disabled={isSending} />
+                <Label htmlFor="direct" className="font-normal cursor-pointer">Direct Message</Label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="template" id="template" disabled={isSending} />
+                <Label htmlFor="template" className="font-normal cursor-pointer">Use Template</Label>
+              </div>
+            </RadioGroup>
           </div>
 
           {/* Template Selection */}
           {messageMode === 'template' && (
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Select Template
-              </label>
-              <select
+            <div className="space-y-2">
+              <Label>Select Template</Label>
+              <Select
                 value={selectedTemplateId}
-                onChange={(e) => setSelectedTemplateId(e.target.value)}
-                className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+                onValueChange={setSelectedTemplateId}
                 disabled={isSending}
               >
-                <option value="">Choose a template...</option>
-                {templates.map((template) => (
-                  <option key={template.id} value={template.id}>
-                    {template.template_name}
-                  </option>
-                ))}
-              </select>
+                <SelectTrigger>
+                  <SelectValue placeholder="Choose a template..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {templates.map((template) => (
+                    <SelectItem key={template.id} value={template.id}>
+                      {template.template_name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           )}
 
           {/* Template Variables */}
           {messageMode === 'template' && selectedTemplateId && getSelectedTemplate()?.variables.length > 0 && (
-            <div className="bg-gray-50 p-4 rounded-lg space-y-4">
-              <h3 className="font-medium text-gray-900">Template Variables</h3>
-              <div className="space-y-3">
-                {getSelectedTemplate().variables.map((variable) => (
-                  <div key={variable}>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      {`{{${variable}}}`}
-                    </label>
-                    <input
-                      type="text"
-                      value={templateVariables[variable] || ''}
-                      onChange={(e) => setTemplateVariables({
-                        ...templateVariables,
-                        [variable]: e.target.value
-                      })}
-                      className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
-                      placeholder={`Enter value for ${variable}`}
-                      disabled={isSending}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
+            <Card className="bg-muted/50">
+              <CardContent className="pt-6 space-y-4">
+                <h3 className="font-medium">Template Variables</h3>
+                <div className="space-y-3">
+                  {getSelectedTemplate().variables.map((variable) => (
+                    <div key={variable} className="space-y-2">
+                      <Label>{`{{${variable}}}`}</Label>
+                      <Input
+                        value={templateVariables[variable] || ''}
+                        onChange={(e) => setTemplateVariables({
+                          ...templateVariables,
+                          [variable]: e.target.value
+                        })}
+                        placeholder={`Enter value for ${variable}`}
+                        disabled={isSending}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
           )}
 
           {/* Message Preview/Input */}
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+          <div className="space-y-2">
+            <Label htmlFor="message">
               {messageMode === 'template' ? 'Message Preview' : 'Message Content'}
-            </label>
-            <textarea
+            </Label>
+            <Textarea
+              id="message"
               value={message}
               onChange={(e) => messageMode === 'direct' && setMessage(e.target.value)}
               placeholder={messageMode === 'direct'
                 ? "Enter your message here...\n\nExample:\nHi {{name}}! This is a reminder about our upcoming event. Looking forward to seeing you there! 🎉"
                 : "Select a template to see preview..."
               }
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 min-h-[150px] resize-none"
+              rows={8}
               disabled={isSending || messageMode === 'template'}
             />
-            <p className="mt-2 text-sm text-gray-500">
+            <p className="text-xs text-muted-foreground">
               {message.length} characters
             </p>
           </div>
 
           {/* Send Result */}
           {sendResult && (
-            <div className="space-y-3">
-              <div className="bg-gray-50 rounded-lg p-4 space-y-2">
-                <h3 className="font-semibold text-gray-900">Sending Summary</h3>
+            <Card>
+              <CardContent className="pt-6 space-y-3">
+                <h3 className="font-semibold">Sending Summary</h3>
                 <div className="grid grid-cols-3 gap-3">
-                  <div className="bg-blue-100 rounded p-3 text-center">
-                    <p className="text-2xl font-bold text-blue-900">{sendResult.total}</p>
-                    <p className="text-xs text-blue-700">Total</p>
-                  </div>
-                  <div className="bg-green-100 rounded p-3 text-center">
-                    <p className="text-2xl font-bold text-green-900">{sendResult.sent}</p>
-                    <p className="text-xs text-green-700">Sent</p>
-                  </div>
-                  <div className="bg-red-100 rounded p-3 text-center">
-                    <p className="text-2xl font-bold text-red-900">{sendResult.failed}</p>
-                    <p className="text-xs text-red-700">Failed</p>
-                  </div>
+                  <Card className="bg-blue-100 dark:bg-blue-900/20">
+                    <CardContent className="p-3 text-center">
+                      <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">{sendResult.total}</p>
+                      <p className="text-xs text-blue-700 dark:text-blue-300">Total</p>
+                    </CardContent>
+                  </Card>
+                  <Card className="bg-green-100 dark:bg-green-900/20">
+                    <CardContent className="p-3 text-center">
+                      <p className="text-2xl font-bold text-green-900 dark:text-green-100">{sendResult.sent}</p>
+                      <p className="text-xs text-green-700 dark:text-green-300">Sent</p>
+                    </CardContent>
+                  </Card>
+                  <Card className="bg-red-100 dark:bg-red-900/20">
+                    <CardContent className="p-3 text-center">
+                      <p className="text-2xl font-bold text-red-900 dark:text-red-100">{sendResult.failed}</p>
+                      <p className="text-xs text-red-700 dark:text-red-300">Failed</p>
+                    </CardContent>
+                  </Card>
                 </div>
-              </div>
 
-              {/* Show failed recipients if any */}
-              {sendResult.failed > 0 && (
-                <details className="bg-red-50 border border-red-200 rounded-lg p-4">
-                  <summary className="cursor-pointer font-medium text-red-900">
-                    View Failed Messages ({sendResult.failed})
-                  </summary>
-                  <div className="mt-3 space-y-2 max-h-40 overflow-y-auto">
-                    {sendResult.results
-                      .filter((r) => !r.message_sid)
-                      .map((result, idx) => (
-                        <div key={idx} className="text-sm bg-white rounded p-2">
-                          <p className="font-medium text-gray-900">{result.email}</p>
-                          <p className="text-red-600">{result.phone}</p>
-                          <p className="text-xs text-gray-600">{result.error}</p>
-                        </div>
-                      ))}
-                  </div>
-                </details>
-              )}
-            </div>
+                {/* Show failed recipients if any */}
+                {sendResult.failed > 0 && (
+                  <details className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
+                    <summary className="cursor-pointer font-medium">
+                      View Failed Messages ({sendResult.failed})
+                    </summary>
+                    <div className="mt-3 space-y-2 max-h-40 overflow-y-auto">
+                      {sendResult.results
+                        .filter((r) => !r.message_sid)
+                        .map((result, idx) => (
+                          <div key={idx} className="text-sm bg-background rounded p-2">
+                            <p className="font-medium">{result.email}</p>
+                            <p className="text-muted-foreground">{result.phone}</p>
+                            <p className="text-xs text-destructive">{result.error}</p>
+                          </div>
+                        ))}
+                    </div>
+                  </details>
+                )}
+              </CardContent>
+            </Card>
           )}
         </div>
 
-        {/* Footer */}
-        <div className="flex items-center justify-end space-x-3 p-6 border-t bg-gray-50">
-          <button
+        <DialogFooter>
+          <Button
+            variant="outline"
             onClick={handleClose}
-            className="px-4 py-2 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
             disabled={isSending}
           >
             {sendResult ? 'Close' : 'Cancel'}
-          </button>
+          </Button>
           {!sendResult && (
-            <button
+            <Button
               onClick={handleSend}
               disabled={isSending || (messageMode === 'direct' && !message.trim()) || (messageMode === 'template' && !selectedTemplateId)}
-              className="btn-primary flex items-center space-x-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSending ? (
                 <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <LoaderIcon className="h-4 w-4 mr-2" />
                   <span>Sending...</span>
                 </>
               ) : (
                 <>
-                  <Send className="w-4 h-4" />
+                  <SendIcon className="w-4 h-4 mr-2" />
                   <span>Send Messages</span>
                 </>
               )}
-            </button>
+            </Button>
           )}
-        </div>
-      </div>
-    </div>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

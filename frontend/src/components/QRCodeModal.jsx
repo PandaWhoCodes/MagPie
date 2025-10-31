@@ -2,13 +2,42 @@ import React, { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { qrCodesApi } from '../services/api';
-import { X, Download, Trash2 } from './SimpleIcons';
+
+// Icons (inline SVG)
+const DownloadIcon = ({ className = "h-4 w-4" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+    <polyline points="7 10 12 15 17 10" />
+    <line x1="12" y1="15" x2="12" y2="3" />
+  </svg>
+);
+
+const Trash2Icon = ({ className = "h-4 w-4" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <polyline points="3 6 5 6 21 6" />
+    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+  </svg>
+);
 
 export default function QRCodeModal({ event, onClose }) {
   const queryClient = useQueryClient();
   const [activeTab, setActiveTab] = useState('create');
-  const { register, handleSubmit, reset, formState: { errors } } = useForm();
+  const { register, handleSubmit, reset, setValue, watch, formState: { errors } } = useForm({
+    defaultValues: {
+      qr_type: 'message',
+      message: '',
+    },
+  });
 
   // Fetch existing QR codes for this event
   const { data: qrCodes = [], isLoading } = useQuery({
@@ -29,7 +58,7 @@ export default function QRCodeModal({ event, onClose }) {
       });
       return response.data;
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       toast.success('QR Code created successfully!');
       queryClient.invalidateQueries(['qrCodes', event.id]);
       reset();
@@ -66,161 +95,145 @@ export default function QRCodeModal({ event, onClose }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-        {/* Header */}
-        <div className="bg-white border-b border-gray-200 px-6 py-4 flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-gray-900">
-            QR Codes: {event.name}
-          </h2>
-          <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-lg">
-            <X className="w-6 h-6" />
-          </button>
-        </div>
+    <Dialog open={true} onOpenChange={onClose}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>QR Codes: {event.name}</DialogTitle>
+        </DialogHeader>
 
-        {/* Tabs */}
-        <div className="border-b border-gray-200">
-          <div className="flex">
-            <button
-              onClick={() => setActiveTab('create')}
-              className={`px-6 py-3 font-medium ${
-                activeTab === 'create'
-                  ? 'text-primary border-b-2 border-primary'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
-              Create New
-            </button>
-            <button
-              onClick={() => setActiveTab('list')}
-              className={`px-6 py-3 font-medium ${
-                activeTab === 'list'
-                  ? 'text-primary border-b-2 border-primary'
-                  : 'text-gray-600 hover:text-gray-900'
-              }`}
-            >
+        <Tabs value={activeTab} onValueChange={setActiveTab}>
+          <TabsList className="w-full">
+            <TabsTrigger value="create" className="flex-1">Create New</TabsTrigger>
+            <TabsTrigger value="list" className="flex-1">
               Existing QR Codes ({qrCodes.length})
-            </button>
-          </div>
-        </div>
+            </TabsTrigger>
+          </TabsList>
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6">
-          {activeTab === 'create' ? (
+          <TabsContent value="create" className="mt-6">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  QR Type
-                </label>
-                <select {...register('qr_type')} className="input-field">
-                  <option value="message">Message (WiFi Password, Instructions, etc.)</option>
-                  <option value="url">URL (Link to join group, website, etc.)</option>
-                </select>
+              <div className="space-y-2">
+                <Label htmlFor="qr_type">QR Type</Label>
+                <Select
+                  value={watch('qr_type')}
+                  onValueChange={(value) => setValue('qr_type', value)}
+                >
+                  <SelectTrigger id="qr_type">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="message">Message (WiFi Password, Instructions, etc.)</SelectItem>
+                    <SelectItem value="url">URL (Link to join group, website, etc.)</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Message / URL *
-                </label>
-                <textarea
+              <div className="space-y-2">
+                <Label htmlFor="message">Message / URL *</Label>
+                <Textarea
+                  id="message"
                   {...register('message', { required: 'This field is required' })}
-                  className="input-field"
-                  rows="4"
+                  rows={4}
                   placeholder="Enter the message or URL that will be shown after check-in..."
+                  className={errors.message ? 'border-destructive' : ''}
                 />
                 {errors.message && (
-                  <p className="mt-1 text-sm text-red-600">{errors.message.message}</p>
+                  <p className="text-sm text-destructive">{errors.message.message}</p>
                 )}
-                <p className="mt-2 text-sm text-gray-600">
+                <p className="text-xs text-muted-foreground">
                   This will be displayed to attendees after they check in using their email.
                 </p>
               </div>
 
-              <button
+              <Button
                 type="submit"
                 disabled={createMutation.isPending}
-                className="btn-primary w-full"
+                className="w-full"
               >
                 {createMutation.isPending ? 'Creating...' : 'Create QR Code'}
-              </button>
+              </Button>
             </form>
-          ) : (
+          </TabsContent>
+
+          <TabsContent value="list" className="mt-6">
             <div className="space-y-4">
               {isLoading ? (
-                <div className="text-center py-8">
-                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+                <div className="space-y-4">
+                  <Skeleton className="h-40 w-full" />
+                  <Skeleton className="h-40 w-full" />
                 </div>
               ) : qrCodes.length === 0 ? (
-                <div className="text-center py-12">
-                  <p className="text-gray-600">No QR codes created yet</p>
-                  <button
-                    onClick={() => setActiveTab('create')}
-                    className="mt-4 btn-primary"
-                  >
-                    Create Your First QR Code
-                  </button>
-                </div>
+                <Card>
+                  <CardContent className="flex flex-col items-center justify-center py-12">
+                    <p className="text-muted-foreground mb-4">No QR codes created yet</p>
+                    <Button onClick={() => setActiveTab('create')}>
+                      Create Your First QR Code
+                    </Button>
+                  </CardContent>
+                </Card>
               ) : (
                 qrCodes.map((qr) => (
-                  <div key={qr.id} className="card border-2 border-gray-200">
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center space-x-2 mb-2">
-                          <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded">
-                            {qr.qr_type}
-                          </span>
-                          <span className="text-sm text-gray-500">
-                            {new Date(qr.created_at).toLocaleDateString()}
-                          </span>
-                        </div>
-                        <p className="text-gray-900 break-all mb-4">{qr.message}</p>
-
-                        {/* Show QR Code Image if available */}
-                        {qr.qr_image && (
-                          <div className="mb-4">
-                            <img
-                              src={`data:image/png;base64,${qr.qr_image}`}
-                              alt="QR Code"
-                              className="w-48 h-48 border border-gray-300 rounded"
-                            />
+                  <Card key={qr.id}>
+                    <CardContent className="pt-6">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <Badge variant="secondary">{qr.qr_type}</Badge>
+                            <span className="text-sm text-muted-foreground">
+                              {new Date(qr.created_at).toLocaleDateString()}
+                            </span>
                           </div>
-                        )}
+                          <p className="break-all mb-4">{qr.message}</p>
 
-                        <p className="text-sm text-gray-600">
-                          Check-in URL: {window.location.origin}/check-in/{event.id}/{qr.id}
-                        </p>
-                      </div>
+                          {/* Show QR Code Image if available */}
+                          {qr.qr_image && (
+                            <div className="mb-4">
+                              <img
+                                src={`data:image/png;base64,${qr.qr_image}`}
+                                alt="QR Code"
+                                className="w-48 h-48 border rounded"
+                              />
+                            </div>
+                          )}
 
-                      <div className="flex flex-col space-y-2 ml-4">
-                        {qr.qr_image && (
-                          <button
-                            onClick={() => downloadQRCode(qr.qr_image, qr.id)}
-                            className="p-2 hover:bg-gray-100 rounded-lg"
-                            title="Download QR Code"
+                          <p className="text-sm text-muted-foreground">
+                            Check-in URL: {window.location.origin}/check-in/{event.id}/{qr.id}
+                          </p>
+                        </div>
+
+                        <div className="flex flex-col gap-2 ml-4">
+                          {qr.qr_image && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => downloadQRCode(qr.qr_image, qr.id)}
+                              title="Download QR Code"
+                            >
+                              <DownloadIcon className="h-5 w-5 text-blue-600" />
+                            </Button>
+                          )}
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => {
+                              if (confirm('Delete this QR code?')) {
+                                deleteMutation.mutate(qr.id);
+                              }
+                            }}
+                            title="Delete"
+                            className="text-destructive hover:text-destructive"
                           >
-                            <Download className="w-5 h-5 text-blue-600" />
-                          </button>
-                        )}
-                        <button
-                          onClick={() => {
-                            if (confirm('Delete this QR code?')) {
-                              deleteMutation.mutate(qr.id);
-                            }
-                          }}
-                          className="p-2 hover:bg-red-100 rounded-lg"
-                          title="Delete"
-                        >
-                          <Trash2 className="w-5 h-5 text-red-600" />
-                        </button>
+                            <Trash2Icon />
+                          </Button>
+                        </div>
                       </div>
-                    </div>
-                  </div>
+                    </CardContent>
+                  </Card>
                 ))
               )}
             </div>
-          )}
-        </div>
-      </div>
-    </div>
+          </TabsContent>
+        </Tabs>
+      </DialogContent>
+    </Dialog>
   );
 }

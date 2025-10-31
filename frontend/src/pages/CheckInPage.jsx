@@ -3,37 +3,37 @@ import { useParams } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
-import { motion, AnimatePresence } from 'framer-motion';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ThemeProvider, useTheme } from "@/contexts/ThemeProvider";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { qrCodesApi, registrationsApi } from '../services/api';
-import { CheckCircle, Wifi, Link as LinkIcon, Sparkles, Zap } from '../components/SimpleIcons';
 import Footer from '../components/Footer';
 
-// Ripple effect component
-const RippleEffect = () => {
-  return (
-    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-      {[...Array(3)].map((_, i) => (
-        <motion.div
-          key={i}
-          initial={{ scale: 0, opacity: 1 }}
-          animate={{ scale: 3, opacity: 0 }}
-          transition={{
-            duration: 1.5,
-            delay: i * 0.3,
-            repeat: Infinity,
-            repeatDelay: 0.5,
-          }}
-          className="absolute w-32 h-32 border-4 border-green-400 rounded-full"
-        />
-      ))}
-    </div>
-  );
-};
+// Icons (inline SVG)
+const CheckCircleIcon = ({ className = "h-10 w-10" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+    <polyline points="22 4 12 14.01 9 11.01" />
+  </svg>
+);
 
-export default function CheckInPage() {
+const LinkIcon = ({ className = "h-5 w-5" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+    <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+  </svg>
+);
+
+function CheckInPageContent() {
   const { eventId, qrId } = useParams();
   const [checkedIn, setCheckedIn] = useState(false);
   const { register, handleSubmit, formState: { errors } } = useForm();
+  const { mode, toggleMode } = useTheme();
 
   // Fetch QR code details
   const { data: qrCode, isLoading } = useQuery({
@@ -52,7 +52,7 @@ export default function CheckInPage() {
     },
     onSuccess: () => {
       setCheckedIn(true);
-      toast.success('✨ Successfully checked in!', {
+      toast.success('Successfully checked in!', {
         icon: '🎉',
         duration: 3000,
       });
@@ -69,329 +69,134 @@ export default function CheckInPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-blue-950 dark:via-purple-950 dark:to-pink-950 transition-colors duration-300">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="text-center"
-        >
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-            className="w-16 h-16 border-4 border-blue-500 dark:border-blue-400 border-t-transparent rounded-full mx-auto dark:shadow-lg dark:shadow-blue-500/30"
-          />
-          <motion.p
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="mt-4 text-gray-600 dark:text-gray-400 font-medium"
-          >
-            Loading...
-          </motion.p>
-        </motion.div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Card className="w-full max-w-md mx-4">
+          <CardHeader>
+            <Skeleton className="h-8 w-3/4 mb-2" />
+            <Skeleton className="h-4 w-full" />
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (checkedIn) {
+    return (
+      <div className="min-h-screen flex flex-col bg-background">
+        <div className="fixed top-4 right-4 z-50">
+          <ThemeToggle mode={mode} onToggle={toggleMode} />
+        </div>
+
+        <div className="flex-1 flex items-center justify-center px-4 py-12">
+          <Card className="w-full max-w-md">
+            <CardHeader className="text-center">
+              <div className="flex justify-center mb-4">
+                <div className="inline-flex items-center justify-center w-20 h-20 bg-green-100 dark:bg-green-900/20 rounded-full">
+                  <CheckCircleIcon className="h-12 w-12 text-green-600 dark:text-green-500" />
+                </div>
+              </div>
+              <CardTitle className="text-2xl">Check-in Successful!</CardTitle>
+              <CardDescription>
+                You've been successfully checked in to the event.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {qrCode && (
+                <>
+                  {qrCode.qr_type === 'text' && qrCode.message && (
+                    <Alert>
+                      <AlertDescription className="text-center">
+                        {qrCode.message}
+                      </AlertDescription>
+                    </Alert>
+                  )}
+
+                  {qrCode.qr_type === 'url' && qrCode.message && (
+                    <div className="text-center">
+                      <Button asChild>
+                        <a
+                          href={qrCode.message}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-2"
+                        >
+                          <LinkIcon className="h-4 w-4" />
+                          Visit Link
+                        </a>
+                      </Button>
+                    </div>
+                  )}
+                </>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+        <Footer />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden transition-colors duration-300">
-      {/* Animated Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-blue-950 dark:via-purple-950 dark:to-pink-950 transition-colors duration-300">
-        <motion.div
-          className="absolute top-20 -left-20 w-96 h-96 bg-blue-300 dark:bg-blue-600/30 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-xl opacity-70 dark:opacity-40"
-          animate={{
-            x: [0, 100, 0],
-            y: [0, 50, 0],
-          }}
-          transition={{
-            duration: 20,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-        <motion.div
-          className="absolute top-40 -right-20 w-96 h-96 bg-purple-300 dark:bg-purple-600/30 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-xl opacity-70 dark:opacity-40"
-          animate={{
-            x: [0, -100, 0],
-            y: [0, 100, 0],
-          }}
-          transition={{
-            duration: 15,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-        <motion.div
-          className="absolute -bottom-20 left-1/2 w-96 h-96 bg-pink-300 dark:bg-pink-600/30 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-xl opacity-70 dark:opacity-40"
-          animate={{
-            x: [0, 50, 0],
-            y: [0, -50, 0],
-          }}
-          transition={{
-            duration: 18,
-            repeat: Infinity,
-            ease: "easeInOut"
-          }}
-        />
-
-        {/* Additional dark mode particles */}
-        <div className="dark:block hidden">
-          <motion.div
-            className="absolute top-1/3 right-1/4 w-2 h-2 bg-blue-400 rounded-full"
-            animate={{
-              scale: [1, 1.5, 1],
-              opacity: [0.3, 0.7, 0.3],
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: "easeInOut"
-            }}
-          />
-          <motion.div
-            className="absolute bottom-1/3 left-1/3 w-1.5 h-1.5 bg-purple-400 rounded-full"
-            animate={{
-              scale: [1, 2, 1],
-              opacity: [0.2, 0.6, 0.2],
-            }}
-            transition={{
-              duration: 4,
-              repeat: Infinity,
-              ease: "easeInOut",
-              delay: 1
-            }}
-          />
-        </div>
+    <div className="min-h-screen flex flex-col bg-background">
+      <div className="fixed top-4 right-4 z-50">
+        <ThemeToggle mode={mode} onToggle={toggleMode} />
       </div>
 
-      {/* Content */}
-      <div className="relative z-10 min-h-screen flex items-center justify-center py-12 px-4">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="w-full max-w-md"
-        >
-          <div className="backdrop-blur-lg bg-white/80 dark:bg-gray-900/60 rounded-3xl shadow-2xl dark:shadow-[0_20px_50px_rgba(59,130,246,0.2)] border border-white/20 dark:border-gray-700/30 p-8 md:p-10 transition-all duration-300">
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-              className="text-center mb-8"
-            >
-              <motion.div
-                whileHover={{ scale: 1.1, rotate: 10 }}
-                className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-blue-500 to-purple-500 dark:from-blue-600 dark:to-purple-600 rounded-2xl mb-4 shadow-xl dark:shadow-blue-500/30"
-              >
-                {qrCode?.qr_type === 'url' ? (
-                  <LinkIcon className="w-10 h-10 text-white" />
-                ) : (
-                  <Wifi className="w-10 h-10 text-white" />
+      <div className="flex-1 flex items-center justify-center px-4 py-12">
+        <Card className="w-full max-w-md">
+          <CardHeader>
+            <CardTitle>Event Check-in</CardTitle>
+            <CardDescription>
+              Enter your email address to check in to this event
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email Address</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="your.email@example.com"
+                  {...register('email', {
+                    required: 'Email is required',
+                    pattern: {
+                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                      message: 'Invalid email address',
+                    },
+                  })}
+                  className={errors.email ? 'border-destructive' : ''}
+                />
+                {errors.email && (
+                  <p className="text-sm text-destructive">{errors.email.message}</p>
                 )}
-              </motion.div>
+              </div>
 
-              <motion.h1
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="text-4xl font-black text-gray-900 dark:text-gray-100 mb-2 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent"
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={checkInMutation.isPending}
               >
-                Event Check-In
-              </motion.h1>
-
-              <motion.p
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 0.4 }}
-                className="text-gray-600 dark:text-gray-300 text-lg font-medium"
-              >
-                Enter your email to check in
-              </motion.p>
-            </motion.div>
-
-            <AnimatePresence mode="wait">
-              {!checkedIn ? (
-                <motion.form
-                  key="form"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.3 }}
-                  onSubmit={handleSubmit(onSubmit)}
-                  className="space-y-6"
-                >
-                  <motion.div
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.5 }}
-                  >
-                    <label className="block text-sm font-bold text-gray-700 dark:text-gray-300 mb-2">
-                      Email Address
-                    </label>
-                    <input
-                      type="email"
-                      {...register('email', { required: 'Email is required' })}
-                      className="w-full px-4 py-3 rounded-xl border-2 border-gray-200 dark:border-gray-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-4 focus:ring-blue-100 dark:focus:ring-blue-900/50 transition-all duration-300 text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 font-medium placeholder-gray-400 dark:placeholder-gray-500"
-                      placeholder="your@email.com"
-                      autoFocus
-                    />
-                    <AnimatePresence>
-                      {errors.email && (
-                        <motion.p
-                          initial={{ opacity: 0, y: -10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          exit={{ opacity: 0, y: -10 }}
-                          className="mt-2 text-sm text-red-600 font-medium"
-                        >
-                          {errors.email.message}
-                        </motion.p>
-                      )}
-                    </AnimatePresence>
-                  </motion.div>
-
-                  <motion.button
-                    type="submit"
-                    disabled={checkInMutation.isPending}
-                    whileHover={!checkInMutation.isPending ? { scale: 1.02 } : {}}
-                    whileTap={!checkInMutation.isPending ? { scale: 0.98 } : {}}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.6 }}
-                    className={`relative w-full py-4 rounded-xl text-lg font-bold text-white overflow-hidden transition-all duration-300 ${
-                      checkInMutation.isPending
-                        ? 'bg-gradient-to-r from-gray-400 to-gray-500 dark:from-gray-600 dark:to-gray-700'
-                        : 'bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 dark:from-blue-500 dark:via-purple-500 dark:to-pink-500 hover:shadow-2xl dark:hover:shadow-[0_10px_40px_rgba(59,130,246,0.4)]'
-                    } dark:border dark:border-purple-500/20`}
-                  >
-                    <AnimatePresence mode="wait">
-                      {checkInMutation.isPending ? (
-                        <motion.div
-                          key="loading"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                          className="flex items-center justify-center space-x-2"
-                        >
-                          <motion.div
-                            animate={{ rotate: 360 }}
-                            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                            className="w-5 h-5 border-2 border-white border-t-transparent rounded-full"
-                          />
-                          <span>Checking in...</span>
-                        </motion.div>
-                      ) : (
-                        <motion.div
-                          key="default"
-                          initial={{ opacity: 0 }}
-                          animate={{ opacity: 1 }}
-                          exit={{ opacity: 0 }}
-                          className="flex items-center justify-center space-x-2"
-                        >
-                          <Zap className="w-5 h-5" />
-                          <span>Check In</span>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-
-                    {/* Shine effect */}
-                    {!checkInMutation.isPending && (
-                      <motion.div
-                        className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-0"
-                        animate={{
-                          x: ['-100%', '100%'],
-                          opacity: [0, 0.3, 0],
-                        }}
-                        transition={{
-                          duration: 2,
-                          repeat: Infinity,
-                          repeatDelay: 3,
-                        }}
-                      />
-                    )}
-                  </motion.button>
-                </motion.form>
-              ) : (
-                <motion.div
-                  key="success"
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.8 }}
-                  transition={{ duration: 0.5, type: "spring" }}
-                  className="text-center space-y-6"
-                >
-                  <div className="relative inline-block">
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                      className="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full shadow-2xl"
-                    >
-                      <CheckCircle className="w-16 h-16 text-white" />
-                    </motion.div>
-                    <RippleEffect />
-                  </div>
-
-                  <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4 }}
-                  >
-                    <div className="flex items-center justify-center space-x-2 mb-3">
-                      <Sparkles className="w-6 h-6 text-yellow-500 dark:text-yellow-400" />
-                      <h2 className="text-3xl font-black text-gray-900 dark:text-gray-100">
-                        Welcome!
-                      </h2>
-                      <Sparkles className="w-6 h-6 text-yellow-500 dark:text-yellow-400" />
-                    </div>
-                    <p className="text-gray-600 dark:text-gray-300 text-lg font-medium">
-                      You've been successfully checked in.
-                    </p>
-                  </motion.div>
-
-                  {/* Display QR code message/URL */}
-                  {qrCode && (
-                    <motion.div
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: 0.6 }}
-                      className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/30 dark:to-purple-900/30 border-2 border-blue-200 dark:border-blue-600/50 rounded-2xl p-6 shadow-lg dark:shadow-blue-500/20"
-                    >
-                      {qrCode.qr_type === 'url' ? (
-                        <div>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 font-medium">
-                            Click below to access:
-                          </p>
-                          <motion.a
-                            href={qrCode.message}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            whileHover={{ scale: 1.02 }}
-                            whileTap={{ scale: 0.98 }}
-                            className="inline-flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500 text-white font-bold rounded-xl hover:shadow-lg dark:hover:shadow-blue-500/30 transition-all"
-                          >
-                            <LinkIcon className="w-5 h-5" />
-                            <span>Open Link</span>
-                          </motion.a>
-                        </div>
-                      ) : (
-                        <div>
-                          <p className="text-sm text-gray-600 dark:text-gray-400 mb-3 font-bold">
-                            📋 Information:
-                          </p>
-                          <p className="text-gray-900 dark:text-gray-100 font-mono text-lg break-all bg-white/50 dark:bg-gray-800/50 p-4 rounded-xl">
-                            {qrCode.message}
-                          </p>
-                        </div>
-                      )}
-                    </motion.div>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        </motion.div>
+                {checkInMutation.isPending ? 'Checking in...' : 'Check In'}
+              </Button>
+            </form>
+          </CardContent>
+        </Card>
       </div>
+
       <Footer />
     </div>
+  );
+}
+
+export default function CheckInPage() {
+  return (
+    <ThemeProvider>
+      <CheckInPageContent />
+    </ThemeProvider>
   );
 }

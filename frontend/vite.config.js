@@ -2,8 +2,14 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { visualizer } from 'rollup-plugin-visualizer'
 import { ViteImageOptimizer } from 'vite-plugin-image-optimizer'
+import path from 'path'
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+  },
   plugins: [
     react(),
     // Bundle analyzer - generates stats.html after build
@@ -49,7 +55,6 @@ export default defineConfig({
           'react-vendor': ['react', 'react-dom', 'react-router-dom'],
           'clerk-vendor': ['@clerk/clerk-react'],
           'query-vendor': ['@tanstack/react-query'],
-          'animation-vendor': ['framer-motion'],
         },
       },
     },
@@ -88,7 +93,6 @@ export default defineConfig({
       'react-router-dom',
       '@clerk/clerk-react',
       '@tanstack/react-query',
-      'framer-motion',
       'axios',
       'react-hook-form',
       'react-hot-toast',

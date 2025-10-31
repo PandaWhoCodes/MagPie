@@ -2,8 +2,7 @@ import React, { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
-import { ThemeProvider } from './contexts/ThemeContext';
-import { BrandingProvider } from './contexts/BrandingContext';
+import { ThemeProvider } from './contexts/ThemeProvider';
 
 // HomePage - load immediately (first page user sees)
 import HomePage from './pages/HomePage';
@@ -92,14 +91,12 @@ function AppContent() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <BrandingProvider>
-        <ThemeProvider>
-          <Router>
-            <AppContent />
-          </Router>
-          <Toaster position="top-right" />
-        </ThemeProvider>
-      </BrandingProvider>
+      <ThemeProvider>
+        <Router>
+          <AppContent />
+        </Router>
+        <Toaster position="top-right" />
+      </ThemeProvider>
     </QueryClientProvider>
   );
 }
