@@ -1,10 +1,13 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
+
+from dotenv import load_dotenv
+load_dotenv()
+
 from app.core.config import get_settings
 from app.core.database import db
 from app.api import events, registrations, qr_codes, event_fields, branding, whatsapp, message_templates, email
-
 settings = get_settings()
 
 

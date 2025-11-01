@@ -1,40 +1,41 @@
+
 """
 Authentication utilities using Clerk
 """
+import os
+import requests
+import time
+import logging
+from jwt import PyJWKClient
 from fastapi import Security, HTTPException, status
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 import jwt
-from jwt import PyJWKClient
-import os
-import logging
-from dotenv import load_dotenv
+
 
 # Set up logging
 logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
-# Load environment variables
-load_dotenv()
-
 # Get Clerk secret key
 CLERK_SECRET_KEY = os.getenv("CLERK_SECRET_KEY")
-
 if not CLERK_SECRET_KEY:
     raise ValueError("CLERK_SECRET_KEY environment variable is required")
-
 logger.info(f"✅ CLERK_SECRET_KEY loaded: {CLERK_SECRET_KEY[:20]}...")
 
-# JWKS URL for Clerk
-JWKS_URL = "https://steady-hawk-55.clerk.accounts.dev/.well-known/jwks.json"
-logger.info(f"🔑 Using JWKS URL: {JWKS_URL}")
 
-# Initialize PyJWKClient with SSL verification disabled for localhost
+
+
+# JWKS URL for Clerk using Backend API (requires secret key)
+JWKS_URL = "https://api.clerk.com/v1/jwks"
+logger.info(f"🔑 Using Clerk Backend JWKS URL: {JWKS_URL}")
+custom_headers = {"Authorization": f"Bearer {CLERK_SECRET_KEY}", 'User-Agent': 'python-urllib/3.11'}
 import ssl
 import certifi
 jwks_client = PyJWKClient(
     JWKS_URL,
     timeout=30,
-    ssl_context=ssl.create_default_context(cafile=certifi.where())  # Use certifi for SSL
+    ssl_context=ssl.create_default_context(cafile=certifi.where()),  # Use certifi for SSL
+    headers=custom_headers
 )
 
 # HTTP Bearer security scheme
@@ -58,9 +59,10 @@ async def clerk_auth(credentials: HTTPAuthorizationCredentials = Security(securi
     logger.debug(f"🔍 Received token: {token[:50]}...")
 
     try:
-        # Get the signing key from JWKS
+        # Get the signing key from JWKS using PyJWKClient with headers
         signing_key = jwks_client.get_signing_key_from_jwt(token)
-        logger.debug(f"✅ Got signing key")
+        logger.info(f"🔍 signing_key: {signing_key.key}...")
+        logger.debug("✅ Got signing key")
 
         # Decode and verify the token
         decoded_token = jwt.decode(
