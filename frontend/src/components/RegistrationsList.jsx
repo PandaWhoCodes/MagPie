@@ -1,9 +1,58 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import { eventsApi } from '../services/api';
-import { Download, Search, CheckCircle, XCircle, MessageCircle, Mail } from './SimpleIcons';
 import WhatsAppModal from './WhatsAppModal';
 import EmailModal from './EmailModal';
+
+// Icons (inline SVG)
+const DownloadIcon = ({ className = "h-5 w-5" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+    <polyline points="7 10 12 15 17 10" />
+    <line x1="12" y1="15" x2="12" y2="3" />
+  </svg>
+);
+
+const SearchIcon = ({ className = "h-5 w-5" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <circle cx="11" cy="11" r="8" />
+    <path d="m21 21-4.35-4.35" />
+  </svg>
+);
+
+const CheckCircleIcon = ({ className = "h-5 w-5" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+    <polyline points="22 4 12 14.01 9 11.01" />
+  </svg>
+);
+
+const XCircleIcon = ({ className = "h-5 w-5" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <circle cx="12" cy="12" r="10" />
+    <line x1="15" y1="9" x2="9" y2="15" />
+    <line x1="9" y1="9" x2="15" y2="15" />
+  </svg>
+);
+
+const MessageCircleIcon = ({ className = "h-5 w-5" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+  </svg>
+);
+
+const MailIcon = ({ className = "h-5 w-5" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <rect x="2" y="4" width="20" height="16" rx="2" />
+    <path d="m2 7 8.97 5.7a1.94 1.94 0 0 0 2.06 0L22 7" />
+  </svg>
+);
 
 export default function RegistrationsList({ eventId }) {
   const [searchTerm, setSearchTerm] = useState('');
@@ -35,18 +84,17 @@ export default function RegistrationsList({ eventId }) {
   const exportToCSV = () => {
     if (registrations.length === 0) return;
 
-    // Get all unique fields from form_data, excluding email and phone (already in main columns)
+    // Get all unique fields from form_data, excluding email and phone
     const allFields = new Set();
     registrations.forEach((reg) => {
       Object.keys(reg.form_data).forEach((key) => {
-        // Exclude email and phone as they're already in the main columns
         if (key !== 'email' && key !== 'phone') {
           allFields.add(key);
         }
       });
     });
 
-    // Create CSV header - convert field names to proper case
+    // Create CSV header
     const headers = [
       'Email',
       'Phone',
@@ -92,18 +140,25 @@ export default function RegistrationsList({ eventId }) {
 
   if (isLoading) {
     return (
-      <div className="text-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-        <p className="mt-4 text-gray-600">Loading registrations...</p>
+      <div className="space-y-4">
+        <Skeleton className="h-10 w-full" />
+        <div className="grid grid-cols-3 gap-4">
+          <Skeleton className="h-20 w-full" />
+          <Skeleton className="h-20 w-full" />
+          <Skeleton className="h-20 w-full" />
+        </div>
+        <Skeleton className="h-64 w-full" />
       </div>
     );
   }
 
   if (registrations.length === 0) {
     return (
-      <div className="text-center py-12">
-        <p className="text-gray-600 text-lg">No registrations yet</p>
-      </div>
+      <Card>
+        <CardContent className="flex flex-col items-center justify-center py-12">
+          <p className="text-muted-foreground text-lg">No registrations yet</p>
+        </CardContent>
+      </Card>
     );
   }
 
@@ -112,123 +167,123 @@ export default function RegistrationsList({ eventId }) {
       {/* Header with search and export */}
       <div className="flex items-center justify-between gap-4">
         <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-          <input
+          <SearchIcon className="h-5 w-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+          <Input
             type="text"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder="Search by email or phone..."
-            className="input-field pl-10"
+            className="pl-10"
           />
         </div>
         <div className="flex items-center gap-2">
-          <button
+          <Button
             onClick={() => setIsEmailModalOpen(true)}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
+            className="bg-blue-600 hover:bg-blue-700"
           >
-            <Mail className="w-5 h-5" />
+            <MailIcon className="h-4 w-4 mr-2" />
             <span>Send Email</span>
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => setIsWhatsAppModalOpen(true)}
-            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
+            className="bg-green-600 hover:bg-green-700"
           >
-            <MessageCircle className="w-5 h-5" />
+            <MessageCircleIcon className="h-4 w-4 mr-2" />
             <span>Send WhatsApp</span>
-          </button>
-          <button onClick={exportToCSV} className="btn-primary flex items-center space-x-2">
-            <Download className="w-5 h-5" />
+          </Button>
+          <Button onClick={exportToCSV} variant="default">
+            <DownloadIcon className="h-4 w-4 mr-2" />
             <span>Export CSV</span>
-          </button>
+          </Button>
         </div>
       </div>
 
       {/* Stats */}
       <div className="grid grid-cols-3 gap-4">
-        <div className="bg-blue-50 rounded-lg p-4">
-          <p className="text-sm text-blue-600 mb-1">Total</p>
-          <p className="text-2xl font-bold text-blue-900">{registrations.length}</p>
-        </div>
-        <div className="bg-green-50 rounded-lg p-4">
-          <p className="text-sm text-green-600 mb-1">Checked In</p>
-          <p className="text-2xl font-bold text-green-900">
-            {registrations.filter((r) => r.is_checked_in).length}
-          </p>
-        </div>
-        <div className="bg-gray-50 rounded-lg p-4">
-          <p className="text-sm text-gray-600 mb-1">Pending</p>
-          <p className="text-2xl font-bold text-gray-900">
-            {registrations.filter((r) => !r.is_checked_in).length}
-          </p>
-        </div>
+        <Card className="bg-blue-50 dark:bg-blue-900/20">
+          <CardContent className="p-4">
+            <p className="text-sm text-blue-600 dark:text-blue-400 mb-1">Total</p>
+            <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">{registrations.length}</p>
+          </CardContent>
+        </Card>
+        <Card className="bg-green-50 dark:bg-green-900/20">
+          <CardContent className="p-4">
+            <p className="text-sm text-green-600 dark:text-green-400 mb-1">Checked In</p>
+            <p className="text-2xl font-bold text-green-900 dark:text-green-100">
+              {registrations.filter((r) => r.is_checked_in).length}
+            </p>
+          </CardContent>
+        </Card>
+        <Card className="bg-muted">
+          <CardContent className="p-4">
+            <p className="text-sm text-muted-foreground mb-1">Pending</p>
+            <p className="text-2xl font-bold">
+              {registrations.filter((r) => !r.is_checked_in).length}
+            </p>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Table */}
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                Status
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                Email
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                Phone
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                Registered At
-              </th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                Details
-              </th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {filteredRegistrations.map((reg) => (
-              <tr key={reg.id} className="hover:bg-gray-50">
-                <td className="px-4 py-3 whitespace-nowrap">
-                  {reg.is_checked_in ? (
-                    <CheckCircle className="w-5 h-5 text-green-600" />
-                  ) : (
-                    <XCircle className="w-5 h-5 text-gray-400" />
-                  )}
-                </td>
-                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                  {reg.email}
-                </td>
-                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-900">
-                  {reg.phone}
-                </td>
-                <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
-                  {new Date(reg.created_at).toLocaleString()}
-                </td>
-                <td className="px-4 py-3 text-sm">
-                  <details className="cursor-pointer">
-                    <summary className="text-primary hover:underline">View Form Data</summary>
-                    <div className="mt-2 p-3 bg-gray-50 rounded-lg">
-                      {Object.entries(reg.form_data).map(([key, value]) => (
-                        <div key={key} className="mb-2">
-                          <span className="font-medium text-gray-700">{key}:</span>
-                          <span className="ml-2 text-gray-900">
-                            {typeof value === 'object' ? JSON.stringify(value) : value}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </details>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+      <Card>
+        <CardContent className="p-0">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-20">Status</TableHead>
+                <TableHead>Email</TableHead>
+                <TableHead>Phone</TableHead>
+                <TableHead>Registered At</TableHead>
+                <TableHead>Details</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredRegistrations.map((reg) => (
+                <TableRow key={reg.id}>
+                  <TableCell>
+                    {reg.is_checked_in ? (
+                      <Badge variant="default" className="bg-green-600">
+                        <CheckCircleIcon className="w-4 h-4" />
+                      </Badge>
+                    ) : (
+                      <Badge variant="secondary">
+                        <XCircleIcon className="w-4 h-4" />
+                      </Badge>
+                    )}
+                  </TableCell>
+                  <TableCell className="font-medium">{reg.email}</TableCell>
+                  <TableCell>{reg.phone}</TableCell>
+                  <TableCell className="text-muted-foreground">
+                    {new Date(reg.created_at).toLocaleString()}
+                  </TableCell>
+                  <TableCell>
+                    <details className="cursor-pointer">
+                      <summary className="text-primary hover:underline">View Form Data</summary>
+                      <div className="mt-2 p-3 bg-muted rounded-lg space-y-2">
+                        {Object.entries(reg.form_data).map(([key, value]) => (
+                          <div key={key} className="text-sm">
+                            <span className="font-medium">{key}:</span>
+                            <span className="ml-2">
+                              {typeof value === 'object' ? JSON.stringify(value) : value}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </details>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </CardContent>
+      </Card>
 
       {filteredRegistrations.length === 0 && searchTerm && (
-        <div className="text-center py-8">
-          <p className="text-gray-600">No registrations match your search</p>
-        </div>
+        <Card>
+          <CardContent className="text-center py-8">
+            <p className="text-muted-foreground">No registrations match your search</p>
+          </CardContent>
+        </Card>
       )}
 
       {/* WhatsApp Modal */}

@@ -1,9 +1,62 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { useMutation } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { eventsApi } from '../services/api';
-import { Plus, Trash2, GripVertical } from './SimpleIcons';
+
+// Icons (inline SVG)
+const PlusIcon = ({ className = "h-4 w-4" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <line x1="12" y1="5" x2="12" y2="19" />
+    <line x1="5" y1="12" x2="19" y2="12" />
+  </svg>
+);
+
+const Trash2Icon = ({ className = "h-4 w-4" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <polyline points="3 6 5 6 21 6" />
+    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+  </svg>
+);
+
+const GripVerticalIcon = ({ className = "h-4 w-4" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <circle cx="9" cy="12" r="1" />
+    <circle cx="9" cy="5" r="1" />
+    <circle cx="9" cy="19" r="1" />
+    <circle cx="15" cy="12" r="1" />
+    <circle cx="15" cy="5" r="1" />
+    <circle cx="15" cy="19" r="1" />
+  </svg>
+);
+
+const ChevronUpIcon = ({ className = "h-4 w-4" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <polyline points="18 15 12 9 6 15" />
+  </svg>
+);
+
+const ChevronDownIcon = ({ className = "h-4 w-4" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <polyline points="6 9 12 15 18 9" />
+  </svg>
+);
+
+const InfoIcon = ({ className = "h-4 w-4" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <circle cx="12" cy="12" r="10" />
+    <line x1="12" y1="16" x2="12" y2="12" />
+    <line x1="12" y1="8" x2="12.01" y2="8" />
+  </svg>
+);
 
 const FIELD_TYPES = [
   { value: 'text', label: 'Text' },
@@ -17,7 +70,7 @@ const FIELD_TYPES = [
 
 export default function EventForm({ event, onSuccess, onCancel }) {
   const isEditing = !!event;
-  const { register, handleSubmit, control, watch, formState: { errors } } = useForm({
+  const { register, handleSubmit, control, watch, setValue, formState: { errors } } = useForm({
     defaultValues: event ? {
       ...event,
       fields: event.fields?.map(field => ({
@@ -130,251 +183,243 @@ export default function EventForm({ event, onSuccess, onCancel }) {
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       {/* Basic Info */}
       <div className="space-y-4">
-        <h3 className="text-lg font-semibold text-gray-900">Event Details</h3>
+        <h3 className="text-lg font-semibold">Event Details</h3>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Event Name *
-          </label>
-          <input
+        <div className="space-y-2">
+          <Label htmlFor="name">Event Name *</Label>
+          <Input
+            id="name"
             {...register('name', { required: 'Event name is required' })}
-            className="input-field"
             placeholder="e.g., MagPie Summit 2025"
+            className={errors.name ? 'border-destructive' : ''}
           />
           {errors.name && (
-            <p className="mt-1 text-sm text-red-600">{errors.name.message}</p>
+            <p className="text-sm text-destructive">{errors.name.message}</p>
           )}
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Description
-          </label>
-          <textarea
+        <div className="space-y-2">
+          <Label htmlFor="description">Description</Label>
+          <Textarea
+            id="description"
             {...register('description')}
-            className="input-field"
-            rows="3"
+            rows={3}
             placeholder="Tell us about this event..."
           />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Date *
-            </label>
-            <input
+          <div className="space-y-2">
+            <Label htmlFor="date">Date *</Label>
+            <Input
+              id="date"
               type="date"
               {...register('date', { required: 'Date is required' })}
-              className="input-field"
+              className={errors.date ? 'border-destructive' : ''}
             />
             {errors.date && (
-              <p className="mt-1 text-sm text-red-600">{errors.date.message}</p>
+              <p className="text-sm text-destructive">{errors.date.message}</p>
             )}
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Time *
-            </label>
-            <input
+          <div className="space-y-2">
+            <Label htmlFor="time">Time *</Label>
+            <Input
+              id="time"
               type="time"
               {...register('time', { required: 'Time is required' })}
-              className="input-field"
+              className={errors.time ? 'border-destructive' : ''}
             />
             {errors.time && (
-              <p className="mt-1 text-sm text-red-600">{errors.time.message}</p>
+              <p className="text-sm text-destructive">{errors.time.message}</p>
             )}
           </div>
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Venue *
-          </label>
-          <input
+        <div className="space-y-2">
+          <Label htmlFor="venue">Venue *</Label>
+          <Input
+            id="venue"
             {...register('venue', { required: 'Venue is required' })}
-            className="input-field"
             placeholder="e.g., IBM India Office"
+            className={errors.venue ? 'border-destructive' : ''}
           />
           {errors.venue && (
-            <p className="mt-1 text-sm text-red-600">{errors.venue.message}</p>
+            <p className="text-sm text-destructive">{errors.venue.message}</p>
           )}
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Venue Address
-          </label>
-          <textarea
+        <div className="space-y-2">
+          <Label htmlFor="venue_address">Venue Address</Label>
+          <Textarea
+            id="venue_address"
             {...register('venue_address')}
-            className="input-field"
-            rows="2"
+            rows={2}
             placeholder="Full address..."
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Google Maps Link
-          </label>
-          <input
+        <div className="space-y-2">
+          <Label htmlFor="venue_map_link">Google Maps Link</Label>
+          <Input
+            id="venue_map_link"
             {...register('venue_map_link')}
-            className="input-field"
             placeholder="https://maps.google.com/..."
           />
         </div>
 
-        <div className="flex items-center">
-          <input
-            type="checkbox"
-            {...register('is_active')}
-            className="w-4 h-4 text-primary"
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id="is_active"
+            onCheckedChange={(checked) => setValue('is_active', checked)}
+            defaultChecked={watch('is_active')}
           />
-          <label className="ml-2 text-sm font-medium text-gray-700">
+          <Label htmlFor="is_active" className="font-normal cursor-pointer">
             Set as Active Event
-          </label>
+          </Label>
         </div>
       </div>
 
-      {/* Custom Fields - Show for both create and edit */}
+      {/* Custom Fields */}
       <div className="space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold text-gray-900">
-            Registration Fields
-          </h3>
-          <button
-            type="button"
-            onClick={addField}
-            className="btn-secondary text-sm flex items-center space-x-1"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Add Field</span>
-          </button>
+          <h3 className="text-lg font-semibold">Registration Fields</h3>
+          <Button type="button" onClick={addField} variant="outline" size="sm">
+            <PlusIcon className="h-4 w-4 mr-2" />
+            Add Field
+          </Button>
         </div>
 
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-muted-foreground">
           Email and Phone are mandatory by default. Add additional fields as needed.
-          {isEditing && (
-            <span className="block text-amber-600 mt-1">
-              ⚠️ Note: Changing fields will not affect existing registrations.
-            </span>
-          )}
         </p>
 
-          <div className="space-y-4">
-            {fields.map((field, index) => (
-              <div key={field.id} className="card bg-gray-50 border-2 border-gray-200">
-                <div className="flex items-start space-x-4">
-                  <div className="flex flex-col items-center space-y-1 pt-2">
-                    <button
-                      type="button"
-                      onClick={() => index > 0 && move(index, index - 1)}
-                      disabled={index === 0}
-                      className={`p-1 rounded ${index === 0 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:bg-gray-200'}`}
-                      title="Move up"
-                    >
-                      ▲
-                    </button>
-                    <GripVertical className="w-5 h-5 text-gray-400" />
-                    <button
-                      type="button"
-                      onClick={() => index < fields.length - 1 && move(index, index + 1)}
-                      disabled={index === fields.length - 1}
-                      className={`p-1 rounded ${index === fields.length - 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:bg-gray-200'}`}
-                      title="Move down"
-                    >
-                      ▼
-                    </button>
-                  </div>
+        {isEditing && (
+          <Alert>
+            <InfoIcon className="h-4 w-4" />
+            <AlertDescription>
+              Note: Changing fields will not affect existing registrations.
+            </AlertDescription>
+          </Alert>
+        )}
 
-                  <div className="flex-1 space-y-3">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Field Label (shown to user)
-                      </label>
-                      <input
-                        {...register(`fields.${index}.field_label`, {
-                          required: 'Field label is required',
-                        })}
-                        className="input-field"
-                        placeholder="e.g., GitHub Profile URL"
-                      />
-                      <p className="text-xs text-gray-500 mt-1">
-                        Identifier will be auto-generated: {watch(`fields.${index}.field_label`) ? generateFieldName(watch(`fields.${index}.field_label`)) : 'field_name'}
-                      </p>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Field Type
-                        </label>
-                        <select
-                          {...register(`fields.${index}.field_type`)}
-                          className="input-field"
-                        >
-                          {FIELD_TYPES.map((type) => (
-                            <option key={type.value} value={type.value}>
-                              {type.label}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Options (for select/radio, comma-separated)
-                        </label>
-                        <input
-                          {...register(`fields.${index}.field_options`)}
-                          className="input-field"
-                          placeholder="Option 1, Option 2, Option 3"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="flex items-center">
-                      <input
-                        type="checkbox"
-                        {...register(`fields.${index}.is_required`)}
-                        className="w-4 h-4 text-primary"
-                      />
-                      <label className="ml-2 text-sm font-medium text-gray-700">
-                        Required Field
-                      </label>
-                    </div>
-                  </div>
-
-                  <button
+        <div className="space-y-4">
+          {fields.map((field, index) => (
+            <Card key={field.id} className="p-4 bg-muted/50">
+              <div className="flex items-start gap-4">
+                <div className="flex flex-col items-center gap-1 pt-2">
+                  <Button
                     type="button"
-                    onClick={() => remove(index)}
-                    className="p-2 hover:bg-red-100 rounded-lg text-red-600"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => index > 0 && move(index, index - 1)}
+                    disabled={index === 0}
+                    className="h-6 w-6"
                   >
-                    <Trash2 className="w-5 h-5" />
-                  </button>
+                    <ChevronUpIcon />
+                  </Button>
+                  <GripVerticalIcon className="h-5 w-5 text-muted-foreground" />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => index < fields.length - 1 && move(index, index + 1)}
+                    disabled={index === fields.length - 1}
+                    className="h-6 w-6"
+                  >
+                    <ChevronDownIcon />
+                  </Button>
                 </div>
+
+                <div className="flex-1 space-y-3">
+                  <div className="space-y-2">
+                    <Label htmlFor={`field_label_${index}`}>Field Label (shown to user)</Label>
+                    <Input
+                      id={`field_label_${index}`}
+                      {...register(`fields.${index}.field_label`, {
+                        required: 'Field label is required',
+                      })}
+                      placeholder="e.g., GitHub Profile URL"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Identifier: {watch(`fields.${index}.field_label`) ? generateFieldName(watch(`fields.${index}.field_label`)) : 'field_name'}
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor={`field_type_${index}`}>Field Type</Label>
+                      <Select
+                        value={watch(`fields.${index}.field_type`)}
+                        onValueChange={(value) => setValue(`fields.${index}.field_type`, value)}
+                      >
+                        <SelectTrigger id={`field_type_${index}`}>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {FIELD_TYPES.map((type) => (
+                            <SelectItem key={type.value} value={type.value}>
+                              {type.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label htmlFor={`field_options_${index}`}>
+                        Options (for select/radio, comma-separated)
+                      </Label>
+                      <Input
+                        id={`field_options_${index}`}
+                        {...register(`fields.${index}.field_options`)}
+                        placeholder="Option 1, Option 2, Option 3"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`is_required_${index}`}
+                      onCheckedChange={(checked) => setValue(`fields.${index}.is_required`, checked)}
+                      defaultChecked={watch(`fields.${index}.is_required`)}
+                    />
+                    <Label htmlFor={`is_required_${index}`} className="font-normal cursor-pointer">
+                      Required Field
+                    </Label>
+                  </div>
+                </div>
+
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => remove(index)}
+                  className="text-destructive hover:text-destructive"
+                >
+                  <Trash2Icon />
+                </Button>
               </div>
-            ))}
-          </div>
+            </Card>
+          ))}
         </div>
+      </div>
 
       {/* Actions */}
-      <div className="flex items-center justify-end space-x-4 pt-4 border-t">
-        <button type="button" onClick={onCancel} className="btn-secondary">
+      <div className="flex items-center justify-end gap-4 pt-4 border-t">
+        <Button type="button" onClick={onCancel} variant="outline">
           Cancel
-        </button>
-        <button
+        </Button>
+        <Button
           type="submit"
           disabled={createMutation.isPending || updateMutation.isPending}
-          className="btn-primary"
         >
           {createMutation.isPending || updateMutation.isPending
             ? 'Saving...'
             : isEditing
             ? 'Update Event'
             : 'Create Event'}
-        </button>
+        </Button>
       </div>
     </form>
   );

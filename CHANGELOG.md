@@ -8,6 +8,108 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **MAJOR REDESIGN: shadcn/ui Integration - Phase 1 Complete**
+  - `frontend/jsconfig.json` - NEW FILE: JavaScript config with @ alias for imports
+  - `frontend/vite.config.js:5,8-12` - Added path import and @ alias resolver
+  - `frontend/src/lib/utils.js` - NEW FILE: shadcn utility functions (cn helper)
+  - `frontend/components.json` - NEW FILE: shadcn component configuration
+  - `frontend/package.json` - Added shadcn dependencies:
+    - `@radix-ui/*` - 20+ Radix UI primitives (headless UI components)
+    - `class-variance-authority@0.7.1` - CVA for component variants
+    - `clsx@2.1.1` - className utility
+    - `tailwind-merge@2.7.0` - Tailwind class merging
+    - `tailwindcss-animate@1.0.7` - Animation utilities
+  - **Installed 21 shadcn components:**
+    - `frontend/src/components/ui/button.jsx` - Button component with variants
+    - `frontend/src/components/ui/input.jsx` - Input component
+    - `frontend/src/components/ui/textarea.jsx` - Textarea component
+    - `frontend/src/components/ui/select.jsx` - Select dropdown component
+    - `frontend/src/components/ui/label.jsx` - Form label component
+    - `frontend/src/components/ui/card.jsx` - Card container component
+    - `frontend/src/components/ui/dialog.jsx` - Modal dialog component
+    - `frontend/src/components/ui/form.jsx` - Form component with react-hook-form
+    - `frontend/src/components/ui/checkbox.jsx` - Checkbox component
+    - `frontend/src/components/ui/radio-group.jsx` - Radio button group
+    - `frontend/src/components/ui/switch.jsx` - Toggle switch component
+    - `frontend/src/components/ui/badge.jsx` - Badge/chip component
+    - `frontend/src/components/ui/separator.jsx` - Divider component
+    - `frontend/src/components/ui/table.jsx` - Table component
+    - `frontend/src/components/ui/tabs.jsx` - Tab navigation component
+    - `frontend/src/components/ui/alert.jsx` - Alert message component
+    - `frontend/src/components/ui/toast.jsx` - Toast notification component
+    - `frontend/src/components/ui/toaster.jsx` - Toast container
+    - `frontend/src/components/ui/skeleton.jsx` - Loading skeleton component
+    - `frontend/src/components/ui/dropdown-menu.jsx` - Dropdown menu component
+    - `frontend/src/hooks/use-toast.js` - Toast hook for notifications
+  - `frontend/tailwind.config.js` - Updated by shadcn with:
+    - Dark mode configuration (`darkMode: ["class"]`)
+    - CSS variable-based color system
+    - Border radius variables
+    - tailwindcss-animate plugin
+  - `frontend/src/styles/index.css` - Updated with shadcn base styles and CSS variables
+  - **Theme System Foundation:**
+    - `frontend/src/config/theme-presets.js` - NEW FILE: 8 curated themes from tweakcn:
+      - modern-minimal (light/dark)
+      - violet-bloom (light/dark)
+      - catppuccin (light/dark)
+      - supabase (light/dark)
+      - cyberpunk (light/dark)
+      - ocean-breeze (light/dark)
+      - neo-brutalism (light/dark)
+      - pastel-dreams (light/dark)
+    - Each theme includes complete light/dark color schemes
+    - Color values in hex format with automatic HSL conversion
+    - Includes helper function `getThemeList()` for dropdowns
+  - `frontend/src/utils/apply-theme.js` - NEW FILE: Theme application utility with:
+    - `hexToHSL()` - Convert hex colors to HSL format for CSS variables
+    - `applyTheme(themeId, mode)` - Apply theme and mode to document root
+    - `getCurrentTheme()` - Get current theme from DOM
+    - `getCurrentMode()` - Get current mode (light/dark) from DOM
+    - `toggleMode(themeId)` - Toggle between light and dark modes
+  - **Performance Impact:**
+    - Zero-cost theme switching (CSS variables)
+    - No theme CSS files needed (dynamic application)
+    - Only one theme loaded at a time
+    - Instant theme changes without page reload
+  - **Next Steps:** Phases 2-10 (Theme providers, component migration, cleanup)
+
+- **MAJOR REDESIGN: shadcn/ui Integration - Phase 2 Complete**
+  - **Theme Providers Created:**
+    - `frontend/src/contexts/ThemeProvider.jsx` - NEW FILE: Theme provider for public pages
+      - Fetches theme from database (branding_settings.theme)
+      - Reads light/dark mode from localStorage (visitor preference)
+      - Auto-applies theme on mount and when changed
+      - Caches branding data for 6 hours (React Query)
+      - Provides theme context to public pages
+    - `frontend/src/contexts/DashboardThemeProvider.jsx` - NEW FILE: Theme provider for dashboard
+      - Reads theme from localStorage (admin preference)
+      - Reads light/dark mode from localStorage (admin preference)
+      - Independent from public page theme
+      - Provides theme context to dashboard
+  - **Utility Components Created:**
+    - `frontend/src/components/ThemeToggle.jsx` - REPLACED: shadcn-based dark mode toggle
+      - Removed Framer Motion animations (was 120 lines)
+      - Now uses shadcn Switch component (65 lines)
+      - Inline SVG icons (Sun/Moon)
+      - Optional label display
+      - Works with both public and dashboard theme providers
+    - `frontend/src/components/ThemeSelector.jsx` - NEW FILE: Theme picker component
+      - Uses shadcn Select component
+      - Lists all 8 themes from theme-presets.js
+      - Link to tweakcn.com for theme preview
+      - Reusable for both branding settings and dashboard preferences
+  - **Architecture:**
+    - Public pages: Database theme + localStorage mode
+    - Dashboard: localStorage theme + localStorage mode
+    - Complete isolation between public and admin theming
+    - Zero props drilling (context-based)
+  - **Performance Impact:**
+    - Removed Framer Motion from ThemeToggle (~40KB saved)
+    - Theme providers use React Query caching
+    - No unnecessary re-renders
+  - **Next Steps:** Phase 3-10 (Rebuild pages/components, cleanup old code)
+
+### Added
 - **PERFORMANCE: Branding API Caching with Automatic Invalidation**
   - `backend/app/core/cache.py` - New in-memory cache utility module with TTL and invalidation support
     - `CacheStore` class with get/set/delete operations and pattern-based invalidation

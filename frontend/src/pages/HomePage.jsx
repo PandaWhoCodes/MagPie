@@ -1,24 +1,83 @@
-import React, { useState, useEffect, lazy, Suspense } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
-import { eventsApi, registrationsApi } from '../services/api';
-import { ExternalLink, Sparkles, CheckCircle2, ArrowRight } from '../components/SimpleIcons';
-import { getThemeConfig } from '../config/themes';
-import { useBranding } from '../contexts/BrandingContext';
-import { PureWhiteBackground } from '../components/PureWhiteBackground';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ThemeProvider, useTheme } from "@/contexts/ThemeProvider";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { eventsApi, registrationsApi, brandingApi } from '../services/api';
+import Footer from '../components/Footer';
 
-// Lazy load Midnight Black theme (includes framer-motion)
-const MidnightBlackTheme = lazy(() => import('../components/themes/MidnightBlackTheme'));
+// Icons (inline SVG)
+const SparklesIcon = ({ className = "h-10 w-10" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
+    <path d="M5 3v4" />
+    <path d="M19 17v4" />
+    <path d="M3 5h4" />
+    <path d="M17 19h4" />
+  </svg>
+);
 
-export default function HomePage() {
+const CalendarIcon = ({ className = "h-4 w-4" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
+    <line x1="16" y1="2" x2="16" y2="6" />
+    <line x1="8" y1="2" x2="8" y2="6" />
+    <line x1="3" y1="10" x2="21" y2="10" />
+  </svg>
+);
+
+const ClockIcon = ({ className = "h-4 w-4" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <circle cx="12" cy="12" r="10" />
+    <polyline points="12 6 12 12 16 14" />
+  </svg>
+);
+
+const MapPinIcon = ({ className = "h-4 w-4" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+    <circle cx="12" cy="10" r="3" />
+  </svg>
+);
+
+const ExternalLinkIcon = ({ className = "h-4 w-4" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+    <polyline points="15 3 21 3 21 9" />
+    <line x1="10" x2="21" y1="14" y2="3" />
+  </svg>
+);
+
+const CheckCircleIcon = ({ className = "h-5 w-5" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+    <polyline points="22 4 12 14.01 9 11.01" />
+  </svg>
+);
+
+const LoaderIcon = ({ className = "h-5 w-5" }) => (
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`${className} animate-spin`}>
+    <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+  </svg>
+);
+
+function HomePageContent() {
   const navigate = useNavigate();
   const [autoFillAttempted, setAutoFillAttempted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successState, setSuccessState] = useState(false);
-  const [focusedField, setFocusedField] = useState(null);
   const { register, handleSubmit, formState: { errors }, watch, setValue } = useForm();
+  const { mode, toggleMode } = useTheme();
 
   // Fetch active event
   const { data: event, isLoading, error } = useQuery({
@@ -30,10 +89,14 @@ export default function HomePage() {
     retry: false,
   });
 
-  // Get branding from context (already preloaded at app level - no theme flash!)
-  const branding = useBranding();
-  const theme = branding?.theme || 'pure_white';
-  const themeConfig = getThemeConfig(theme);
+  // Fetch branding
+  const { data: branding } = useQuery({
+    queryKey: ['branding'],
+    queryFn: async () => {
+      const response = await brandingApi.get();
+      return response.data;
+    },
+  });
 
   // Watch email and phone for auto-fill
   const emailValue = watch('email');
@@ -50,8 +113,8 @@ export default function HomePage() {
       Object.keys(data.profile_data).forEach((key) => {
         setValue(key, data.profile_data[key]);
       });
-      toast.success('✨ Form auto-filled with your previous information!', {
-        icon: '🎯',
+      toast.success('Form auto-filled with your previous information!', {
+        icon: '✨',
         duration: 3000,
       });
     },
@@ -110,13 +173,18 @@ export default function HomePage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 via-blue-50 to-pink-50 dark:from-purple-950 dark:via-blue-950 dark:to-pink-950 transition-colors duration-300">
-        <div className="text-center fade-in">
-          <div className="w-16 h-16 border-4 border-purple-500 dark:border-purple-400 border-t-transparent rounded-full mx-auto dark:shadow-lg dark:shadow-purple-500/30 animate-spin" />
-          <p className="mt-4 text-gray-600 dark:text-gray-400 font-medium fade-in-delay-100">
-            Loading event...
-          </p>
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <Card className="w-full max-w-md mx-4">
+          <CardHeader>
+            <Skeleton className="h-8 w-3/4 mb-2" />
+            <Skeleton className="h-4 w-full" />
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -128,250 +196,214 @@ export default function HomePage() {
     registrationMutation.mutate(data);
   };
 
-  // Pure White Theme (Default - Fast and Clean)
-  if (theme === 'pure_white' || !theme) {
-    return (
-      <div className={`${themeConfig.containerClass} theme-pure-white`}>
-        <PureWhiteBackground />
+  return (
+    <div className="min-h-screen flex flex-col bg-background">
+      {/* Theme toggle */}
+      <div className="fixed top-4 right-4 z-50">
+        <ThemeToggle mode={mode} onToggle={toggleMode} />
+      </div>
 
-        <div className="w-full max-w-md relative z-10 pb-20 fade-in-up">
-          <div className="mb-12 text-center fade-in-delay-100">
+      <div className="flex-1 flex items-center justify-center px-4 py-12">
+        <div className="w-full max-w-2xl space-y-8">
+          {/* Header */}
+          <div className="text-center space-y-4">
             {branding?.logo_url ? (
-              <div className="inline-block mb-6">
-                <img src={branding.logo_url} alt="Logo" className="h-10 mx-auto object-contain" />
+              <div className="flex justify-center mb-4">
+                <img src={branding.logo_url} alt="Logo" className="h-12 object-contain" />
               </div>
             ) : (
-              <div className="inline-block mb-6">
-                <Sparkles className="w-10 h-10 text-blue-600" strokeWidth={1.5} />
+              <div className="flex justify-center mb-4">
+                <SparklesIcon className="h-12 w-12 text-primary" />
               </div>
             )}
-            <h1 className="mb-3 text-gray-900">
-              {branding?.site_title || 'MagPie'}
-            </h1>
-            <p className="text-gray-600">
-              {branding?.site_headline || 'Where Innovation Meets Community'}
-            </p>
-          </div>
-
-          <div className="mb-8 fade-in-delay-200">
-            <h2 className="text-gray-900 mb-2">{event.name}</h2>
-            {event.description && (
-              <p className="text-gray-600 text-sm">{event.description}</p>
-            )}
-            <div className="mt-4 space-y-2 text-sm">
-              <p className="text-gray-700">📅 {event.date} • ⏰ {event.time}</p>
-              <p className="text-gray-700">📍 {event.venue}</p>
-              {event.venue_map_link && (
-                <a
-                  href={event.venue_map_link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center text-blue-600 hover:text-blue-700 transition-colors duration-200 underline underline-offset-2"
-                >
-                  <ExternalLink className="w-4 h-4 mr-1" />
-                  View on Google Maps
-                </a>
-              )}
+            <div>
+              <h1 className="text-4xl font-bold tracking-tight">
+                {branding?.site_title || 'MagPie'}
+              </h1>
+              <p className="text-muted-foreground mt-2">
+                {branding?.site_headline || 'Where Innovation Meets Community'}
+              </p>
             </div>
           </div>
 
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="space-y-6 fade-in-delay-300"
-          >
-            <div>
-              <label htmlFor="email" className={themeConfig.labelClass}>
-                Email Address
-              </label>
-              <input
-                id="email"
-                type="email"
-                {...register('email', { required: 'Email is required' })}
-                onFocus={() => setFocusedField('email')}
-                onBlur={() => setFocusedField(null)}
-                placeholder="you@example.com"
-                className={themeConfig.inputClass}
-                required
-              />
-              {errors.email && (
-                <p className="mt-2 text-sm text-red-600 font-medium fade-in">
-                  {errors.email.message}
-                </p>
+          {/* Event Card */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl">{event.name}</CardTitle>
+              {event.description && (
+                <CardDescription className="text-base">{event.description}</CardDescription>
               )}
-            </div>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              <div className="flex items-center gap-2 text-sm">
+                <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+                <span>{event.date}</span>
+                <span className="text-muted-foreground">•</span>
+                <ClockIcon className="h-4 w-4 text-muted-foreground" />
+                <span>{event.time}</span>
+              </div>
+              <div className="flex items-start gap-2 text-sm">
+                <MapPinIcon className="h-4 w-4 mt-0.5 text-muted-foreground" />
+                <div className="flex-1">
+                  <span>{event.venue}</span>
+                  {event.venue_map_link && (
+                    <a
+                      href={event.venue_map_link}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="ml-2 text-primary hover:underline inline-flex items-center gap-1"
+                    >
+                      View Map <ExternalLinkIcon className="h-3 w-3" />
+                    </a>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-            <div>
-              <label htmlFor="phone" className={themeConfig.labelClass}>
-                Phone Number
-              </label>
-              <input
-                id="phone"
-                type="tel"
-                {...register('phone', {
-                  required: 'Phone is required',
-                  pattern: {
-                    value: /^\d{10}$/,
-                    message: 'Phone must be 10 digits',
-                  },
-                })}
-                onFocus={() => setFocusedField('phone')}
-                onBlur={() => setFocusedField(null)}
-                placeholder="1234567890"
-                className={themeConfig.inputClass}
-                required
-              />
-              {errors.phone && (
-                <p className="mt-2 text-sm text-red-600 font-medium fade-in">
-                  {errors.phone.message}
-                </p>
-              )}
-            </div>
+          {/* Registration Form */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Register for Event</CardTitle>
+              <CardDescription>Fill in your details below to register</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                {/* Email */}
+                <div className="space-y-2">
+                  <Label htmlFor="email">Email Address *</Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="you@example.com"
+                    {...register('email', { required: 'Email is required' })}
+                    className={errors.email ? 'border-destructive' : ''}
+                  />
+                  {errors.email && (
+                    <p className="text-sm text-destructive">{errors.email.message}</p>
+                  )}
+                </div>
 
-            {/* Dynamic fields */}
-            {event.fields && event.fields.length > 0 && (
-              <>
-                {event.fields.map((field, index) => (
-                  <div key={field.id}>
-                    <label htmlFor={field.field_name} className={themeConfig.labelClass}>
-                      {field.field_label} {field.is_required && '*'}
-                    </label>
+                {/* Phone */}
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Phone Number *</Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    placeholder="1234567890"
+                    {...register('phone', {
+                      required: 'Phone is required',
+                      pattern: {
+                        value: /^\d{10}$/,
+                        message: 'Phone must be 10 digits',
+                      },
+                    })}
+                    className={errors.phone ? 'border-destructive' : ''}
+                  />
+                  {errors.phone && (
+                    <p className="text-sm text-destructive">{errors.phone.message}</p>
+                  )}
+                </div>
 
-                    {field.field_type === 'textarea' ? (
-                      <textarea
-                        id={field.field_name}
-                        {...register(field.field_name, {
-                          required: field.is_required ? `${field.field_label} is required` : false,
-                        })}
-                        onFocus={() => setFocusedField(field.field_name)}
-                        onBlur={() => setFocusedField(null)}
-                        className={themeConfig.inputClass}
-                        rows="4"
-                      />
-                    ) : field.field_type === 'select' ? (
-                      <select
-                        id={field.field_name}
-                        {...register(field.field_name, {
-                          required: field.is_required ? `${field.field_label} is required` : false,
-                        })}
-                        onFocus={() => setFocusedField(field.field_name)}
-                        onBlur={() => setFocusedField(null)}
-                        className={themeConfig.inputClass}
-                      >
-                        <option value="">Select...</option>
-                        {field.field_options &&
-                          JSON.parse(field.field_options).map((option) => (
-                            <option key={option} value={option}>
-                              {option}
-                            </option>
-                          ))}
-                      </select>
-                    ) : field.field_type === 'checkbox' ? (
-                      <div className="flex items-center">
-                        <input
-                          type="checkbox"
-                          id={field.field_name}
-                          {...register(field.field_name)}
-                          className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                        />
+                {/* Dynamic Fields */}
+                {event.fields && event.fields.length > 0 && (
+                  <>
+                    {event.fields.map((field) => (
+                      <div key={field.id} className="space-y-2">
+                        <Label htmlFor={field.field_name}>
+                          {field.field_label} {field.is_required && '*'}
+                        </Label>
+
+                        {field.field_type === 'textarea' ? (
+                          <Textarea
+                            id={field.field_name}
+                            {...register(field.field_name, {
+                              required: field.is_required ? `${field.field_label} is required` : false,
+                            })}
+                            rows={4}
+                            className={errors[field.field_name] ? 'border-destructive' : ''}
+                          />
+                        ) : field.field_type === 'select' ? (
+                          <Select
+                            onValueChange={(value) => setValue(field.field_name, value)}
+                          >
+                            <SelectTrigger className={errors[field.field_name] ? 'border-destructive' : ''}>
+                              <SelectValue placeholder="Select..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {field.field_options &&
+                                JSON.parse(field.field_options).map((option) => (
+                                  <SelectItem key={option} value={option}>
+                                    {option}
+                                  </SelectItem>
+                                ))}
+                            </SelectContent>
+                          </Select>
+                        ) : field.field_type === 'checkbox' ? (
+                          <div className="flex items-center space-x-2">
+                            <Checkbox
+                              id={field.field_name}
+                              onCheckedChange={(checked) => setValue(field.field_name, checked)}
+                            />
+                            <Label htmlFor={field.field_name} className="font-normal cursor-pointer">
+                              {field.field_label}
+                            </Label>
+                          </div>
+                        ) : (
+                          <Input
+                            type={field.field_type}
+                            id={field.field_name}
+                            {...register(field.field_name, {
+                              required: field.is_required ? `${field.field_label} is required` : false,
+                            })}
+                            className={errors[field.field_name] ? 'border-destructive' : ''}
+                          />
+                        )}
+
+                        {errors[field.field_name] && (
+                          <p className="text-sm text-destructive">{errors[field.field_name].message}</p>
+                        )}
                       </div>
-                    ) : (
-                      <input
-                        type={field.field_type}
-                        id={field.field_name}
-                        {...register(field.field_name, {
-                          required: field.is_required ? `${field.field_label} is required` : false,
-                        })}
-                        onFocus={() => setFocusedField(field.field_name)}
-                        onBlur={() => setFocusedField(null)}
-                        className={themeConfig.inputClass}
-                      />
-                    )}
-
-                    {errors[field.field_name] && (
-                      <p className="mt-2 text-sm text-red-600 font-medium fade-in">
-                        {errors[field.field_name].message}
-                      </p>
-                    )}
-                  </div>
-                ))}
-              </>
-            )}
-
-            <div>
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className={successState ? 'success-button w-full h-14 mt-8 transition-all duration-200 rounded-xl font-semibold bg-green-600 text-white' : themeConfig.buttonClass}
-              >
-                {successState ? (
-                  <span className="flex items-center justify-center space-x-2">
-                    <CheckCircle2 className="w-5 h-5" />
-                    <span>Success!</span>
-                  </span>
-                ) : isSubmitting ? (
-                  <span className="flex items-center justify-center space-x-2">
-                    <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin" />
-                    <span>Registering...</span>
-                  </span>
-                ) : (
-                  <span className="flex items-center justify-center">
-                    <span>Continue</span>
-                    <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </span>
+                    ))}
+                  </>
                 )}
-              </button>
-            </div>
-          </form>
 
+                {/* Submit Button */}
+                <Button
+                  type="submit"
+                  className="w-full"
+                  disabled={isSubmitting}
+                  variant={successState ? "default" : "default"}
+                >
+                  {successState ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <CheckCircleIcon />
+                      <span>Success!</span>
+                    </span>
+                  ) : isSubmitting ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <LoaderIcon />
+                      <span>Registering...</span>
+                    </span>
+                  ) : (
+                    <span>Register Now</span>
+                  )}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
         </div>
-
-        {/* Footer for Pure White theme */}
-        <footer className="absolute bottom-8 left-0 right-0 text-center z-10 fade-in-delay-300">
-          <p className="text-sm text-gray-500">
-            Made with{' '}
-            <span className="text-red-500 inline-block">❤️</span>{' '}
-            at{' '}
-            <a
-              href="https://build2learn.in"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 hover:text-blue-700 font-medium transition-colors duration-200 underline underline-offset-2"
-            >
-              Build2Learn
-            </a>
-          </p>
-        </footer>
       </div>
-    );
-  }
 
-  // Midnight Black Theme (Lazy-loaded to avoid loading framer-motion for Pure White theme)
-  if (theme === 'midnight_black') {
-    return (
-      <Suspense fallback={
-        <div className="min-h-screen flex items-center justify-center bg-black">
-          <div className="animate-spin w-16 h-16 border-4 border-white/20 border-t-white rounded-full"></div>
-        </div>
-      }>
-        <MidnightBlackTheme
-          event={event}
-          branding={branding}
-          themeConfig={themeConfig}
-          register={register}
-          handleSubmit={handleSubmit}
-          errors={errors}
-          watch={watch}
-          setValue={setValue}
-          focusedField={focusedField}
-          setFocusedField={setFocusedField}
-          isSubmitting={isSubmitting}
-          successState={successState}
-          onSubmit={onSubmit}
-        />
-      </Suspense>
-    );
-  }
+      <Footer />
+    </div>
+  );
+}
 
-  // Fallback to Pure White for any unknown theme
-  return <HomePage />;
+export default function HomePage() {
+  return (
+    <ThemeProvider>
+      <HomePageContent />
+    </ThemeProvider>
+  );
 }
