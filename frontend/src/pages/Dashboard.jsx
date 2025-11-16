@@ -18,6 +18,8 @@ import QRCodeModal from '../components/QRCodeModal';
 import BrandingSettings from '../components/BrandingSettings';
 import MessageTemplates from '../components/MessageTemplates';
 import Footer from '../components/Footer';
+import { FadeIn, StaggerChildren } from '@/components/animations';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 // Icons (inline SVG)
 const PlusIcon = ({ className = "h-5 w-5" }) => (
@@ -98,6 +100,7 @@ function DashboardContent() {
   const [showQRModal, setShowQRModal] = useState(false);
   const [activeTab, setActiveTab] = useState('events');
   const { mode, toggleMode, theme, setTheme } = useDashboardTheme();
+  const prefersReducedMotion = useReducedMotion();
 
   // Fetch all events
   const { data: events = [], isLoading } = useQuery({
@@ -195,41 +198,46 @@ function DashboardContent() {
       <div className="flex-1 px-4 py-8">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <div className="mb-8">
-            <div className="flex items-center justify-between">
-              <div>
-                <h1 className="text-4xl font-bold tracking-tight mb-2">
-                  Admin Dashboard
-                </h1>
-                <p className="text-muted-foreground">
-                  Manage your MagPie events
-                  {user && <span className="ml-2">• {user.firstName || user.emailAddresses[0].emailAddress}</span>}
-                </p>
-              </div>
-              <div className="flex items-center gap-4">
-                {activeTab === 'events' && (
-                  <Button
-                    onClick={() => {
-                      setEditingEvent(null);
-                      setShowEventForm(true);
-                    }}
-                  >
-                    <PlusIcon className="h-4 w-4 mr-2" />
-                    Create Event
-                  </Button>
-                )}
-                <div className="w-48">
-                  <ThemeSelector
-                    value={theme}
-                    onChange={setTheme}
-                    label={null}
-                    showPreviewLink={false}
-                  />
+          <FadeIn
+            direction={prefersReducedMotion ? 'none' : 'down'}
+            delay={0.1}
+            duration={prefersReducedMotion ? 0.01 : 0.3}
+          >
+            <div className="mb-8">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h1 className="text-4xl font-bold tracking-tight mb-2">
+                    Admin Dashboard
+                  </h1>
+                  <p className="text-muted-foreground">
+                    Manage your MagPie events
+                    {user && <span className="ml-2">• {user.firstName || user.emailAddresses[0].emailAddress}</span>}
+                  </p>
                 </div>
-                <ThemeToggle mode={mode} onToggle={toggleMode} />
-                <UserButton afterSignOutUrl="/" />
+                <div className="flex items-center gap-4">
+                  {activeTab === 'events' && (
+                    <Button
+                      onClick={() => {
+                        setEditingEvent(null);
+                        setShowEventForm(true);
+                      }}
+                    >
+                      <PlusIcon className="h-4 w-4 mr-2" />
+                      Create Event
+                    </Button>
+                  )}
+                  <div className="w-48">
+                    <ThemeSelector
+                      value={theme}
+                      onChange={setTheme}
+                      label={null}
+                      showPreviewLink={false}
+                    />
+                  </div>
+                  <ThemeToggle mode={mode} onToggle={toggleMode} />
+                  <UserButton afterSignOutUrl="/" />
+                </div>
               </div>
-            </div>
 
             {/* Tabs */}
             <Tabs value={activeTab} onValueChange={setActiveTab} className="mt-6">
@@ -252,8 +260,15 @@ function DashboardContent() {
               {/* Events Tab */}
               <TabsContent value="events" className="mt-6 space-y-6">
                 {/* Stats */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <Card>
+                <StaggerChildren
+                  staggerDelay={prefersReducedMotion ? 0 : 0.08}
+                  initialDelay={0.2}
+                  duration={prefersReducedMotion ? 0.01 : 0.3}
+                  direction="up"
+                  distance={20}
+                  className="grid grid-cols-1 md:grid-cols-3 gap-6"
+                >
+                  <Card className="hover:-translate-y-1 transition-all duration-200">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                       <CardTitle className="text-sm font-medium">Total Events</CardTitle>
                       <CalendarIcon className="h-4 w-4 text-muted-foreground" />
@@ -263,7 +278,7 @@ function DashboardContent() {
                     </CardContent>
                   </Card>
 
-                  <Card>
+                  <Card className="hover:-translate-y-1 transition-all duration-200">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                       <CardTitle className="text-sm font-medium">Active Events</CardTitle>
                       <ToggleRightIcon className="h-4 w-4 text-green-600" />
@@ -275,7 +290,7 @@ function DashboardContent() {
                     </CardContent>
                   </Card>
 
-                  <Card>
+                  <Card className="hover:-translate-y-1 transition-all duration-200">
                     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                       <CardTitle className="text-sm font-medium">Inactive Events</CardTitle>
                       <ToggleLeftIcon className="h-4 w-4 text-muted-foreground" />
@@ -286,25 +301,39 @@ function DashboardContent() {
                       </div>
                     </CardContent>
                   </Card>
-                </div>
+                </StaggerChildren>
 
                 {/* Events List */}
                 <div className="space-y-4">
                   {events.length === 0 ? (
-                    <Card>
-                      <CardContent className="flex flex-col items-center justify-center py-12">
-                        <CalendarIcon className="h-16 w-16 text-muted-foreground mb-4" />
-                        <CardTitle className="mb-2">No events yet</CardTitle>
-                        <CardDescription className="mb-4">Create your first event to get started</CardDescription>
-                        <Button onClick={() => setShowEventForm(true)}>
-                          <PlusIcon className="h-4 w-4 mr-2" />
-                          Create Your First Event
-                        </Button>
-                      </CardContent>
-                    </Card>
+                    <FadeIn
+                      direction={prefersReducedMotion ? 'none' : 'up'}
+                      delay={0.4}
+                      duration={prefersReducedMotion ? 0.01 : 0.3}
+                    >
+                      <Card>
+                        <CardContent className="flex flex-col items-center justify-center py-12">
+                          <CalendarIcon className="h-16 w-16 text-muted-foreground mb-4" />
+                          <CardTitle className="mb-2">No events yet</CardTitle>
+                          <CardDescription className="mb-4">Create your first event to get started</CardDescription>
+                          <Button onClick={() => setShowEventForm(true)}>
+                            <PlusIcon className="h-4 w-4 mr-2" />
+                            Create Your First Event
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    </FadeIn>
                   ) : (
-                    events.map((event) => (
-                      <Card key={event.id}>
+                    <StaggerChildren
+                      staggerDelay={prefersReducedMotion ? 0 : 0.1}
+                      initialDelay={0.4}
+                      duration={prefersReducedMotion ? 0.01 : 0.3}
+                      direction="up"
+                      distance={20}
+                      className="space-y-4"
+                    >
+                      {events.map((event) => (
+                        <Card key={event.id} className="hover:-translate-y-1 hover:shadow-lg transition-all duration-200">
                         <CardHeader>
                           <div className="flex items-start justify-between">
                             <div className="flex-1">
@@ -391,12 +420,14 @@ function DashboardContent() {
                           </div>
                         </CardContent>
                       </Card>
-                    ))
+                    ))}
+                    </StaggerChildren>
                   )}
                 </div>
               </TabsContent>
             </Tabs>
-          </div>
+            </div>
+          </FadeIn>
         </div>
       </div>
 

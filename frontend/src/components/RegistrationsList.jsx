@@ -9,6 +9,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { eventsApi } from '../services/api';
 import WhatsAppModal from './WhatsAppModal';
 import EmailModal from './EmailModal';
+import { FadeIn, StaggerChildren } from '@/components/animations';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 // Icons (inline SVG)
 const DownloadIcon = ({ className = "h-5 w-5" }) => (
@@ -58,6 +60,7 @@ export default function RegistrationsList({ eventId }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
   const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
+  const prefersReducedMotion = useReducedMotion();
 
   const { data: registrations = [], isLoading } = useQuery({
     queryKey: ['registrations', eventId],
@@ -199,14 +202,21 @@ export default function RegistrationsList({ eventId }) {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
-        <Card className="bg-blue-50 dark:bg-blue-900/20">
+      <StaggerChildren
+        staggerDelay={prefersReducedMotion ? 0 : 0.08}
+        initialDelay={0.1}
+        duration={prefersReducedMotion ? 0.01 : 0.3}
+        direction="up"
+        distance={15}
+        className="grid grid-cols-3 gap-4"
+      >
+        <Card className="bg-blue-50 dark:bg-blue-900/20 hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-4">
             <p className="text-sm text-blue-600 dark:text-blue-400 mb-1">Total</p>
             <p className="text-2xl font-bold text-blue-900 dark:text-blue-100">{registrations.length}</p>
           </CardContent>
         </Card>
-        <Card className="bg-green-50 dark:bg-green-900/20">
+        <Card className="bg-green-50 dark:bg-green-900/20 hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-4">
             <p className="text-sm text-green-600 dark:text-green-400 mb-1">Checked In</p>
             <p className="text-2xl font-bold text-green-900 dark:text-green-100">
@@ -214,7 +224,7 @@ export default function RegistrationsList({ eventId }) {
             </p>
           </CardContent>
         </Card>
-        <Card className="bg-muted">
+        <Card className="bg-muted hover:-translate-y-1 transition-all duration-200">
           <CardContent className="p-4">
             <p className="text-sm text-muted-foreground mb-1">Pending</p>
             <p className="text-2xl font-bold">
@@ -222,61 +232,73 @@ export default function RegistrationsList({ eventId }) {
             </p>
           </CardContent>
         </Card>
-      </div>
+      </StaggerChildren>
 
       {/* Table */}
-      <Card>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-20">Status</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Phone</TableHead>
-                <TableHead>Registered At</TableHead>
-                <TableHead>Details</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredRegistrations.map((reg) => (
-                <TableRow key={reg.id}>
-                  <TableCell>
-                    {reg.is_checked_in ? (
-                      <Badge variant="default" className="bg-green-600">
-                        <CheckCircleIcon className="w-4 h-4" />
-                      </Badge>
-                    ) : (
-                      <Badge variant="secondary">
-                        <XCircleIcon className="w-4 h-4" />
-                      </Badge>
-                    )}
-                  </TableCell>
-                  <TableCell className="font-medium">{reg.email}</TableCell>
-                  <TableCell>{reg.phone}</TableCell>
-                  <TableCell className="text-muted-foreground">
-                    {new Date(reg.created_at).toLocaleString()}
-                  </TableCell>
-                  <TableCell>
-                    <details className="cursor-pointer">
-                      <summary className="text-primary hover:underline">View Form Data</summary>
-                      <div className="mt-2 p-3 bg-muted rounded-lg space-y-2">
-                        {Object.entries(reg.form_data).map(([key, value]) => (
-                          <div key={key} className="text-sm">
-                            <span className="font-medium">{key}:</span>
-                            <span className="ml-2">
-                              {typeof value === 'object' ? JSON.stringify(value) : value}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </details>
-                  </TableCell>
+      <FadeIn
+        direction={prefersReducedMotion ? 'none' : 'up'}
+        delay={0.3}
+        duration={prefersReducedMotion ? 0.01 : 0.3}
+      >
+        <Card>
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-20">Status</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Phone</TableHead>
+                  <TableHead>Registered At</TableHead>
+                  <TableHead>Details</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </CardContent>
-      </Card>
+              </TableHeader>
+              <TableBody>
+                {filteredRegistrations.map((reg, index) => (
+                  <TableRow
+                    key={reg.id}
+                    className="hover:bg-muted/50 transition-colors duration-150"
+                    style={{
+                      animation: prefersReducedMotion ? 'none' : `fadeIn 0.3s ease-out ${0.4 + index * 0.05}s backwards`
+                    }}
+                  >
+                    <TableCell>
+                      {reg.is_checked_in ? (
+                        <Badge variant="default" className="bg-green-600">
+                          <CheckCircleIcon className="w-4 h-4" />
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary">
+                          <XCircleIcon className="w-4 h-4" />
+                        </Badge>
+                      )}
+                    </TableCell>
+                    <TableCell className="font-medium">{reg.email}</TableCell>
+                    <TableCell>{reg.phone}</TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {new Date(reg.created_at).toLocaleString()}
+                    </TableCell>
+                    <TableCell>
+                      <details className="cursor-pointer">
+                        <summary className="text-primary hover:underline">View Form Data</summary>
+                        <div className="mt-2 p-3 bg-muted rounded-lg space-y-2">
+                          {Object.entries(reg.form_data).map(([key, value]) => (
+                            <div key={key} className="text-sm">
+                              <span className="font-medium">{key}:</span>
+                              <span className="ml-2">
+                                {typeof value === 'object' ? JSON.stringify(value) : value}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      </details>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
+      </FadeIn>
 
       {filteredRegistrations.length === 0 && searchTerm && (
         <Card>

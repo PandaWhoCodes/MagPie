@@ -5,6 +5,7 @@
 @layer base {
   body {
     @apply bg-gray-50 text-gray-900 dark:bg-gray-950 dark:text-gray-100 transition-colors duration-300;
+    font-family: var(--font-sans, ui-sans-serif, system-ui, sans-serif);
   }
   :root {
     --background: 0 0% 100%;
@@ -131,6 +132,106 @@
     background-image: radial-gradient(circle at 20% 50%, rgba(139, 92, 246, 0.3) 0%, transparent 50%),
                       radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.3) 0%, transparent 50%),
                       radial-gradient(circle at 40% 20%, rgba(236, 72, 153, 0.3) 0%, transparent 50%);
+  }
+
+  /* Button hover animations */
+  .btn-hover-scale {
+    @apply transition-transform duration-200 ease-out;
+  }
+
+  .btn-hover-scale:hover {
+    @apply transform scale-105;
+  }
+
+  .btn-hover-scale:active {
+    @apply transform scale-95;
+  }
+
+  /* Card hover animations */
+  .card-hover {
+    @apply transition-all duration-300 ease-out;
+  }
+
+  .card-hover:hover {
+    @apply transform -translate-y-1 shadow-lg;
+  }
+
+  /* Link hover underline animation */
+  .link-hover {
+    @apply relative inline-block;
+  }
+
+  .link-hover::after {
+    content: '';
+    @apply absolute left-0 bottom-0 w-0 h-0.5 bg-primary transition-all duration-300 ease-out;
+  }
+
+  .link-hover:hover::after {
+    @apply w-full;
+  }
+
+  /* Dashboard-specific animations */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.5;
+    }
+  }
+
+  /* Table row stagger animation */
+  .table-row-enter {
+    animation: fadeIn 0.3s ease-out backwards;
+  }
+
+  /* Success flash animation */
+  @keyframes successFlash {
+    0% {
+      background-color: transparent;
+    }
+    50% {
+      background-color: rgba(34, 197, 94, 0.2);
+    }
+    100% {
+      background-color: transparent;
+    }
+  }
+
+  .success-flash {
+    animation: successFlash 0.6s ease-out;
+  }
+
+  /* Loading pulse for skeletons */
+  .skeleton-pulse {
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  /* Badge scale-in */
+  @keyframes badgeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .badge-enter {
+    animation: badgeIn 0.2s ease-out;
   }
 }
 
