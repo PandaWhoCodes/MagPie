@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import { useForm } from 'react-hook-form';
@@ -13,6 +13,8 @@ import { ThemeProvider, useTheme } from "@/contexts/ThemeProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { qrCodesApi, registrationsApi } from '../services/api';
 import Footer from '../components/Footer';
+import { FadeIn, Confetti } from '@/components/animations';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 // Icons (inline SVG)
 const CheckCircleIcon = ({ className = "h-10 w-10" }) => (
@@ -34,6 +36,8 @@ function CheckInPageContent() {
   const [checkedIn, setCheckedIn] = useState(false);
   const { register, handleSubmit, formState: { errors } } = useForm();
   const { mode, toggleMode } = useTheme();
+  const prefersReducedMotion = useReducedMotion();
+  const [showConfetti, setShowConfetti] = useState(false);
 
   // Fetch QR code details
   const { data: qrCode, isLoading } = useQuery({
@@ -56,6 +60,11 @@ function CheckInPageContent() {
         icon: '🎉',
         duration: 3000,
       });
+      // Trigger confetti
+      if (!prefersReducedMotion) {
+        setShowConfetti(true);
+        setTimeout(() => setShowConfetti(false), 3000);
+      }
     },
     onError: (error) => {
       const message = error.response?.data?.detail || 'Failed to check in. Please try again.';
@@ -87,23 +96,43 @@ function CheckInPageContent() {
   if (checkedIn) {
     return (
       <div className="min-h-screen flex flex-col bg-background">
+        {/* Confetti celebration */}
+        <Confetti active={showConfetti} particleCount={60} />
+
         <div className="fixed top-4 right-4 z-50">
           <ThemeToggle mode={mode} onToggle={toggleMode} />
         </div>
 
         <div className="flex-1 flex items-center justify-center px-4 py-12">
-          <Card className="w-full max-w-md">
-            <CardHeader className="text-center">
-              <div className="flex justify-center mb-4">
-                <div className="inline-flex items-center justify-center w-20 h-20 bg-green-100 dark:bg-green-900/20 rounded-full">
-                  <CheckCircleIcon className="h-12 w-12 text-green-600 dark:text-green-500" />
-                </div>
-              </div>
-              <CardTitle className="text-2xl">Check-in Successful!</CardTitle>
-              <CardDescription>
-                You've been successfully checked in to the event.
-              </CardDescription>
-            </CardHeader>
+          <FadeIn
+            direction={prefersReducedMotion ? 'none' : 'up'}
+            delay={0.1}
+            duration={prefersReducedMotion ? 0.01 : 0.6}
+          >
+            <Card className="w-full max-w-md">
+              <CardHeader className="text-center">
+                <FadeIn
+                  direction={prefersReducedMotion ? 'none' : 'down'}
+                  delay={0.3}
+                  duration={prefersReducedMotion ? 0.01 : 0.6}
+                >
+                  <div className="flex justify-center mb-4">
+                    <div className="inline-flex items-center justify-center w-20 h-20 bg-green-100 dark:bg-green-900/20 rounded-full">
+                      <CheckCircleIcon className="h-12 w-12 text-green-600 dark:text-green-500" />
+                    </div>
+                  </div>
+                </FadeIn>
+                <FadeIn
+                  direction={prefersReducedMotion ? 'none' : 'up'}
+                  delay={0.5}
+                  duration={prefersReducedMotion ? 0.01 : 0.6}
+                >
+                  <CardTitle className="text-2xl">Check-in Successful!</CardTitle>
+                  <CardDescription>
+                    You've been successfully checked in to the event.
+                  </CardDescription>
+                </FadeIn>
+              </CardHeader>
             <CardContent className="space-y-6">
               {qrCode && (
                 <>
@@ -133,7 +162,8 @@ function CheckInPageContent() {
                 </>
               )}
             </CardContent>
-          </Card>
+            </Card>
+          </FadeIn>
         </div>
         <Footer />
       </div>
@@ -147,13 +177,18 @@ function CheckInPageContent() {
       </div>
 
       <div className="flex-1 flex items-center justify-center px-4 py-12">
-        <Card className="w-full max-w-md">
-          <CardHeader>
-            <CardTitle>Event Check-in</CardTitle>
-            <CardDescription>
-              Enter your email address to check in to this event
-            </CardDescription>
-          </CardHeader>
+        <FadeIn
+          direction={prefersReducedMotion ? 'none' : 'up'}
+          delay={0.1}
+          duration={prefersReducedMotion ? 0.01 : 0.6}
+        >
+          <Card className="w-full max-w-md">
+            <CardHeader>
+              <CardTitle>Event Check-in</CardTitle>
+              <CardDescription>
+                Enter your email address to check in to this event
+              </CardDescription>
+            </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
               <div className="space-y-2">
@@ -185,7 +220,8 @@ function CheckInPageContent() {
               </Button>
             </form>
           </CardContent>
-        </Card>
+          </Card>
+        </FadeIn>
       </div>
 
       <Footer />
