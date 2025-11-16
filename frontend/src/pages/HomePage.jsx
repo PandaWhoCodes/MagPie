@@ -15,6 +15,8 @@ import { ThemeProvider, useTheme } from "@/contexts/ThemeProvider";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { eventsApi, registrationsApi, brandingApi } from '../services/api';
 import Footer from '../components/Footer';
+import { FadeIn, StaggerChildren } from '@/components/animations';
+import { useReducedMotion } from '@/hooks/useReducedMotion';
 
 // Icons (inline SVG)
 const SparklesIcon = ({ className = "h-10 w-10" }) => (
@@ -78,6 +80,7 @@ function HomePageContent() {
   const [successState, setSuccessState] = useState(false);
   const { register, handleSubmit, formState: { errors }, watch, setValue } = useForm();
   const { mode, toggleMode } = useTheme();
+  const prefersReducedMotion = useReducedMotion();
 
   // Fetch active event
   const { data: event, isLoading, error } = useQuery({
@@ -206,63 +209,80 @@ function HomePageContent() {
       <div className="flex-1 flex items-center justify-center px-4 py-12">
         <div className="w-full max-w-2xl space-y-8">
           {/* Header */}
-          <div className="text-center space-y-4">
-            {branding?.logo_url ? (
-              <div className="flex justify-center mb-4">
-                <img src={branding.logo_url} alt="Logo" className="h-12 object-contain" />
+          <FadeIn
+            direction={prefersReducedMotion ? 'none' : 'down'}
+            delay={0.1}
+            duration={prefersReducedMotion ? 0.01 : 0.6}
+          >
+            <div className="text-center space-y-4">
+              {branding?.logo_url ? (
+                <div className="flex justify-center mb-4">
+                  <img src={branding.logo_url} alt="Logo" className="h-12 object-contain" />
+                </div>
+              ) : (
+                <div className="flex justify-center mb-4">
+                  <SparklesIcon className="h-12 w-12 text-primary" />
+                </div>
+              )}
+              <div>
+                <h1 className="text-4xl font-bold tracking-tight">
+                  {branding?.site_title || 'MagPie'}
+                </h1>
+                <p className="text-muted-foreground mt-2">
+                  {branding?.site_headline || 'Where Innovation Meets Community'}
+                </p>
               </div>
-            ) : (
-              <div className="flex justify-center mb-4">
-                <SparklesIcon className="h-12 w-12 text-primary" />
-              </div>
-            )}
-            <div>
-              <h1 className="text-4xl font-bold tracking-tight">
-                {branding?.site_title || 'MagPie'}
-              </h1>
-              <p className="text-muted-foreground mt-2">
-                {branding?.site_headline || 'Where Innovation Meets Community'}
-              </p>
             </div>
-          </div>
+          </FadeIn>
 
           {/* Event Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-2xl">{event.name}</CardTitle>
-              {event.description && (
-                <CardDescription className="text-base">{event.description}</CardDescription>
-              )}
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <div className="flex items-center gap-2 text-sm">
-                <CalendarIcon className="h-4 w-4 text-muted-foreground" />
-                <span>{event.date}</span>
-                <span className="text-muted-foreground">•</span>
-                <ClockIcon className="h-4 w-4 text-muted-foreground" />
-                <span>{event.time}</span>
-              </div>
-              <div className="flex items-start gap-2 text-sm">
-                <MapPinIcon className="h-4 w-4 mt-0.5 text-muted-foreground" />
-                <div className="flex-1">
-                  <span>{event.venue}</span>
-                  {event.venue_map_link && (
-                    <a
-                      href={event.venue_map_link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="ml-2 text-primary hover:underline inline-flex items-center gap-1"
-                    >
-                      View Map <ExternalLinkIcon className="h-3 w-3" />
-                    </a>
-                  )}
+          <FadeIn
+            direction={prefersReducedMotion ? 'none' : 'up'}
+            delay={0.3}
+            duration={prefersReducedMotion ? 0.01 : 0.6}
+          >
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-2xl">{event.name}</CardTitle>
+                {event.description && (
+                  <CardDescription className="text-base">{event.description}</CardDescription>
+                )}
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="flex items-center gap-2 text-sm">
+                  <CalendarIcon className="h-4 w-4 text-muted-foreground" />
+                  <span>{event.date}</span>
+                  <span className="text-muted-foreground">•</span>
+                  <ClockIcon className="h-4 w-4 text-muted-foreground" />
+                  <span>{event.time}</span>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+                <div className="flex items-start gap-2 text-sm">
+                  <MapPinIcon className="h-4 w-4 mt-0.5 text-muted-foreground" />
+                  <div className="flex-1">
+                    <span>{event.venue}</span>
+                    {event.venue_map_link && (
+                      <a
+                        href={event.venue_map_link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="ml-2 text-primary hover:underline inline-flex items-center gap-1"
+                      >
+                        View Map <ExternalLinkIcon className="h-3 w-3" />
+                      </a>
+                    )}
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </FadeIn>
 
           {/* Registration Form */}
-          <Card>
+          <FadeIn
+            direction={prefersReducedMotion ? 'none' : 'up'}
+            delay={0.5}
+            duration={prefersReducedMotion ? 0.01 : 0.6}
+          >
+            <Card>
             <CardHeader>
               <CardTitle>Register for Event</CardTitle>
               <CardDescription>Fill in your details below to register</CardDescription>
@@ -391,7 +411,8 @@ function HomePageContent() {
                 </Button>
               </form>
             </CardContent>
-          </Card>
+            </Card>
+          </FadeIn>
         </div>
       </div>
 
