@@ -1,6 +1,9 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 from contextlib import asynccontextmanager
+from pathlib import Path
 from app.core.config import get_settings
 from app.core.database import db
 from app.api import events, registrations, qr_codes, event_fields, branding, whatsapp, message_templates, email
@@ -71,6 +74,32 @@ async def root():
 async def health_check():
     """Health check endpoint"""
     return {"status": "healthy"}
+
+
+# Static files setup for serving frontend
+# Check if frontend dist directory exists (for production deployment)
+frontend_dist_path = Path(__file__).parent.parent.parent / "frontend" / "dist"
+if frontend_dist_path.exists():
+    # Mount static assets directory (JS, CSS, fonts, images)
+    assets_path = frontend_dist_path / "assets"
+    if assets_path.exists():
+        app.mount("/assets", StaticFiles(directory=str(assets_path)), name="assets")
+
+    # Catch-all route for SPA routing
+    # This must be last to not override API routes
+    @app.get("/{full_path:path}")
+    async def serve_spa(full_path: str):
+        """Serve the React SPA for all non-API routes"""
+        # If path starts with api/, let it 404 normally (API route not found)
+        if full_path.startswith("api/"):
+            raise HTTPException(status_code=404, detail="API endpoint not found")
+
+        # Serve index.html for all other routes (SPA routing)
+        index_path = frontend_dist_path / "index.html"
+        if index_path.exists():
+            return FileResponse(str(index_path))
+        else:
+            raise HTTPException(status_code=404, detail="Frontend not found")
 
 
 if __name__ == "__main__":
