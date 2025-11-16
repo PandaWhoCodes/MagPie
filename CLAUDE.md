@@ -7,7 +7,9 @@ MagPie Event Registration Platform - A full-stack event registration management 
 - **Backend**: FastAPI (Python 3.11+) - Running on http://0.0.0.0:8000
 - **Frontend**: React 18 + Vite - Running on http://localhost:3000/
 - **Database**: Turso (libsql) - SQLite-compatible cloud database (local: `local.db`)
-- **Deployment**: Render (both frontend and backend)
+- **Deployment**:
+  - **Fly.io** (Recommended): Single unified app, FastAPI serves static frontend
+  - **Render**: Separate frontend and backend services (legacy)
 
 ## Current Status
 Both servers are running and operational.
@@ -24,20 +26,28 @@ Both servers are running and operational.
 - **Framework**: React 18
 - **Build Tool**: Vite
 - **Authentication**: Clerk (@clerk/clerk-react)
-- **Styling**: TailwindCSS
-- **Animations**: Framer Motion (public pages only), Motion (theme-specific animations)
+- **Styling**: TailwindCSS + shadcn/ui
+- **Animations**: Motion One (lightweight, 5.8KB) - See [ANIMATION_PATTERNS.md](ANIMATION_PATTERNS.md)
 - **State Management**: React Query (@tanstack/react-query)
 - **Forms**: React Hook Form
-- **Icons**: Lucide React
+- **Icons**: Inline SVG (performance optimized)
 - **HTTP Client**: Axios
-- **Theming**: Custom theme system with multiple visual styles
+- **Theming**: 22 professional themes via theme-presets.js
 
 ## Quick Start Commands
+
+### Option 1: One-Command Startup (Recommended)
+```bash
+# Start both servers with one command
+./start.sh
+```
+
+### Option 2: Manual Startup
 ```bash
 # Start Backend
 cd backend && source venv/bin/activate && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
-# Start Frontend
+# Start Frontend (in a new terminal)
 cd frontend && npm run dev
 ```
 
@@ -205,7 +215,7 @@ magpie/
 ## Common Development Tasks
 - **Add field to event**: Update EventForm.jsx, add to form submission
 - **Add API endpoint**: Create router in api/, add service method
-- **Add animation**: Use Framer Motion in public pages
+- **Add animation**: Use animation components from `frontend/src/components/animations/` - See [ANIMATION_PATTERNS.md](ANIMATION_PATTERNS.md) for 35+ ready-to-use patterns
 - **Export data**: Update RegistrationsList.jsx CSV logic
 - **Change styling**: Use Tailwind classes or update index.css
 - **Send WhatsApp messages**: Use "Send WhatsApp" button in registrations list (dashboard)
@@ -278,7 +288,51 @@ Complete documentation is available in the `/docs` directory:
 - [Features Guide](docs/FEATURES.md) - Detailed feature documentation
 - [API Reference](docs/API.md) - API endpoints and examples
 - [WhatsApp Setup](docs/WHATSAPP_SETUP.md) - WhatsApp integration guide
-- [Deployment Guide](docs/DEPLOYMENT.md) - Production deployment
+- [Deployment Guide](docs/DEPLOYMENT.md) - Production deployment (Render, legacy)
+- [Fly.io Deployment](docs/FLY_DEPLOYMENT.md) - **Recommended deployment guide**
+- [Animation Quick Start](ANIMATION_QUICK_START.md) - Get started with animations in 5 minutes ⚡
+- [Animation Patterns](ANIMATION_PATTERNS.md) - 35+ ready-to-use animation components
+- [UI Enhancement Guide](UI_ENHANCEMENT_GUIDE.md) - Comprehensive animation library guide
+
+## Deployment Options
+
+### Option 1: Fly.io (Recommended) 🚀
+**Single unified app deployment** - FastAPI serves the React frontend as static files.
+
+**Advantages:**
+- ✅ Simpler management (one app vs two)
+- ✅ Lower cost (single app instance)
+- ✅ No CORS issues (same domain)
+- ✅ Faster deployment
+- ✅ Better for monolithic architecture
+- ✅ Built-in SSL and CDN
+
+**Quick Deploy:**
+```bash
+# 1. Install flyctl
+brew install flyctl  # or see docs/FLY_DEPLOYMENT.md
+
+# 2. Authenticate
+fly auth login
+
+# 3. Create app
+fly apps create b2l-registration
+
+# 4. Set secrets (see docs/FLY_DEPLOYMENT.md for full list)
+fly secrets set TURSO_DATABASE_URL="..." CLERK_SECRET_KEY="..."
+
+# 5. Deploy
+fly deploy --build-secret VITE_CLERK_PUBLISHABLE_KEY
+```
+
+**See [docs/FLY_DEPLOYMENT.md](docs/FLY_DEPLOYMENT.md) for complete guide.**
+
+### Option 2: Render (Legacy)
+**Separate frontend and backend services.**
+
+Configured via `render.yaml`. Frontend served as static site, backend as web service.
+
+**See [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) for legacy deployment guide.**
 
 ## Notes
 - Backend uses Turso database (SQLite-compatible)

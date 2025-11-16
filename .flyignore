@@ -1,0 +1,58 @@
+# .flyignore - Files to exclude when uploading to fly.io
+# Similar to .dockerignore but for fly.io deployment context
+
+# Node modules
+frontend/node_modules/
+node_modules/
+
+# Python virtual environment
+backend/venv/
+venv/
+__pycache__/
+
+# Build outputs
+frontend/dist/
+frontend/build/
+
+# Environment files
+.env
+.env.*
+*.env
+
+# Database files
+*.db
+*.db-shm
+*.db-wal
+local.db
+
+# Git
+.git/
+.gitignore
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# Documentation
+docs/
+*.md
+
+# Test files
+backend/tests/
+frontend/src/**/*.test.*
+
+# Logs
+*.log
+npm-debug.log*
+
+# CI/CD
+.github/
+
+# Temporary
+*.tmp
+.cache/
+
+# Playwright
+.playwright-mcp/

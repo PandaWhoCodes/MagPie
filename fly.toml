@@ -1,0 +1,56 @@
+# fly.toml app configuration file generated for b2l-registration
+#
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
+
+app = 'b2l-registration'
+primary_region = 'sin'  # Singapore - closest to Turso database (ap-south-1)
+kill_signal = 'SIGINT'
+kill_timeout = '5s'
+
+[experimental]
+  auto_rollback = true
+
+[build]
+  dockerfile = 'Dockerfile'
+
+[env]
+  IS_LOCAL = "false"
+  # FRONTEND_URL will be set to https://<app-name>.fly.dev after deployment
+  # Update this after first deploy or use fly secrets for dynamic values
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = 'stop'
+  auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+
+  [[http_service.checks]]
+    grace_period = "10s"
+    interval = "30s"
+    method = "GET"
+    timeout = "5s"
+    path = "/health"
+
+[[vm]]
+  memory = '512mb'
+  cpu_kind = 'shared'
+  cpus = 1
+
+# Secrets to set via fly CLI:
+# fly secrets set \
+#   TURSO_DATABASE_URL="libsql://..." \
+#   TURSO_AUTH_TOKEN="..." \
+#   CLERK_SECRET_KEY="sk_..." \
+#   TWILIO_ACCOUNT_SID="..." \
+#   TWILIO_AUTH_TOKEN="..." \
+#   TWILIO_WHATSAPP_NUMBER="whatsapp:+..." \
+#   RESEND_API_KEY="re_..." \
+#   RESEND_FROM_EMAIL="onboarding@resend.dev" \
+#   VITE_CLERK_PUBLISHABLE_KEY="pk_..." \
+#   FRONTEND_URL="https://b2l-registration.fly.dev"
+#
+# Deploy with build secret:
+# fly deploy --build-secret VITE_CLERK_PUBLISHABLE_KEY

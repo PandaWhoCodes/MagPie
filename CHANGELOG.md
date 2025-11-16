@@ -8,6 +8,54 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Fly.io Deployment Support - Single Unified App Deployment**
+  - `Dockerfile` - Multi-stage Docker build for production deployment
+    - Stage 1: Node.js 18 Alpine for building React frontend with Vite
+    - Stage 2: Python 3.11 Slim for FastAPI backend serving static frontend
+    - Uses build secrets for `VITE_CLERK_PUBLISHABLE_KEY` (secure build-time injection)
+    - Runs as non-root user for security
+    - Uvicorn with 2 workers for production performance
+  - `fly.toml` - Fly.io application configuration
+    - App name: b2l-registration
+    - Region: Singapore (sin) - closest to Turso database
+    - Port: 8080 with auto-stop/auto-start for cost optimization
+    - Health checks on `/health` endpoint
+    - 512MB RAM, shared CPU
+  - `.dockerignore` - Optimized Docker build context
+    - Excludes node_modules, venv, .env files, local.db
+    - Reduces build time and image size
+  - `.flyignore` - Fly.io deployment optimization
+    - Excludes unnecessary files from upload context
+  - `docs/FLY_DEPLOYMENT.md` - Comprehensive deployment guide
+    - Installation and authentication
+    - Secrets management
+    - Deployment steps
+    - Troubleshooting guide
+    - Cost estimation
+    - Monitoring and scaling
+
+### Changed
+- **Backend Static File Serving - Unified Deployment Model**
+  - `backend/app/main.py:1-9` - Added imports for StaticFiles, FileResponse, HTTPException, Path
+  - `backend/app/main.py:79-102` - Added static file serving for production deployment
+    - Mounts `/assets` directory for JavaScript, CSS, fonts, and images
+    - Catch-all route for SPA routing (serves index.html for non-API routes)
+    - Checks if frontend dist exists before mounting (graceful degradation)
+    - API routes (starting with `api/`) excluded from catch-all
+- **Frontend API Configuration - Relative URLs for Same-Domain Deployment**
+  - `frontend/src/services/api.js:3-5` - Updated API base URL to use relative path `/api`
+    - Falls back to `/api` (relative) instead of `http://localhost:8000/api`
+    - Works seamlessly in production (same domain) and development (with VITE_API_URL)
+    - Eliminates CORS issues in unified deployment
+- **Documentation Updates**
+  - `CLAUDE.md:10-12` - Updated deployment section with Fly.io as recommended option
+  - `CLAUDE.md:284-335` - Added comprehensive deployment options section
+    - Fly.io deployment guide (recommended)
+    - Quick deploy commands
+    - Advantages of unified deployment
+    - Legacy Render deployment reference
+
+### Added
 - **Dashboard Animations - Professional Polish for Admin Interface**
   - `frontend/src/pages/Dashboard.jsx:21-22` - Imported FadeIn, StaggerChildren animations and useReducedMotion hook
   - `frontend/src/pages/Dashboard.jsx:103` - Added prefersReducedMotion detection for accessibility

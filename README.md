@@ -30,7 +30,8 @@ Just like the magpie bird known for its intelligence and ability to recognize pa
 - 📧 **Email Notifications** - Beautiful HTML emails with Resend (100 emails/day free tier)
 - 🔗 **QR Code Check-ins** - Generate and scan QR codes for attendance
 - 📊 **Analytics & Export** - View registrations and export to CSV
-- 🎨 **Modern UI Themes** - Choose between colorful Default or sleek Midnight Black
+- 🎨 **Modern UI Themes** - 22 professional themes with light/dark modes
+- ✨ **Smooth Animations** - Motion One powered animations (lightweight, performant)
 - 🔒 **Secure Dashboard** - Clerk authentication protects admin features
 - ⚡ **Fast & Reliable** - Built with FastAPI and React
 
@@ -61,13 +62,17 @@ pip install -r requirements.txt
 cp .env.example .env
 # Edit .env with your credentials
 
-# Start backend
-uvicorn app.main:app --reload
-
-# Frontend setup (new terminal)
-cd frontend
+# Frontend setup
+cd ../frontend
 npm install
-npm run dev
+
+# Start both servers (Option 1 - Recommended)
+cd ..
+./start.sh
+
+# OR Start manually (Option 2)
+# Terminal 1: cd backend && source venv/bin/activate && uvicorn app.main:app --reload
+# Terminal 2: cd frontend && npm run dev
 ```
 
 **Access MagPie**:
@@ -82,13 +87,25 @@ For detailed installation instructions, see **[Setup Guide](docs/SETUP.md)**.
 
 ## 🎨 Themes
 
-MagPie comes with two beautiful themes:
+MagPie comes with **22 professionally designed themes**, each with light and dark modes:
 
-### 🌈 **Default Theme**
-Vibrant gradients with purple, blue, and pink hues - perfect for creative events
+### Popular Themes
+- 🌈 **modern-minimal** - Clean, contemporary design
+- 💜 **violet-bloom** - Elegant purple accents
+- 🌊 **ocean-breeze** - Calming blue tones
+- 🌃 **cyberpunk** - Neon-fueled futuristic vibes
+- 🎨 **pastel-dreams** - Soft, gentle colors
+- 🌲 **forest-mist** - Natural green palette
+- ☕ **notebook** - Warm, paper-like aesthetic
+- 🎮 **doom-64** - Retro gaming inspired
+- 💻 **hacker-green** - Classic terminal look
+- ...and 13 more!
 
-### 🌑 **Midnight Black Theme**
-Sleek, pure black background with floating particles - for those who prefer elegance in darkness
+**Features:**
+- Light and dark modes for each theme
+- CSS variable-based (zero-cost switching)
+- Custom fonts per theme
+- 6-hour caching with auto-invalidation
 
 Switch themes from Dashboard → Branding Settings
 
@@ -104,6 +121,9 @@ Switch themes from Dashboard → Branding Settings
 | **[WhatsApp Setup](docs/WHATSAPP_SETUP.md)** | WhatsApp integration guide |
 | **[Deployment Guide](docs/DEPLOYMENT.md)** | Production deployment instructions |
 | **[System Architecture](SYSTEM_ARCHITECTURE.md)** | Technical architecture details |
+| **[Animation Quick Start](ANIMATION_QUICK_START.md)** | Get started with animations in 5 minutes ⚡ |
+| **[Animation Patterns](ANIMATION_PATTERNS.md)** | 35+ ready-to-use animation components |
+| **[UI Enhancement Guide](UI_ENHANCEMENT_GUIDE.md)** | Comprehensive animation library guide |
 
 ---
 
@@ -118,9 +138,10 @@ Switch themes from Dashboard → Branding Settings
 ### Frontend Feathers 🪶
 - **React 18** - UI library
 - **Vite** - Build tool
-- **TailwindCSS** - Styling
-- **Framer Motion** - Animations
+- **TailwindCSS + shadcn/ui** - Styling & components
+- **Motion One** - Lightweight animations (5.8KB)
 - **React Query** - State management
+- **Clerk** - Authentication
 
 ---
 
@@ -178,7 +199,27 @@ Generate QR code → Print/display → Scan at event
 
 ## 🚢 Deployment
 
-### Render (Recommended)
+### Fly.io - Single App (Recommended) 🚀
+
+**One command deployment** - FastAPI serves the React frontend as static files.
+
+```bash
+# Quick deploy
+./fly-deploy.sh
+
+# Or manually:
+fly deploy --build-secret VITE_CLERK_PUBLISHABLE_KEY
+```
+
+**Advantages:**
+- ✅ One app = simpler management
+- ✅ Lower cost than separate services
+- ✅ No CORS issues (same domain)
+- ✅ Built-in SSL and auto-scaling
+
+**Setup Guide**: [docs/FLY_DEPLOYMENT.md](docs/FLY_DEPLOYMENT.md)
+
+### Render - Separate Services (Legacy)
 
 ```bash
 # Push to GitHub
@@ -191,6 +232,8 @@ git push origin master
 # 4. Deploy!
 ```
 
+**Setup Guide**: [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md)
+
 ### Other Platforms
 
 MagPie can nest anywhere:
@@ -198,8 +241,6 @@ MagPie can nest anywhere:
 - AWS / DigitalOcean (backend)
 - Docker containers
 - Traditional VPS
-
-**For detailed deployment**, see [Deployment Guide](docs/DEPLOYMENT.md).
 
 ---
 
