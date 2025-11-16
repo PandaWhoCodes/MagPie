@@ -12,8 +12,8 @@ WORKDIR /app/frontend
 # Copy package files
 COPY frontend/package*.json ./
 
-# Install dependencies
-RUN npm ci --only=production
+# Install ALL dependencies (including devDependencies needed for build)
+RUN npm ci
 
 # Copy frontend source
 COPY frontend/ ./
@@ -21,7 +21,13 @@ COPY frontend/ ./
 # Build frontend with Vite
 # Mount VITE_CLERK_PUBLISHABLE_KEY as build secret
 RUN --mount=type=secret,id=VITE_CLERK_PUBLISHABLE_KEY \
-    export VITE_CLERK_PUBLISHABLE_KEY=$(cat /run/secrets/VITE_CLERK_PUBLISHABLE_KEY) && \
+    if [ -f /run/secrets/VITE_CLERK_PUBLISHABLE_KEY ]; then \
+        export VITE_CLERK_PUBLISHABLE_KEY=$(cat /run/secrets/VITE_CLERK_PUBLISHABLE_KEY); \
+    else \
+        echo "WARNING: VITE_CLERK_PUBLISHABLE_KEY build secret not provided"; \
+        echo "Usage: fly deploy --build-secret VITE_CLERK_PUBLISHABLE_KEY=pk_test_your_key"; \
+        exit 1; \
+    fi && \
     npm run build
 
 # Output is in /app/frontend/dist/
