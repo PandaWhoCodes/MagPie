@@ -90,7 +90,20 @@ case $choice in
         ;;
     3)
         echo -e "${BLUE}Deploying application...${NC}"
-        fly deploy --build-secret VITE_CLERK_PUBLISHABLE_KEY
+        echo -e "${YELLOW}⚠ Build secrets need actual values, extracting from frontend/.env...${NC}"
+
+        # Extract Clerk publishable key from .env file
+        CLERK_PUB_KEY=$(grep VITE_CLERK_PUBLISHABLE_KEY frontend/.env | cut -d '=' -f2-)
+
+        if [ -z "$CLERK_PUB_KEY" ]; then
+            echo -e "${RED}✗ VITE_CLERK_PUBLISHABLE_KEY not found in frontend/.env${NC}"
+            echo -e "${YELLOW}Please add it to frontend/.env or pass it manually:${NC}"
+            echo -e "${YELLOW}fly deploy --build-secret VITE_CLERK_PUBLISHABLE_KEY=pk_test_your_key${NC}"
+            exit 1
+        fi
+
+        echo -e "${GREEN}✓ Found Clerk key, deploying...${NC}"
+        fly deploy --build-secret VITE_CLERK_PUBLISHABLE_KEY=$CLERK_PUB_KEY
         echo -e "${GREEN}✓ Deployment complete${NC}"
         echo -e "${YELLOW}Your app is live at: https://b2l-registration.fly.dev${NC}"
         ;;

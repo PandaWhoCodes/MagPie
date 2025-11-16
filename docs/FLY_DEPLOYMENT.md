@@ -98,13 +98,31 @@ fly secrets list
 ### 3. Deploy Application
 
 **Deploy with build secret:**
+
+⚠️ **IMPORTANT**: Build secrets must be passed with their actual VALUES, not just names. They are NOT automatically pulled from fly secrets.
+
 ```bash
-fly deploy --build-secret VITE_CLERK_PUBLISHABLE_KEY
+# Get your Clerk publishable key and pass it as a build secret
+fly deploy --build-secret VITE_CLERK_PUBLISHABLE_KEY=pk_test_your_actual_key_here
+```
+
+**Or use a helper command to get it from fly secrets:**
+```bash
+# Extract secret value and pass to build
+CLERK_KEY=$(fly secrets list | grep VITE_CLERK_PUBLISHABLE_KEY | awk '{print $2}')
+fly deploy --build-secret VITE_CLERK_PUBLISHABLE_KEY=$CLERK_KEY
+```
+
+**Or set it as environment variable first:**
+```bash
+# Set from your local .env file
+export CLERK_PUB_KEY=$(grep VITE_CLERK_PUBLISHABLE_KEY frontend/.env | cut -d '=' -f2)
+fly deploy --build-secret VITE_CLERK_PUBLISHABLE_KEY=$CLERK_PUB_KEY
 ```
 
 This command will:
 1. Build the Docker image with multi-stage build
-2. Build the React frontend with Vite
+2. Build the React frontend with Vite (using the build secret)
 3. Copy built frontend to Python image
 4. Deploy to fly.io
 5. Run health checks

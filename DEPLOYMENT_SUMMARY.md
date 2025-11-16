@@ -67,8 +67,12 @@ fly secrets set \
   VITE_CLERK_PUBLISHABLE_KEY="pk_test_..." \
   FRONTEND_URL="https://b2l-registration.fly.dev"
 
-# 5. Deploy
-fly deploy --build-secret VITE_CLERK_PUBLISHABLE_KEY
+# 5. Deploy (build secrets need actual VALUES, not just names)
+export CLERK_PUB_KEY=$(grep VITE_CLERK_PUBLISHABLE_KEY frontend/.env | cut -d '=' -f2)
+fly deploy --build-secret VITE_CLERK_PUBLISHABLE_KEY=$CLERK_PUB_KEY
+
+# Or pass directly:
+fly deploy --build-secret VITE_CLERK_PUBLISHABLE_KEY=pk_test_your_actual_key
 
 # 6. Open app
 fly open

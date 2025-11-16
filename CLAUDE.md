@@ -321,8 +321,9 @@ fly apps create b2l-registration
 # 4. Set secrets (see docs/FLY_DEPLOYMENT.md for full list)
 fly secrets set TURSO_DATABASE_URL="..." CLERK_SECRET_KEY="..."
 
-# 5. Deploy
-fly deploy --build-secret VITE_CLERK_PUBLISHABLE_KEY
+# 5. Deploy (build secrets need actual values)
+export CLERK_KEY=$(grep VITE_CLERK_PUBLISHABLE_KEY frontend/.env | cut -d '=' -f2)
+fly deploy --build-secret VITE_CLERK_PUBLISHABLE_KEY=$CLERK_KEY
 ```
 
 **See [docs/FLY_DEPLOYMENT.md](docs/FLY_DEPLOYMENT.md) for complete guide.**
