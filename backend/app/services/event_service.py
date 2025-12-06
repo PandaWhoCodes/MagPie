@@ -167,17 +167,8 @@ class EventService:
     @staticmethod
     async def toggle_event_status(event_id: str) -> Optional[EventResponse]:
         """Toggle event active status"""
-        event = await db.fetch_one("SELECT is_active FROM events WHERE id = ?", [event_id])
-        if not event:
-            return None
 
-        new_status = 0 if event["is_active"] else 1
-
-        # If activating, deactivate all other events
-        if new_status == 1:
-            await db.execute("UPDATE events SET is_active = 0 WHERE id != ?", [event_id])
-
-        await db.execute("UPDATE events SET is_active = ? WHERE id = ?", [new_status, event_id])
+        await db.execute("UPDATE events SET is_active = 1 WHERE id = ?", [event_id])
 
         return await EventService.get_event(event_id)
 
