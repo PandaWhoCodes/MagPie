@@ -173,10 +173,6 @@ class EventService:
 
         new_status = 0 if event["is_active"] else 1
 
-        # If activating, deactivate all other events
-        if new_status == 1:
-            await db.execute("UPDATE events SET is_active = 0 WHERE id != ?", [event_id])
-
         await db.execute("UPDATE events SET is_active = ? WHERE id = ?", [new_status, event_id])
 
         return await EventService.get_event(event_id)
