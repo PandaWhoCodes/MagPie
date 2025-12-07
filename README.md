@@ -58,6 +58,33 @@ python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt
 
+## libsql installation error
+If you encounter errors installing `libsql-client` or building the backend, make sure you have CMake installed:
+
+```bash
+brew install cmake
+```
+
+## Local development (no Turso needed)
+For local builds, you do **not** need Turso. You can set the environment variable:
+
+```env
+IS_LOCAL=true
+```
+
+This will use SQLite locally and skip Turso setup.
+
+## Email setup instructions
+To enable email notifications, set up your provider credentials in `.env`:
+
+```env
+EMAIL_PROVIDER=resend  # or brevo
+RESEND_API_KEY=your_resend_key
+BREVO_API_KEY=your_brevo_key
+```
+
+Choose your provider and add the corresponding API key. For more details, see [Features Guide](docs/FEATURES.md) and [Setup Guide](docs/SETUP.md).
+
 # Configure .env (see Setup Guide)
 cp .env.example .env
 # Edit .env with your credentials
