@@ -62,6 +62,9 @@ RUN adduser --disabled-password --gecos '' appuser && \
 
 USER appuser
 
+# Set working directory to backend for Python imports
+WORKDIR /app/backend
+
 # Environment variables
 ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -71,4 +74,4 @@ EXPOSE 8080
 
 # Run uvicorn with production settings
 # 2 workers for better performance, no reload
-CMD ["uvicorn", "backend.app.main:app", "--host", "0.0.0.0", "--port", "8080", "--workers", "2"]
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8080", "--workers", "2"]
