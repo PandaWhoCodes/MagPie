@@ -42,13 +42,13 @@ api.interceptors.request.use(
 export const eventsApi = {
   getAll: () => api.get('/events/'),
   getActive: () => api.get('/events/active'),
-  getById: (id) => api.get(`/events/${id}/`),
+  getById: (id) => api.get(`/events/${id}`),
   create: (data) => api.post('/events/', data),
   update: (id, data) => api.patch(`/events/${id}/`, data),
   toggle: (id) => api.post(`/events/${id}/toggle/`),
   clone: (id, newName) => api.post(`/events/${id}/clone/?new_name=${encodeURIComponent(newName)}`),
   delete: (id) => api.delete(`/events/${id}/`),
-  getRegistrations: (id) => api.get(`/events/${id}/registrations/`),
+  getRegistrations: (id) => api.get(`/events/${id}/registrations`),
   updateFields: (id, fields) => api.put(`/events/${id}/fields/`, fields),
 };
 

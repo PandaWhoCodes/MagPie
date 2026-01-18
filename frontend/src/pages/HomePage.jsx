@@ -75,6 +75,24 @@ const LoaderIcon = ({ className = "h-5 w-5" }) => (
   </svg>
 );
 
+// Helper function to format time to 12-hour format with AM/PM and IST
+const formatTimeDisplay = (time) => {
+  if (!time) return '';
+  // Handle both "HH:MM" and "HH:MM - HH:MM" formats
+  const formatSingleTime = (t) => {
+    const [hours, minutes] = t.trim().split(':').map(Number);
+    const period = hours >= 12 ? 'PM' : 'AM';
+    const displayHours = hours % 12 || 12;
+    return `${displayHours}:${minutes.toString().padStart(2, '0')} ${period}`;
+  };
+
+  if (time.includes('-')) {
+    const [start, end] = time.split('-');
+    return `${formatSingleTime(start)} - ${formatSingleTime(end)} IST`;
+  }
+  return `${formatSingleTime(time)} IST`;
+};
+
 function HomePageContent() {
   const navigate = useNavigate();
   const [autoFillAttempted, setAutoFillAttempted] = useState(false);
@@ -258,7 +276,7 @@ function HomePageContent() {
                   <span>{event.date}</span>
                   <span className="text-muted-foreground">•</span>
                   <ClockIcon className="h-4 w-4 text-muted-foreground" />
-                  <span>{event.time}</span>
+                  <span>{formatTimeDisplay(event.time)}</span>
                 </div>
                 <div className="flex items-start gap-2 text-sm">
                   <MapPinIcon className="h-4 w-4 mt-0.5 text-muted-foreground" />
@@ -292,7 +310,24 @@ function HomePageContent() {
               <CardDescription>Fill in your details below to register</CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              <form
+                onSubmit={handleSubmit(onSubmit)}
+                className="space-y-6"
+                onKeyDown={(e) => {
+                  // Prevent Enter from submitting form (except on submit button)
+                  // This improves mobile keyboard experience
+                  if (e.key === 'Enter' && e.target.type !== 'submit' && e.target.tagName !== 'TEXTAREA') {
+                    e.preventDefault();
+                    // Move to next focusable input
+                    const form = e.currentTarget;
+                    const inputs = Array.from(form.querySelectorAll('input, select, textarea, button[type="submit"]'));
+                    const currentIndex = inputs.indexOf(e.target);
+                    if (currentIndex >= 0 && currentIndex < inputs.length - 1) {
+                      inputs[currentIndex + 1].focus();
+                    }
+                  }
+                }}
+              >
                 {/* Email */}
                 <div className="space-y-2">
                   <Label htmlFor="email">Email Address *</Label>

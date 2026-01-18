@@ -1,5 +1,6 @@
 import uuid
 import json
+import logging
 from typing import Optional
 from app.core.database import db
 from app.schemas.registration import (
@@ -7,6 +8,9 @@ from app.schemas.registration import (
     RegistrationResponse,
     UserProfileResponse,
 )
+from app.services.email_service import email_service
+
+logger = logging.getLogger(__name__)
 
 
 class RegistrationService:
@@ -38,6 +42,13 @@ class RegistrationService:
         await RegistrationService.update_user_profile(
             registration_data.email,
             registration_data.phone,
+            registration_data.form_data,
+        )
+
+        # Send confirmation email
+        await RegistrationService._send_confirmation_email(
+            registration_data.event_id,
+            registration_data.email,
             registration_data.form_data,
         )
 
@@ -152,3 +163,60 @@ class RegistrationService:
             [event_id, email],
         )
         return reg is not None
+
+    @staticmethod
+    async def _send_confirmation_email(
+        event_id: str, email: str, form_data: dict
+    ) -> None:
+        """Send registration confirmation email"""
+        try:
+            # Get full event details for email
+            event = await db.fetch_one(
+                "SELECT name, date, time, venue, venue_address, venue_map_link FROM events WHERE id = ?",
+                [event_id]
+            )
+
+            if not event:
+                logger.warning(f"Event {event_id} not found for confirmation email")
+                return
+
+            event_name = event["name"]
+
+            # Build event details dict
+            event_details = {
+                "name": event_name,
+                "date": event["date"],
+                "time": event["time"],
+                "venue": event["venue"],
+                "venue_address": event["venue_address"],
+                "venue_map_link": event["venue_map_link"],
+            }
+
+            # Get event fields for label mapping (field_name -> field_label)
+            event_fields = await db.fetch_all(
+                "SELECT field_name, field_label FROM event_fields WHERE event_id = ?",
+                [event_id]
+            )
+            field_labels = {f["field_name"]: f["field_label"] for f in event_fields}
+
+            # Get user's name from form_data
+            name = form_data.get("name", form_data.get("full_name", "Participant"))
+
+            # Send confirmation email (non-blocking, don't fail registration if email fails)
+            success = email_service.send_registration_confirmation(
+                to_email=email,
+                name=name,
+                event_name=event_name,
+                registration_data=form_data,
+                event_details=event_details,
+                field_labels=field_labels,
+            )
+
+            if success:
+                logger.info(f"Confirmation email sent to {email} for event {event_name}")
+            else:
+                logger.warning(f"Failed to send confirmation email to {email}")
+
+        except Exception as e:
+            # Log error but don't fail the registration
+            logger.error(f"Error sending confirmation email to {email}: {str(e)}")

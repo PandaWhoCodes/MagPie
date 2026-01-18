@@ -1,9 +1,11 @@
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import HTMLResponse
 from contextlib import asynccontextmanager
 from pathlib import Path
+import html
+import re
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -80,6 +82,64 @@ if frontend_dist_path.exists():
     if assets_path.exists():
         app.mount("/assets", StaticFiles(directory=str(assets_path)), name="assets")
 
+    # Cache for OG-injected HTML (regenerated every 5 minutes or when event changes)
+    _og_cache = {"html": None, "event_id": None, "timestamp": 0}
+
+    async def get_og_injected_html() -> str:
+        """Get index.html with dynamic OG tags, cached for performance"""
+        import time
+        from app.services.event_service import EventService
+
+        index_path = frontend_dist_path / "index.html"
+        current_time = time.time()
+        cache_ttl = 300  # 5 minutes
+
+        # Check if cache is still valid
+        if (
+            _og_cache["html"]
+            and current_time - _og_cache["timestamp"] < cache_ttl
+        ):
+            return _og_cache["html"]
+
+        # Read base HTML
+        html_content = index_path.read_text()
+
+        # Try to inject OG tags from active event
+        try:
+            active_event = await EventService.get_active_event()
+            if active_event:
+                event_name = html.escape(active_event.name)
+                desc = active_event.description or ""
+                event_description = html.escape(
+                    desc[:200] + "..." if len(desc) > 200 else desc
+                )
+                # Remove markdown syntax for cleaner OG description
+                event_description = re.sub(r'[#*_`\[\]()]', '', event_description)
+
+                og_title = f"{event_name} - Build2Learn"
+
+                # Replace OG tags
+                replacements = [
+                    (r'<title>[^<]*</title>', f'<title>{og_title}</title>'),
+                    (r'<meta name="description" content="[^"]*"', f'<meta name="description" content="{event_description}"'),
+                    (r'<meta property="og:title" content="[^"]*"', f'<meta property="og:title" content="{og_title}"'),
+                    (r'<meta property="og:description" content="[^"]*"', f'<meta property="og:description" content="{event_description}"'),
+                    (r'<meta name="twitter:title" content="[^"]*"', f'<meta name="twitter:title" content="{og_title}"'),
+                    (r'<meta name="twitter:description" content="[^"]*"', f'<meta name="twitter:description" content="{event_description}"'),
+                ]
+                for pattern, replacement in replacements:
+                    html_content = re.sub(pattern, replacement, html_content)
+
+                _og_cache["event_id"] = active_event.id
+        except Exception:
+            pass  # Use default HTML on error
+
+        # Update cache
+        _og_cache["html"] = html_content
+        _og_cache["timestamp"] = current_time
+
+        return html_content
+
     # Catch-all route for SPA routing
     # This must be last to not override API routes
     @app.get("/{full_path:path}")
@@ -89,12 +149,14 @@ if frontend_dist_path.exists():
         if full_path.startswith("api/"):
             raise HTTPException(status_code=404, detail="API endpoint not found")
 
-        # Serve index.html for all other routes (SPA routing)
+        # Check if frontend exists
         index_path = frontend_dist_path / "index.html"
-        if index_path.exists():
-            return FileResponse(str(index_path))
-        else:
+        if not index_path.exists():
             raise HTTPException(status_code=404, detail="Frontend not found")
+
+        # Return cached OG-injected HTML
+        html_content = await get_og_injected_html()
+        return HTMLResponse(content=html_content)
 
 
 if __name__ == "__main__":

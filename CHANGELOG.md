@@ -8,6 +8,57 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Enhanced Registration Confirmation Emails**
+  - `backend/app/services/registration_service.py:167-214` - Updated `_send_confirmation_email` method
+    - Now fetches full event details (date, time, venue, address, map link)
+    - Passes event_details to email service for rich confirmation emails
+  - `backend/app/services/email_service.py:121-141` - New `_format_time_12h` helper
+    - Converts 24-hour time to 12-hour format with AM/PM and IST
+  - `backend/app/services/email_service.py:143-203` - New `_create_google_calendar_url` method
+    - Generates Google Calendar "Add Event" URL with event details
+    - Includes event name, date, time, location, and timezone (Asia/Kolkata)
+  - `backend/app/services/email_service.py:205-329` - Completely redesigned email template
+    - Event details section with date, time, venue, address, and Google Maps link
+    - "Add to Google Calendar" button for one-click calendar integration
+    - Full field labels (no more truncation)
+    - Updated footer: "Build2Learn" branding, 2026 year
+    - Clean table-based layout for better email client compatibility
+
+- **Keyboard Accessibility for Registration Form**
+  - `frontend/src/pages/HomePage.jsx:295-311` - Form onKeyDown handler
+    - Prevents Enter key from submitting form prematurely
+    - Enter key now moves focus to next input field
+    - Improves mobile keyboard navigation experience
+    - Textarea fields still allow Enter for new lines
+
+- **Time Format Display with AM/PM and IST**
+  - `frontend/src/pages/HomePage.jsx:78-94` - New `formatTimeDisplay` helper function
+    - Converts 24-hour time to 12-hour format with AM/PM
+    - Appends IST timezone indicator
+    - Handles both single times and time ranges (e.g., "9:30 AM - 2:00 PM IST")
+  - `frontend/src/pages/HomePage.jsx:279` - Event card now shows formatted time
+
+- **Automatic Registration Confirmation Emails**
+  - `backend/app/services/registration_service.py:11` - Import email_service
+  - `backend/app/services/registration_service.py:48-53` - Call `_send_confirmation_email` after registration
+  - Non-blocking: registration succeeds even if email fails
+  - Email sent from `noreply@build2learn.in` domain
+
+- **Dynamic OpenGraph Meta Tags**
+  - `frontend/index.html` - Added default OG and Twitter Card meta tags
+  - `backend/app/main.py:85-141` - New `get_og_injected_html()` function with 5-minute cache
+  - `backend/app/main.py:145-159` - Updated `serve_spa()` to return OG-injected HTML
+  - Dynamically injects event name and description into OG tags from active event
+  - Cached for performance (5-minute TTL) - no DB query on every request
+  - Social media crawlers (Facebook, Twitter, LinkedIn) see event-specific previews
+
+### Changed
+- **Email Provider Configuration**
+  - `backend/.env` - Changed default email provider from Brevo to Resend
+  - `backend/.env` - Updated `RESEND_FROM_EMAIL` to `noreply@build2learn.in`
+  - Production (Fly.io) - Set `EMAIL_PROVIDER=resend` and `RESEND_FROM_EMAIL=noreply@build2learn.in`
+
+### Added
 - **Markdown Rendering for Event Descriptions**
   - `frontend/src/pages/HomePage.jsx:6-7` - Added react-markdown and remark-gfm imports
   - `frontend/src/pages/HomePage.jsx:251` - Event description renders with GFM plugin for table support
