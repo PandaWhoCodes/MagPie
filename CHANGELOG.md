@@ -8,6 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Markdown Rendering for Event Descriptions**
+  - `frontend/src/pages/HomePage.jsx:6-7` - Added react-markdown and remark-gfm imports
+  - `frontend/src/pages/HomePage.jsx:251` - Event description renders with GFM plugin for table support
+  - `frontend/package.json` - Added `react-markdown` dependency
+  - `frontend/package.json` - Added `remark-gfm` dependency for GitHub Flavored Markdown (tables, strikethrough, task lists)
+  - `frontend/package.json` - Added `@tailwindcss/typography` dependency
+  - `frontend/tailwind.config.js:101` - Added typography plugin for prose styling
+  - Supports full markdown: headers, lists, links, bold, italic, code blocks, **tables**, strikethrough, etc.
+
+### Added
 - **Fly.io Deployment Support - Single Unified App Deployment**
   - `Dockerfile` - Multi-stage Docker build for production deployment
     - Stage 1: Node.js 18 Alpine for building React frontend with Vite
