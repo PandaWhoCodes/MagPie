@@ -146,16 +146,22 @@ function HomePageContent() {
     },
   });
 
-  // Trigger auto-fill when email or phone is entered
+  // Trigger auto-fill only when BOTH email AND phone are entered
   useEffect(() => {
-    if (!autoFillAttempted && (emailValue || phoneValue)) {
-      const timer = setTimeout(() => {
-        if (emailValue || phoneValue) {
+    // Only attempt auto-fill when both fields have values
+    if (!autoFillAttempted && emailValue && phoneValue) {
+      // Validate phone is 10 digits before attempting
+      const isValidPhone = /^\d{10}$/.test(phoneValue);
+      // Basic email validation
+      const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailValue);
+
+      if (isValidPhone && isValidEmail) {
+        const timer = setTimeout(() => {
           autoFillMutation.mutate({ email: emailValue, phone: phoneValue });
           setAutoFillAttempted(true);
-        }
-      }, 1000);
-      return () => clearTimeout(timer);
+        }, 500);
+        return () => clearTimeout(timer);
+      }
     }
   }, [emailValue, phoneValue]);
 

@@ -78,17 +78,16 @@ class RegistrationService:
     async def get_user_profile(
         email: Optional[str] = None, phone: Optional[str] = None
     ) -> Optional[UserProfileResponse]:
-        """Get user profile for auto-fill"""
-        if email:
-            profile = await db.fetch_one(
-                "SELECT * FROM user_profiles WHERE email = ?", [email]
-            )
-        elif phone:
-            profile = await db.fetch_one(
-                "SELECT * FROM user_profiles WHERE phone = ?", [phone]
-            )
-        else:
+        """Get user profile for auto-fill - requires both email AND phone to match"""
+        # Both email and phone are required for auto-fill
+        if not email or not phone:
             return None
+
+        # Look up profile where both email AND phone match
+        profile = await db.fetch_one(
+            "SELECT * FROM user_profiles WHERE email = ? AND phone = ?",
+            [email, phone]
+        )
 
         if not profile:
             return None

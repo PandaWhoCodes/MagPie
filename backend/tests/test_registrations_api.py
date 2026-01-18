@@ -125,8 +125,8 @@ class TestRegistrationsAPI:
         # Note: Response doesn't include event_id, just verify we got 2 registrations
         assert all("email" in r for r in data)
 
-    def test_user_profile_autofill_by_email(self, client, sample_event_data, sample_registration_data):
-        """Test user profile autofill by email"""
+    def test_user_profile_autofill_with_both_email_and_phone(self, client, sample_event_data, sample_registration_data):
+        """Test user profile autofill requires both email AND phone to match"""
         # Create event and first registration
         event_response = client.post("/api/events/", json=sample_event_data)
         event_id = event_response.json()["id"]
@@ -135,16 +135,18 @@ class TestRegistrationsAPI:
         registration_data["event_id"] = event_id
         client.post("/api/registrations/", json=registration_data)
 
-        # Get autofill data by email - use query parameter
-        response = client.get(f"/api/registrations/profile/autofill?email={registration_data['email']}")
+        # Get autofill data with both email and phone - should work
+        response = client.get(
+            f"/api/registrations/profile/autofill?email={registration_data['email']}&phone={registration_data['phone']}"
+        )
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
         assert data["email"] == registration_data["email"]
         assert data["phone"] == registration_data["phone"]
         assert "profile_data" in data
 
-    def test_user_profile_autofill_by_phone(self, client, sample_event_data, sample_registration_data):
-        """Test user profile autofill by phone"""
+    def test_autofill_fails_with_only_email(self, client, sample_event_data, sample_registration_data):
+        """Test autofill fails when only email is provided"""
         # Create event and registration
         event_response = client.post("/api/events/", json=sample_event_data)
         event_id = event_response.json()["id"]
@@ -153,17 +155,45 @@ class TestRegistrationsAPI:
         registration_data["event_id"] = event_id
         client.post("/api/registrations/", json=registration_data)
 
-        # Get autofill data by phone - use query parameter
+        # Get autofill data with only email - should fail
+        response = client.get(f"/api/registrations/profile/autofill?email={registration_data['email']}")
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "both" in response.json()["detail"].lower()
+
+    def test_autofill_fails_with_only_phone(self, client, sample_event_data, sample_registration_data):
+        """Test autofill fails when only phone is provided"""
+        # Create event and registration
+        event_response = client.post("/api/events/", json=sample_event_data)
+        event_id = event_response.json()["id"]
+
+        registration_data = sample_registration_data.copy()
+        registration_data["event_id"] = event_id
+        client.post("/api/registrations/", json=registration_data)
+
+        # Get autofill data with only phone - should fail
         response = client.get(f"/api/registrations/profile/autofill?phone={registration_data['phone']}")
-        assert response.status_code == status.HTTP_200_OK
-        data = response.json()
-        assert data["phone"] == registration_data["phone"]
-        assert data["email"] == registration_data["email"]
-        assert "profile_data" in data
+        assert response.status_code == status.HTTP_400_BAD_REQUEST
+        assert "both" in response.json()["detail"].lower()
+
+    def test_autofill_fails_with_mismatched_credentials(self, client, sample_event_data, sample_registration_data):
+        """Test autofill fails when email and phone don't match the same user"""
+        # Create event and registration
+        event_response = client.post("/api/events/", json=sample_event_data)
+        event_id = event_response.json()["id"]
+
+        registration_data = sample_registration_data.copy()
+        registration_data["event_id"] = event_id
+        client.post("/api/registrations/", json=registration_data)
+
+        # Try autofill with correct email but wrong phone
+        response = client.get(
+            f"/api/registrations/profile/autofill?email={registration_data['email']}&phone=0000000000"
+        )
+        assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_autofill_nonexistent_user(self, client):
         """Test autofill for nonexistent user"""
-        response = client.get("/api/registrations/profile/autofill?email=nonexistent@example.com")
+        response = client.get("/api/registrations/profile/autofill?email=nonexistent@example.com&phone=0000000000")
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
     def test_autofill_missing_parameters(self, client):

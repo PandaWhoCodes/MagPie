@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+- **Auto-fill Security Enhancement: Requires Both Email AND Phone to Match**
+  - `backend/app/services/registration_service.py:77-99` - Updated `get_user_profile` method
+    - Now requires both email AND phone parameters to be provided
+    - Queries database with both fields in WHERE clause (email AND phone)
+    - Returns profile only if both credentials match the stored user profile
+    - Prevents profile data leakage from partial credential matching
+  - `backend/app/api/registrations.py:62-88` - Updated autofill endpoint validation
+    - Returns 400 Bad Request if only one of email/phone is provided
+    - Error message clarifies: "Both email and phone must be provided"
+    - Returns 404 if no profile matches both credentials
+  - `frontend/src/pages/HomePage.jsx:149-166` - Updated frontend auto-fill trigger
+    - Only attempts auto-fill when BOTH email AND phone fields have valid values
+    - Validates phone is 10 digits before making API call
+    - Validates email format before making API call
+    - Reduced debounce delay from 1000ms to 500ms for better UX
+  - `backend/tests/test_registrations_api.py:128-202` - Updated tests
+    - New test for successful autofill with both credentials
+    - Tests for failures with only email or only phone
+    - Test for mismatched credentials (correct email, wrong phone)
+
 ### Added
 - **Enhanced Registration Confirmation Emails**
   - `backend/app/services/registration_service.py:167-214` - Updated `_send_confirmation_email` method

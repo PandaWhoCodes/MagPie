@@ -63,19 +63,20 @@ async def get_registration(
 async def get_user_profile_for_autofill(
     email: Optional[str] = Query(None), phone: Optional[str] = Query(None)
 ):
-    """Get user profile for auto-fill feature"""
+    """Get user profile for auto-fill feature - requires both email AND phone to match"""
     try:
-        if not email and not phone:
+        # Both email and phone are required for auto-fill
+        if not email or not phone:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Either email or phone must be provided",
+                detail="Both email and phone must be provided",
             )
 
         profile = await RegistrationService.get_user_profile(email, phone)
         if not profile:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
-                detail="No profile found",
+                detail="No profile found matching both email and phone",
             )
         return profile
     except HTTPException:
