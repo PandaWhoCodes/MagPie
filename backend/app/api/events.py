@@ -79,7 +79,7 @@ async def get_event(
         )
 
 
-@router.patch("/{event_id}", response_model=EventResponse)
+@router.patch("/{event_id}/", response_model=EventResponse)
 async def update_event(
     event_id: str,
     event: EventUpdate,
