@@ -3,6 +3,8 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -245,7 +247,9 @@ function HomePageContent() {
               <CardHeader>
                 <CardTitle className="text-2xl">{event.name}</CardTitle>
                 {event.description && (
-                  <CardDescription className="text-base">{event.description}</CardDescription>
+                  <div className="prose prose-sm dark:prose-invert max-w-none text-muted-foreground">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{event.description}</ReactMarkdown>
+                  </div>
                 )}
               </CardHeader>
               <CardContent className="space-y-3">

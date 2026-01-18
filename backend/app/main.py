@@ -32,6 +32,7 @@ app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
     lifespan=lifespan,
+    redirect_slashes=True,  # Allow both /path and /path/ URLs
 )
 
 # CORS middleware
@@ -62,16 +63,6 @@ app.include_router(branding.router, prefix="/api")
 app.include_router(whatsapp.router, prefix="/api")
 app.include_router(message_templates.router)
 app.include_router(email.router, prefix="/api")
-
-
-@app.get("/")
-async def root():
-    """Root endpoint"""
-    return {
-        "message": "MagPie Event Registration API",
-        "version": settings.APP_VERSION,
-        "status": "running",
-    }
 
 
 @app.get("/health")
