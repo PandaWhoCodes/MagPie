@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { useMutation } from '@tanstack/react-query';
 import toast from 'react-hot-toast';
@@ -70,6 +70,7 @@ const FIELD_TYPES = [
 
 export default function EventForm({ event, onSuccess, onCancel }) {
   const isEditing = !!event;
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { register, handleSubmit, control, watch, setValue, formState: { errors } } = useForm({
     defaultValues: event ? {
       ...event,
@@ -131,40 +132,48 @@ export default function EventForm({ event, onSuccess, onCancel }) {
   });
 
   const onSubmit = async (data) => {
-    // Process field options for select/radio fields and auto-generate field names
-    const processedFields = data.fields?.map((field, index) => ({
-      ...field,
-      field_name: generateFieldName(field.field_label), // Auto-generate from label
-      field_order: index, // Set correct order based on array index
-      field_options:
-        field.field_type === 'select' || field.field_type === 'radio'
-          ? JSON.stringify(
-              field.field_options
-                ?.split(',')
-                .map((opt) => opt.trim())
-                .filter(Boolean) || []
-            )
-          : null,
-    })) || [];
+    // Prevent double submissions
+    if (isSubmitting) return;
+    setIsSubmitting(true);
 
-    if (isEditing) {
-      // For update, send basic data and fields separately
-      const { fields, ...updateData } = data;
-      updateMutation.mutate(updateData);
+    try {
+      // Process field options for select/radio fields and auto-generate field names
+      const processedFields = data.fields?.map((field, index) => ({
+        ...field,
+        field_name: generateFieldName(field.field_label), // Auto-generate from label
+        field_order: index, // Set correct order based on array index
+        field_options:
+          field.field_type === 'select' || field.field_type === 'radio'
+            ? JSON.stringify(
+                field.field_options
+                  ?.split(',')
+                  .map((opt) => opt.trim())
+                  .filter(Boolean) || []
+              )
+            : null,
+      })) || [];
 
-      // Update fields separately via new API endpoint
-      try {
-        await eventsApi.updateFields(event.id, processedFields);
-      } catch (error) {
-        console.error('Failed to update fields:', error);
+      if (isEditing) {
+        // For update, send basic data and fields separately
+        const { fields, ...updateData } = data;
+        updateMutation.mutate(updateData);
+
+        // Update fields separately via new API endpoint
+        try {
+          await eventsApi.updateFields(event.id, processedFields);
+        } catch (error) {
+          console.error('Failed to update fields:', error);
+        }
+      } else {
+        // For create, send everything together
+        const processedData = {
+          ...data,
+          fields: processedFields,
+        };
+        createMutation.mutate(processedData);
       }
-    } else {
-      // For create, send everything together
-      const processedData = {
-        ...data,
-        fields: processedFields,
-      };
-      createMutation.mutate(processedData);
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -412,9 +421,9 @@ export default function EventForm({ event, onSuccess, onCancel }) {
         </Button>
         <Button
           type="submit"
-          disabled={createMutation.isPending || updateMutation.isPending}
+          disabled={isSubmitting || createMutation.isPending || updateMutation.isPending}
         >
-          {createMutation.isPending || updateMutation.isPending
+          {isSubmitting || createMutation.isPending || updateMutation.isPending
             ? 'Saving...'
             : isEditing
             ? 'Update Event'

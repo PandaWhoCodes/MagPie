@@ -242,34 +242,41 @@ class EventService:
 
     @staticmethod
     async def update_event_fields(event_id: str, fields: List) -> Optional[List[EventFieldResponse]]:
-        """Replace all fields for an event"""
+        """Replace all fields for an event.
+
+        Uses a transaction to ensure atomic delete + insert operations,
+        preventing duplicate fields from concurrent requests.
+        """
         event = await db.fetch_one("SELECT id FROM events WHERE id = ?", [event_id])
         if not event:
             return None
 
-        # Delete existing fields
-        await db.execute("DELETE FROM event_fields WHERE event_id = ?", [event_id])
+        # Use transaction to make delete + insert atomic
+        # This prevents race conditions when multiple save requests arrive
+        with db.transaction():
+            # Delete existing fields
+            await db.execute("DELETE FROM event_fields WHERE event_id = ?", [event_id])
 
-        # Insert new fields
-        for field in fields:
-            field_id = str(uuid.uuid4())
-            await db.execute(
-                """
-                INSERT INTO event_fields (id, event_id, field_name, field_type,
-                                        field_label, is_required, field_options, field_order)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            """,
-                [
-                    field_id,
-                    event_id,
-                    field.field_name,
-                    field.field_type,
-                    field.field_label,
-                    1 if field.is_required else 0,
-                    field.field_options,
-                    field.field_order,
-                ],
-            )
+            # Insert new fields
+            for field in fields:
+                field_id = str(uuid.uuid4())
+                await db.execute(
+                    """
+                    INSERT INTO event_fields (id, event_id, field_name, field_type,
+                                            field_label, is_required, field_options, field_order)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                    [
+                        field_id,
+                        event_id,
+                        field.field_name,
+                        field.field_type,
+                        field.field_label,
+                        1 if field.is_required else 0,
+                        field.field_options,
+                        field.field_order,
+                    ],
+                )
 
         # Return updated fields
         event = await EventService.get_event(event_id)

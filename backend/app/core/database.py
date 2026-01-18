@@ -1,4 +1,5 @@
 import libsql
+from contextlib import contextmanager
 from app.core.config import get_settings
 from app.core.schema_manager import SchemaManager
 
@@ -11,6 +12,7 @@ class Database:
     def __init__(self):
         self.conn = None
         self.schema_manager = None
+        self._in_transaction = False
 
     async def connect(self):
         """Connect to database"""
@@ -19,24 +21,18 @@ class Database:
             self.conn = libsql.connect("../local-dev/magpie_local.db")
             print("✅ Connected to local SQLite database")
         else:
-            # Production: Use Turso with embedded replica
+            # Production: Direct connection to Turso (no embedded replica)
+            # Convert libsql:// to https:// for direct connection
+            db_url = settings.TURSO_DATABASE_URL.replace("libsql://", "https://")
             self.conn = libsql.connect(
-                "local.db",
-                sync_url=settings.TURSO_DATABASE_URL,
+                db_url,
                 auth_token=settings.TURSO_AUTH_TOKEN
             )
-            print("✅ Connected to Turso database")
+            print("✅ Connected to Turso database (direct connection)")
 
         # Initialize schema manager and sync schema
         self.schema_manager = SchemaManager(self.conn)
         self.schema_manager.sync_schema()
-
-        # Only sync with remote if using Turso
-        if not settings.IS_LOCAL:
-            try:
-                self.conn.sync()
-            except Exception as e:
-                print(f"⚠️  Warning: Could not sync with remote database: {e}")
 
     async def close(self):
         """Close database connection"""
@@ -49,13 +45,32 @@ class Database:
             result = self.conn.execute(query, params)
         else:
             result = self.conn.execute(query)
-        self.conn.commit()
-
-        # Only sync with remote if using Turso
-        if not settings.IS_LOCAL:
-            self.conn.sync()
-
+        # Only auto-commit if not in a transaction
+        if not self._in_transaction:
+            self.conn.commit()
         return result
+
+    @contextmanager
+    def transaction(self):
+        """Context manager for database transactions.
+
+        Usage:
+            with db.transaction():
+                await db.execute("DELETE ...")
+                await db.execute("INSERT ...")
+
+        All operations within the block are committed together,
+        or rolled back if an exception occurs.
+        """
+        self._in_transaction = True
+        try:
+            yield
+            self.conn.commit()
+        except Exception:
+            self.conn.rollback()
+            raise
+        finally:
+            self._in_transaction = False
 
     async def fetch_all(self, query: str, params: list = None):
         """Fetch all rows"""

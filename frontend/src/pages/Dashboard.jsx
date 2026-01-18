@@ -344,7 +344,7 @@ function DashboardContent() {
                                 )}
                               </div>
                               {event.description && (
-                                <CardDescription>{event.description}</CardDescription>
+                                <CardDescription className="line-clamp-2">{event.description}</CardDescription>
                               )}
                             </div>
                             <div className="flex flex-wrap gap-2">
