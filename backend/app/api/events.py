@@ -103,7 +103,7 @@ async def update_event(
         )
 
 
-@router.post("/{event_id}/toggle", response_model=EventResponse)
+@router.post("/{event_id}/toggle/", response_model=EventResponse)
 async def toggle_event_status(
     event_id: str,
     auth: AuthenticatedUser = Depends(clerk_auth)
@@ -126,7 +126,7 @@ async def toggle_event_status(
         )
 
 
-@router.post("/{event_id}/clone", response_model=EventResponse)
+@router.post("/{event_id}/clone/", response_model=EventResponse)
 async def clone_event(
     event_id: str,
     new_name: str,

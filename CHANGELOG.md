@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+- **API Endpoint Trailing Slash Consistency**
+  - `backend/app/api/events.py:106` - Added trailing slash to `/toggle/` endpoint
+  - `backend/app/api/events.py:129` - Added trailing slash to `/clone/` endpoint
+  - `backend/tests/test_events_api.py:157,170,183,189` - Updated test URLs to match
+  - Fixes 405 Method Not Allowed errors when clients include trailing slashes
+
 ### Changed
 - **Auto-fill Security Enhancement: Requires Both Email AND Phone to Match**
   - `backend/app/services/registration_service.py:77-99` - Updated `get_user_profile` method

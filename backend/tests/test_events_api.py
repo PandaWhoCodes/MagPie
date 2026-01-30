@@ -154,7 +154,7 @@ class TestEventsAPI:
 
         # Clone event with new_name as query parameter
         new_name = f"{sample_event_data['name']} (Copy)"
-        response = client.post(f"/api/events/{event_id}/clone?new_name={new_name}")
+        response = client.post(f"/api/events/{event_id}/clone/?new_name={new_name}")
         assert response.status_code == status.HTTP_200_OK
         cloned_event = response.json()
         assert cloned_event["name"] == new_name
@@ -167,7 +167,7 @@ class TestEventsAPI:
 
     def test_clone_nonexistent_event(self, client):
         """Test cloning an event that doesn't exist"""
-        response = client.post("/api/events/99999/clone?new_name=Copy")
+        response = client.post("/api/events/99999/clone/?new_name=Copy")
         # API returns 404 when source event is not found
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
@@ -180,13 +180,13 @@ class TestEventsAPI:
         event_id = create_response.json()["id"]
 
         # Toggle to active
-        response = client.post(f"/api/events/{event_id}/toggle")
+        response = client.post(f"/api/events/{event_id}/toggle/")
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
         assert data["is_active"] is True
 
         # Toggle back to inactive
-        response = client.post(f"/api/events/{event_id}/toggle")
+        response = client.post(f"/api/events/{event_id}/toggle/")
         assert response.status_code == status.HTTP_200_OK
         data = response.json()
         assert data["is_active"] is False
