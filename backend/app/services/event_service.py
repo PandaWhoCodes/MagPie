@@ -22,8 +22,8 @@ class EventService:
         await db.execute(
             """
             INSERT INTO events (id, name, description, date, time, venue,
-                              venue_address, venue_map_link, is_active)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                              venue_address, venue_map_link, is_active, registrations_open)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """,
             [
                 event_id,
@@ -35,6 +35,7 @@ class EventService:
                 event_data.venue_address,
                 event_data.venue_map_link,
                 1 if event_data.is_active else 0,
+                1 if event_data.registrations_open else 0,
             ],
         )
 
@@ -98,6 +99,7 @@ class EventService:
             venue_address=event["venue_address"],
             venue_map_link=event["venue_map_link"],
             is_active=bool(event["is_active"]),
+            registrations_open=True if event["registrations_open"] is None else bool(event["registrations_open"]),
             created_at=event["created_at"],
             updated_at=event["updated_at"],
             fields=fields,
@@ -155,6 +157,9 @@ class EventService:
         if event_data.is_active is not None:
             update_fields.append("is_active = ?")
             params.append(1 if event_data.is_active else 0)
+        if event_data.registrations_open is not None:
+            update_fields.append("registrations_open = ?")
+            params.append(1 if event_data.registrations_open else 0)
 
         if update_fields:
             update_fields.append("updated_at = CURRENT_TIMESTAMP")
@@ -204,6 +209,7 @@ class EventService:
             venue_address=source_event.venue_address,
             venue_map_link=source_event.venue_map_link,
             is_active=False,
+            registrations_open=True,
             fields=[
                 {
                     "field_name": field.field_name,

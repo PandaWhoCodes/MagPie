@@ -15,6 +15,7 @@ class TestEventsAPI:
         assert data["description"] == sample_event_data["description"]
         assert data["venue"] == sample_event_data["venue"]
         assert data["time"] == sample_event_data["time"]
+        assert data["registrations_open"] is True
         assert "id" in data
 
     def test_create_event_with_missing_fields(self, client):
@@ -73,6 +74,16 @@ class TestEventsAPI:
         data = response.json()
         assert data["name"] == "Updated Event Name"
         assert data["venue"] == "Updated Venue"
+
+    def test_update_registrations_open(self, client, sample_event_data):
+        """Test toggling registrations_open on an event"""
+        create_response = client.post("/api/events/", json=sample_event_data)
+        event_id = create_response.json()["id"]
+
+        response = client.patch(f"/api/events/{event_id}/", json={"registrations_open": False})
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert data["registrations_open"] is False
 
     def test_update_nonexistent_event(self, client):
         """Test updating an event that doesn't exist"""
@@ -159,11 +170,22 @@ class TestEventsAPI:
         cloned_event = response.json()
         assert cloned_event["name"] == new_name
         assert cloned_event["is_active"] is False
+        assert cloned_event["registrations_open"] is True
         assert cloned_event["id"] != event_id
 
         # Verify fields were cloned
         assert len(cloned_event["fields"]) == 1
         assert cloned_event["fields"][0]["field_label"] == "College Name"
+
+    def test_create_event_with_closed_registrations(self, client, sample_event_data):
+        """Test creating an event with registrations closed"""
+        event_data = sample_event_data.copy()
+        event_data["registrations_open"] = False
+
+        response = client.post("/api/events/", json=event_data)
+        assert response.status_code == status.HTTP_201_CREATED
+        data = response.json()
+        assert data["registrations_open"] is False
 
     def test_clone_nonexistent_event(self, client):
         """Test cloning an event that doesn't exist"""

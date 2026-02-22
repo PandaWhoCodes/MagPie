@@ -160,6 +160,7 @@ def sample_event_data():
         "venue_address": "123 Test Street",
         "venue_map_link": "https://maps.google.com/?q=test",
         "is_active": True,
+        "registrations_open": True,
         "fields": []
     }
 
@@ -211,5 +212,4 @@ def sample_branding_data():
         "text_style": "gradient",
         "theme": "default"
     }
-
 

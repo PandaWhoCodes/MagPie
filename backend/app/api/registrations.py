@@ -16,6 +16,18 @@ router = APIRouter(prefix="/registrations", tags=["registrations"])
 async def create_registration(registration: RegistrationCreate):
     """Create a new registration"""
     try:
+        event = await RegistrationService.get_event_registration_status(registration.event_id)
+        if not event:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Event not found",
+            )
+        if not event["registrations_open"]:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Registrations are closed for this event",
+            )
+
         # Check if user is already registered
         is_registered = await RegistrationService.is_user_registered(
             registration.event_id, registration.email

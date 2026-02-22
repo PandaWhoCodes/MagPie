@@ -74,6 +74,7 @@ export default function EventForm({ event, onSuccess, onCancel }) {
   const { register, handleSubmit, control, watch, setValue, formState: { errors } } = useForm({
     defaultValues: event ? {
       ...event,
+      registrations_open: event.registrations_open ?? true,
       fields: event.fields?.map(field => ({
         ...field,
         field_options: field.field_options ?
@@ -90,6 +91,7 @@ export default function EventForm({ event, onSuccess, onCancel }) {
       venue_address: '',
       venue_map_link: '',
       is_active: false,
+      registrations_open: true,
       fields: [],
     },
   });
@@ -287,6 +289,20 @@ export default function EventForm({ event, onSuccess, onCancel }) {
             Set as Active Event
           </Label>
         </div>
+
+        <div className="flex items-center space-x-2">
+          <Checkbox
+            id="registrations_open"
+            onCheckedChange={(checked) => setValue('registrations_open', checked)}
+            defaultChecked={watch('registrations_open')}
+          />
+          <Label htmlFor="registrations_open" className="font-normal cursor-pointer">
+            Allow Registrations
+          </Label>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Disable to show event details publicly but prevent new signups.
+        </p>
       </div>
 
       {/* Custom Fields */}

@@ -60,6 +60,7 @@ class SchemaManager:
                     Column('venue_address', 'TEXT', nullable=True),
                     Column('venue_map_link', 'TEXT', nullable=True),
                     Column('is_active', 'INTEGER', nullable=True, default='0'),
+                    Column('registrations_open', 'INTEGER', nullable=True, default='1'),
                     Column('created_at', 'TEXT', nullable=True, default='CURRENT_TIMESTAMP'),
                     Column('updated_at', 'TEXT', nullable=True, default='CURRENT_TIMESTAMP'),
                 ],
