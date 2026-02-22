@@ -55,6 +55,21 @@ class RegistrationService:
         return await RegistrationService.get_registration(registration_id)
 
     @staticmethod
+    async def get_event_registration_status(event_id: str) -> Optional[dict]:
+        """Get event registration status by event ID."""
+        event = await db.fetch_one(
+            "SELECT id, registrations_open FROM events WHERE id = ?",
+            [event_id],
+        )
+        if not event:
+            return None
+
+        return {
+            "id": event["id"],
+            "registrations_open": True if event["registrations_open"] is None else bool(event["registrations_open"]),
+        }
+
+    @staticmethod
     async def get_registration(registration_id: str) -> Optional[RegistrationResponse]:
         """Get registration by ID"""
         reg = await db.fetch_one(

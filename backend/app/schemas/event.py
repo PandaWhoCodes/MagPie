@@ -32,6 +32,7 @@ class EventCreate(BaseModel):
     venue_address: Optional[str] = None
     venue_map_link: Optional[str] = None
     is_active: bool = False
+    registrations_open: bool = True
     fields: List[EventFieldCreate] = []
 
 
@@ -46,6 +47,7 @@ class EventUpdate(BaseModel):
     venue_address: Optional[str] = None
     venue_map_link: Optional[str] = None
     is_active: Optional[bool] = None
+    registrations_open: Optional[bool] = None
 
 
 class EventResponse(BaseModel):
@@ -60,6 +62,7 @@ class EventResponse(BaseModel):
     venue_address: Optional[str]
     venue_map_link: Optional[str]
     is_active: bool
+    registrations_open: bool
     created_at: str
     updated_at: str
     fields: List[EventFieldResponse] = []

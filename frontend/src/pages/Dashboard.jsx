@@ -342,6 +342,9 @@ function DashboardContent() {
                                 {event.is_active && (
                                   <Badge variant="default" className="bg-green-600">Active</Badge>
                                 )}
+                                {event.registrations_open === false && (
+                                  <Badge variant="secondary">Registrations Closed</Badge>
+                                )}
                               </div>
                               {event.description && (
                                 <CardDescription className="line-clamp-2">{event.description}</CardDescription>

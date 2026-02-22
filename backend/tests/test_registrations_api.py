@@ -24,6 +24,31 @@ class TestRegistrationsAPI:
         assert "form_data" in data
         assert "id" in data
 
+    def test_create_registration_fails_when_registrations_closed(
+        self, client, sample_event_data, sample_registration_data
+    ):
+        """Test creating registration fails when registrations are closed"""
+        event_data = sample_event_data.copy()
+        event_data["registrations_open"] = False
+        event_response = client.post("/api/events/", json=event_data)
+        event_id = event_response.json()["id"]
+
+        registration_data = sample_registration_data.copy()
+        registration_data["event_id"] = event_id
+        response = client.post("/api/registrations/", json=registration_data)
+
+        assert response.status_code == status.HTTP_403_FORBIDDEN
+        assert "closed" in response.json()["detail"].lower()
+
+    def test_create_registration_fails_for_nonexistent_event(self, client, sample_registration_data):
+        """Test creating registration fails when event does not exist"""
+        registration_data = sample_registration_data.copy()
+        registration_data["event_id"] = "nonexistent-event-id"
+
+        response = client.post("/api/registrations/", json=registration_data)
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+        assert "event not found" in response.json()["detail"].lower()
+
     def test_create_registration_with_dynamic_fields(self, client, sample_event_data):
         """Test creating registration with dynamic fields"""
         # Create event

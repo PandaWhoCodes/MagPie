@@ -219,6 +219,7 @@ function HomePageContent() {
   }
 
   if (!event) return null;
+  const isRegistrationsOpen = event.registrations_open ?? true;
 
   const onSubmit = (data) => {
     setIsSubmitting(true);
@@ -311,29 +312,39 @@ function HomePageContent() {
             duration={prefersReducedMotion ? 0.01 : 0.6}
           >
             <Card>
-            <CardHeader>
-              <CardTitle>Register for Event</CardTitle>
-              <CardDescription>Fill in your details below to register</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form
-                onSubmit={handleSubmit(onSubmit)}
-                className="space-y-6"
-                onKeyDown={(e) => {
-                  // Prevent Enter from submitting form (except on submit button)
-                  // This improves mobile keyboard experience
-                  if (e.key === 'Enter' && e.target.type !== 'submit' && e.target.tagName !== 'TEXTAREA') {
-                    e.preventDefault();
-                    // Move to next focusable input
-                    const form = e.currentTarget;
-                    const inputs = Array.from(form.querySelectorAll('input, select, textarea, button[type="submit"]'));
-                    const currentIndex = inputs.indexOf(e.target);
-                    if (currentIndex >= 0 && currentIndex < inputs.length - 1) {
-                      inputs[currentIndex + 1].focus();
-                    }
-                  }
-                }}
-              >
+              <CardHeader>
+                {isRegistrationsOpen ? (
+                  <>
+                    <CardTitle>Register for Event</CardTitle>
+                    <CardDescription>Fill in your details below to register</CardDescription>
+                  </>
+                ) : (
+                  <>
+                    <CardTitle>Registration Closed</CardTitle>
+                    <CardDescription>Registrations for this event are currently closed.</CardDescription>
+                  </>
+                )}
+              </CardHeader>
+              {isRegistrationsOpen ? (
+                <CardContent>
+                  <form
+                    onSubmit={handleSubmit(onSubmit)}
+                    className="space-y-6"
+                    onKeyDown={(e) => {
+                      // Prevent Enter from submitting form (except on submit button)
+                      // This improves mobile keyboard experience
+                      if (e.key === 'Enter' && e.target.type !== 'submit' && e.target.tagName !== 'TEXTAREA') {
+                        e.preventDefault();
+                        // Move to next focusable input
+                        const form = e.currentTarget;
+                        const inputs = Array.from(form.querySelectorAll('input, select, textarea, button[type=\"submit\"]'));
+                        const currentIndex = inputs.indexOf(e.target);
+                        if (currentIndex >= 0 && currentIndex < inputs.length - 1) {
+                          inputs[currentIndex + 1].focus();
+                        }
+                      }
+                    }}
+                  >
                 {/* Email */}
                 <div className="space-y-2">
                   <Label htmlFor="email">Email Address *</Label>
@@ -454,8 +465,15 @@ function HomePageContent() {
                     <span>Register Now</span>
                   )}
                 </Button>
-              </form>
-            </CardContent>
+                  </form>
+                </CardContent>
+              ) : (
+                <CardContent>
+                  <p className="text-sm text-muted-foreground">
+                    You can still view event details above. Please check back later if registration reopens.
+                  </p>
+                </CardContent>
+              )}
             </Card>
           </FadeIn>
         </div>
