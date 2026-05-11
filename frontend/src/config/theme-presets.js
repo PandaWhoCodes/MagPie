@@ -3106,6 +3106,83 @@ export const themePresets = {
                                                                       }
     }
   }
+};,
+
+  "neon-cyberpunk": {
+    label: "Neon Cyberpunk",
+    styles: {
+      light: {
+        background: "#0a0a0f",
+        foreground: "#00ffcc",
+        card: "#111122",
+        "card-foreground": "#00ffcc",
+        popover: "#151530",
+        "popover-foreground": "#00ffcc",
+        primary: "#ff00ff",
+        "primary-foreground": "#0a0a0f",
+        secondary: "#1a1a3a",
+        "secondary-foreground": "#00ccff",
+        muted: "#1a1a2e",
+        "muted-foreground": "#7777aa",
+        accent: "#ff00cc",
+        "accent-foreground": "#0a0a0f",
+        destructive: "#ff3366",
+        "destructive-foreground": "#0a0a0f",
+        border: "#333355",
+        input: "#222244",
+        ring: "#ff00ff",
+        "chart-1": "#ff00ff",
+        "chart-2": "#00ffcc",
+        "chart-3": "#ffcc00",
+        "chart-4": "#00ccff",
+        "chart-5": "#ff3366",
+        sidebar: "#0a0a0f",
+        "sidebar-foreground": "#00ffcc",
+        "sidebar-primary": "#ff00ff",
+        "sidebar-primary-foreground": "#0a0a0f",
+        "sidebar-accent": "#ff00cc",
+        "sidebar-accent-foreground": "#0a0a0f",
+        "sidebar-border": "#333355",
+        "sidebar-ring": "#ff00ff",
+        radius: "0.25rem"
+      },
+      dark: {
+        background: "#050510",
+        foreground: "#00ffcc",
+        card: "#0a0a1a",
+        "card-foreground": "#00ffcc",
+        popover: "#101028",
+        "popover-foreground": "#00ffcc",
+        primary: "#ff00ff",
+        "primary-foreground": "#050510",
+        secondary: "#12123a",
+        "secondary-foreground": "#00ccff",
+        muted: "#111128",
+        "muted-foreground": "#666699",
+        accent: "#ff00cc",
+        "accent-foreground": "#050510",
+        destructive: "#ff3366",
+        "destructive-foreground": "#050510",
+        border: "#222255",
+        input: "#1a1a3a",
+        ring: "#ff00ff",
+        "chart-1": "#ff00ff",
+        "chart-2": "#00ffcc",
+        "chart-3": "#ffcc00",
+        "chart-4": "#00ccff",
+        "chart-5": "#ff3366",
+        sidebar: "#050510",
+        "sidebar-foreground": "#00ffcc",
+        "sidebar-primary": "#ff00ff",
+        "sidebar-primary-foreground": "#050510",
+        "sidebar-accent": "#ff00cc",
+        "sidebar-accent-foreground": "#050510",
+        "sidebar-border": "#222255",
+        "sidebar-ring": "#ff00ff",
+        radius: "0.25rem"
+      }
+    }
+  }
 };
 
 
