@@ -37,7 +37,7 @@ async def get_event_qr_codes(
         )
 
 
-@router.get("/{qr_id}")
+@router.get("/{qr_id}/")
 async def get_qr_code(
     qr_id: str,
     auth: AuthenticatedUser = Depends(clerk_auth)
@@ -60,7 +60,7 @@ async def get_qr_code(
         )
 
 
-@router.delete("/{qr_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{qr_id}/", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_qr_code(
     qr_id: str,
     auth: AuthenticatedUser = Depends(clerk_auth)
