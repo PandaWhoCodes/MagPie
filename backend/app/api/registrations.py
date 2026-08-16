@@ -5,6 +5,7 @@ from app.schemas.registration import (
     RegistrationResponse,
     UserProfileResponse,
     CheckInRequest,
+    ManualCheckInRequest,
 )
 from app.services.registration_service import RegistrationService
 from app.core.auth import clerk_auth, AuthenticatedUser
@@ -97,6 +98,32 @@ async def get_user_profile_for_autofill(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to fetch profile: {str(e)}",
+        )
+
+
+@router.post("/{registration_id}/check-in/", response_model=RegistrationResponse)
+async def manual_check_in(
+    registration_id: str,
+    check_in: ManualCheckInRequest,
+    auth: AuthenticatedUser = Depends(clerk_auth),
+):
+    """Check in or undo check-in for a registration by ID (protected)"""
+    try:
+        registration = await RegistrationService.check_in_registration_by_id(
+            registration_id, check_in.check_in
+        )
+        if not registration:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Registration not found",
+            )
+        return registration
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to update check-in status: {str(e)}",
         )
 
 

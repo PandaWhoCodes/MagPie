@@ -36,3 +36,9 @@ class CheckInRequest(BaseModel):
     """Schema for check-in request"""
 
     email: EmailStr
+
+
+class ManualCheckInRequest(BaseModel):
+    """Schema for manual check-in toggle request"""
+
+    check_in: bool

@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { eventsApi } from '../services/api';
+import { eventsApi, registrationsApi } from '../services/api';
+import { useToast } from '@/hooks/use-toast';
 import WhatsAppModal from './WhatsAppModal';
 import EmailModal from './EmailModal';
 import { FadeIn, StaggerChildren } from '@/components/animations';
@@ -56,11 +57,25 @@ const MailIcon = ({ className = "h-5 w-5" }) => (
   </svg>
 );
 
+const formatDateTime = (value) => {
+  if (!value) return '';
+  const date = new Date(typeof value === 'string' && value.includes(' ') ? value.replace(' ', 'T') : value);
+  if (Number.isNaN(date.getTime())) return '';
+  return date.toLocaleString(undefined, {
+    month: 'short',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  });
+};
+
 export default function RegistrationsList({ eventId }) {
   const [searchTerm, setSearchTerm] = useState('');
   const [isWhatsAppModalOpen, setIsWhatsAppModalOpen] = useState(false);
   const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
   const prefersReducedMotion = useReducedMotion();
+  const queryClient = useQueryClient();
+  const { toast } = useToast();
 
   const { data: registrations = [], isLoading } = useQuery({
     queryKey: ['registrations', eventId],
@@ -77,6 +92,33 @@ export default function RegistrationsList({ eventId }) {
       return response.data;
     },
   });
+
+  const checkInMutation = useMutation({
+    mutationFn: ({ registrationId, checkIn }) =>
+      registrationsApi.checkInById(registrationId, checkIn),
+    onSuccess: (response) => {
+      const reg = response.data;
+      toast({
+        title: reg.is_checked_in ? 'Checked in' : 'Check-in undone',
+        description: reg.email,
+      });
+      queryClient.invalidateQueries({ queryKey: ['registrations', eventId] });
+    },
+    onError: (error) => {
+      toast({
+        title: 'Failed to update check-in status',
+        description: error.response?.data?.detail || error.message,
+        variant: 'destructive',
+      });
+    },
+  });
+
+  const handleToggleCheckIn = (reg) => {
+    checkInMutation.mutate({
+      registrationId: reg.id,
+      checkIn: !reg.is_checked_in,
+    });
+  };
 
   const filteredRegistrations = registrations.filter(
     (reg) =>
@@ -249,7 +291,9 @@ export default function RegistrationsList({ eventId }) {
                   <TableHead>Email</TableHead>
                   <TableHead>Phone</TableHead>
                   <TableHead>Registered At</TableHead>
+                  <TableHead>Checked In At</TableHead>
                   <TableHead>Details</TableHead>
+                  <TableHead className="w-28">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -274,8 +318,15 @@ export default function RegistrationsList({ eventId }) {
                     </TableCell>
                     <TableCell className="font-medium">{reg.email}</TableCell>
                     <TableCell>{reg.phone}</TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {new Date(reg.created_at).toLocaleString()}
+                    <TableCell className="text-muted-foreground whitespace-nowrap">
+                      {formatDateTime(reg.created_at)}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground whitespace-nowrap">
+                      {reg.is_checked_in ? (
+                        formatDateTime(reg.checked_in_at)
+                      ) : (
+                        <span className="text-muted-foreground/50">—</span>
+                      )}
                     </TableCell>
                     <TableCell>
                       <details className="cursor-pointer">
@@ -291,6 +342,21 @@ export default function RegistrationsList({ eventId }) {
                           ))}
                         </div>
                       </details>
+                    </TableCell>
+                    <TableCell>
+                      <Button
+                        size="sm"
+                        variant={reg.is_checked_in ? 'outline' : 'default'}
+                        className={reg.is_checked_in ? '' : 'bg-green-600 hover:bg-green-700'}
+                        disabled={checkInMutation.isPending && checkInMutation.variables?.registrationId === reg.id}
+                        onClick={() => handleToggleCheckIn(reg)}
+                      >
+                        {checkInMutation.isPending && checkInMutation.variables?.registrationId === reg.id
+                          ? 'Updating...'
+                          : reg.is_checked_in
+                            ? 'Undo'
+                            : 'Check In'}
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}
