@@ -136,7 +136,7 @@ function CheckInPageContent() {
             <CardContent className="space-y-6">
               {qrCode && (
                 <>
-                  {qrCode.qr_type === 'text' && qrCode.message && (
+                  {(qrCode.qr_type === 'text' || qrCode.qr_type === 'message') && qrCode.message && (
                     <Alert>
                       <AlertDescription className="text-center">
                         {qrCode.message}

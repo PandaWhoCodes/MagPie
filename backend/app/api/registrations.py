@@ -127,7 +127,7 @@ async def manual_check_in(
         )
 
 
-@router.post("/check-in/{event_id}")
+@router.post("/check-in/{event_id}/")
 async def check_in_user(event_id: str, check_in: CheckInRequest):
     """Check in a user for an event"""
     try:

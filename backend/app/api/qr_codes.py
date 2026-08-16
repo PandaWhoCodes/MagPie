@@ -22,10 +22,24 @@ async def create_qr_code(
         )
 
 
-@router.get("/{qr_id}")
+@router.get("/event/{event_id}/")
+async def get_event_qr_codes(
+    event_id: str,
+    auth: AuthenticatedUser = Depends(clerk_auth)
+):
+    """Get all QR codes for an event (protected)"""
+    try:
+        return await QRService.get_event_qr_codes(event_id)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to fetch QR codes: {str(e)}",
+        )
+
+
+@router.get("/{qr_id}/")
 async def get_qr_code(
     qr_id: str,
-    auth: AuthenticatedUser = Depends(clerk_auth)
 ):
     """Get QR code details (protected)"""
     try:
@@ -45,22 +59,7 @@ async def get_qr_code(
         )
 
 
-@router.get("/event/{event_id}")
-async def get_event_qr_codes(
-    event_id: str,
-    auth: AuthenticatedUser = Depends(clerk_auth)
-):
-    """Get all QR codes for an event (protected)"""
-    try:
-        return await QRService.get_event_qr_codes(event_id)
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to fetch QR codes: {str(e)}",
-        )
-
-
-@router.delete("/{qr_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete("/{qr_id}/", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_qr_code(
     qr_id: str,
     auth: AuthenticatedUser = Depends(clerk_auth)

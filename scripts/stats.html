@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Build2Learn #34 - Registration Stats</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #0a0a0a;
+            min-height: 100vh;
+            padding: 40px 20px;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #fff;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 48px;
+            font-size: 1rem;
+        }
+
+        .big-number {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .big-number .number {
+            font-size: 5rem;
+            font-weight: 700;
+            color: #fff;
+            line-height: 1;
+        }
+
+        .big-number .label {
+            font-size: 1.1rem;
+            color: #666;
+            margin-top: 8px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: #141414;
+            border-radius: 16px;
+            padding: 28px;
+            border: 1px solid #222;
+        }
+
+        .card h2 {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 20px;
+        }
+
+        .stat-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .stat-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .stat-label {
+            flex: 0 0 180px;
+            font-size: 0.95rem;
+            color: #aaa;
+        }
+
+        .stat-bar-container {
+            flex: 1;
+            height: 32px;
+            background: #1a1a1a;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-right: 16px;
+        }
+
+        .stat-bar {
+            height: 100%;
+            border-radius: 8px;
+            transition: width 0.5s ease;
+        }
+
+        .stat-value {
+            flex: 0 0 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+            text-align: right;
+        }
+
+        .color-1 { background: linear-gradient(90deg, #6366f1, #8b5cf6); }
+        .color-2 { background: linear-gradient(90deg, #22c55e, #4ade80); }
+        .color-3 { background: linear-gradient(90deg, #f59e0b, #fbbf24); }
+        .color-4 { background: linear-gradient(90deg, #ef4444, #f87171); }
+        .color-5 { background: linear-gradient(90deg, #06b6d4, #22d3ee); }
+
+        .people-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .person-card {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #2a2a2a;
+        }
+
+        .person-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .person-org {
+            font-size: 0.85rem;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .person-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .tag {
+            font-size: 0.75rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: #2a2a2a;
+            color: #888;
+        }
+
+        .tag.mentor {
+            background: #1a3a2a;
+            color: #4ade80;
+        }
+
+        .tag.has-idea {
+            background: #2a1a3a;
+            color: #a78bfa;
+        }
+
+        .tag.student {
+            background: #1a2a3a;
+            color: #60a5fa;
+        }
+
+        .tag.fresher {
+            background: #3a2a1a;
+            color: #fbbf24;
+        }
+
+        .tech-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tech-tag {
+            font-size: 0.9rem;
+            padding: 8px 16px;
+            border-radius: 8px;
+            background: #1a1a1a;
+            color: #aaa;
+            border: 1px solid #2a2a2a;
+        }
+
+        .tech-tag.hot {
+            background: linear-gradient(135deg, #1a1a3a, #2a1a4a);
+            border-color: #4a3a6a;
+            color: #a78bfa;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #fff;
+            margin: 48px 0 24px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Build2Learn #34</h1>
+        <p class="subtitle">January 31st, 2026 - Entrans Technologies</p>
+
+        <div class="big-number">
+            <div class="number">58</div>
+            <div class="label">Registered Participants</div>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h2>Who's Coming</h2>
+                <div class="stat-row">
+                    <span class="stat-label">Experienced Professional</span>
+                    <div class="stat-bar-container">
+                        <div class="stat-bar color-1" style="width: 51.7%"></div>
+                    </div>
+                    <span class="stat-value">30</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Student</span>
+                    <div class="stat-bar-container">
+                        <div class="stat-bar color-2" style="width: 34.5%"></div>
+                    </div>
+                    <span class="stat-value">20</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Fresher</span>
+                    <div class="stat-bar-container">
+                        <div class="stat-bar color-3" style="width: 12.1%"></div>
+                    </div>
+                    <span class="stat-value">7</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>How They Want to Help</h2>
+                <div class="stat-row">
+                    <span class="stat-label">Build & Learn</span>
+                    <div class="stat-bar-container">
+                        <div class="stat-bar color-5" style="width: 77.6%"></div>
+                    </div>
+                    <span class="stat-value">45</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Mentor</span>
+                    <div class="stat-bar-container">
+                        <div class="stat-bar color-2" style="width: 19.0%"></div>
+                    </div>
+                    <span class="stat-value">11</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Project Ideas</h2>
+                <div class="stat-row">
+                    <span class="stat-label">Want to Collaborate</span>
+                    <div class="stat-bar-container">
+                        <div class="stat-bar color-5" style="width: 75.9%"></div>
+                    </div>
+                    <span class="stat-value">44</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Needs Help with Idea</span>
+                    <div class="stat-bar-container">
+                        <div class="stat-bar color-1" style="width: 13.8%"></div>
+                    </div>
+                    <span class="stat-value">8</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Has an Idea</span>
+                    <div class="stat-bar-container">
+                        <div class="stat-bar color-3" style="width: 8.6%"></div>
+                    </div>
+                    <span class="stat-value">5</span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Parking Needed</h2>
+                <div class="stat-row">
+                    <span class="stat-label">2 Wheeler</span>
+                    <div class="stat-bar-container">
+                        <div class="stat-bar color-2" style="width: 50.0%"></div>
+                    </div>
+                    <span class="stat-value">29</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">4 Wheeler</span>
+                    <div class="stat-bar-container">
+                        <div class="stat-bar color-1" style="width: 10.3%"></div>
+                    </div>
+                    <span class="stat-value">6</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">No Parking</span>
+                    <div class="stat-bar-container">
+                        <div class="stat-bar color-3" style="width: 39.7%"></div>
+                    </div>
+                    <span class="stat-value">23</span>
+                </div>
+            </div>
+        </div>
+
+        <h3 class="section-title">Technologies</h3>
+        <div class="card">
+            <div class="tech-cloud">
+                <span class="tech-tag hot">Python (11)</span>
+                <span class="tech-tag hot">AI/ML (11)</span>
+                <span class="tech-tag hot">Java (6)</span>
+                <span class="tech-tag">Full Stack (4)</span>
+                <span class="tech-tag">React (4)</span>
+                <span class="tech-tag">Gen AI (2)</span>
+            </div>
+        </div>
+
+        <h3 class="section-title">All Participants</h3>
+        <div class="people-grid">
+            <div class="person-card">
+                <div class="person-name">Selvakumar</div>
+                <div class="person-org">Zalaris</div>
+                <div class="person-tags">
+                    <span class="tag has-idea">Idea: Tamil RAG</span>
+                    <span class="tag">Python and Vector DB</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Bhavani Ravi</div>
+                <div class="person-org">-</div>
+                <div class="person-tags">
+                    <span class="tag mentor">Mentor</span>
+                    <span class="tag has-idea">Has Idea</span>
+                    <span class="tag">AI</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Suresh Kumar</div>
+                <div class="person-org">Appknox</div>
+                <div class="person-tags">
+                    <span class="tag has-idea">Idea: Finnlens</span>
+                    <span class="tag">Python</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Shiny S U</div>
+                <div class="person-org">Freshworks</div>
+                <div class="person-tags">
+                    <span class="tag mentor">Mentor</span>
+                    <span class="tag">Python</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Thomas Cherian</div>
+                <div class="person-org">Saama</div>
+                <div class="person-tags">
+                    <span class="tag">Python</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Brahadeesh</div>
+                <div class="person-org">Kiya.ai</div>
+                <div class="person-tags">
+                    <span class="tag has-idea">Has Idea</span>
+                    <span class="tag">Java</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Dharmadhevi Ananthavijayan</div>
+                <div class="person-org">Trane technologies</div>
+                <div class="person-tags">
+                    <span class="tag">AI ML</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Kannan A</div>
+                <div class="person-org">Ncompass Tech Studio P...</div>
+                <div class="person-tags">
+                    <span class="tag fresher">Fresher</span>
+                    <span class="tag">Python AI ML Fullsta...</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Rhikshitha Kamalakannan</div>
+                <div class="person-org">Atomicwork</div>
+                <div class="person-tags">
+                    <span class="tag">FE</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Manish Kumar S</div>
+                <div class="person-org">Vivriti Capital</div>
+                <div class="person-tags">
+                    <span class="tag">ML, DL, Full Stack</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Kausik D</div>
+                <div class="person-org">St Joseph's College of...</div>
+                <div class="person-tags">
+                    <span class="tag student">Student</span>
+                    <span class="tag">Python, Backend Engi...</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Vigneshwaran</div>
+                <div class="person-org">Publicis sapient</div>
+                <div class="person-tags">
+                    <span class="tag">Needs Idea Help</span>
+                    <span class="tag">Java</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Lithish.M</div>
+                <div class="person-org">SRI SAIRAM INSTITUTE O...</div>
+                <div class="person-tags">
+                    <span class="tag student">Student</span>
+                    <span class="tag">Ai and gen ai</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Vrishabh K</div>
+                <div class="person-org">SRM University</div>
+                <div class="person-tags">
+                    <span class="tag student">Student</span>
+                    <span class="tag">ai and gen ai</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Gopinathan Asokan</div>
+                <div class="person-org">Center for Responsible AI</div>
+                <div class="person-tags">
+                    <span class="tag">python, react</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Syed Imthiaz I</div>
+                <div class="person-org">KCG College of Technology</div>
+                <div class="person-tags">
+                    <span class="tag student">Student</span>
+                    <span class="tag">full stack</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Neruban V N</div>
+                <div class="person-org">St Joseph's College of...</div>
+                <div class="person-tags">
+                    <span class="tag student">Student</span>
+                    <span class="tag">SLM</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Karthikeyan K R</div>
+                <div class="person-org">Meenakshi Sundararajan...</div>
+                <div class="person-tags">
+                    <span class="tag student">Student</span>
+                    <span class="tag">Open to any</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Kumaraguru</div>
+                <div class="person-org">Meenakshi Sundararajan...</div>
+                <div class="person-tags">
+                    <span class="tag student">Student</span>
+                    <span class="tag">Needs Idea Help</span>
+                    <span class="tag">AI,ML,DS</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Mohammed Mohsin B</div>
+                <div class="person-org">Emerson</div>
+                <div class="person-tags">
+                    <span class="tag fresher">Fresher</span>
+                    <span class="tag">Mechanical</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Jabez Sanjay B</div>
+                <div class="person-org">Entrans Technologies</div>
+                <div class="person-tags">
+                    <span class="tag">Anything lol!</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Satheesh</div>
+                <div class="person-org">-</div>
+                <div class="person-tags">
+                    
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Balaji Anbalagan</div>
+                <div class="person-org">Bank of New York</div>
+                <div class="person-tags">
+                    <span class="tag has-idea">Idea: Edge AI Dashcam usin...</span>
+                    <span class="tag">Edge Computing</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Uma Gayathri</div>
+                <div class="person-org">Sethu Institute of Tec...</div>
+                <div class="person-tags">
+                    <span class="tag fresher">Fresher</span>
+                    <span class="tag">Java - React</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Jashim Ahamed</div>
+                <div class="person-org">SASTRA DEEMED UNIVERSITY</div>
+                <div class="person-tags">
+                    <span class="tag">Full stack technolog...</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Kuberan Sivakumar</div>
+                <div class="person-org">SRM UNIVERSITY</div>
+                <div class="person-tags">
+                    <span class="tag fresher">Fresher</span>
+                    <span class="tag">WordPress ( Frontend...</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">NITHYA SRI S</div>
+                <div class="person-org">meenakshi sundararajan...</div>
+                <div class="person-tags">
+                    <span class="tag student">Student</span>
+                    <span class="tag">Needs Idea Help</span>
+                    <span class="tag">AI developer</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">P.G. Harish</div>
+                <div class="person-org">SRM</div>
+                <div class="person-tags">
+                    <span class="tag student">Student</span>
+                    <span class="tag">Mern Stack</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Saravanan S.S.</div>
+                <div class="person-org">Gregorious College</div>
+                <div class="person-tags">
+                    <span class="tag fresher">Fresher</span>
+                    <span class="tag">Devops and Next.js</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Arockiaraj</div>
+                <div class="person-org">Batonsystems</div>
+                <div class="person-tags">
+                    <span class="tag mentor">Mentor</span>
+                    <span class="tag">Needs Idea Help</span>
+                    <span class="tag">Anything</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Vignesh S</div>
+                <div class="person-org">CTS</div>
+                <div class="person-tags">
+                    <span class="tag">AI</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">MONISH VIJAI S</div>
+                <div class="person-org">MahalakmiTechCapmus</div>
+                <div class="person-tags">
+                    <span class="tag student">Student</span>
+                    <span class="tag">Backend</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Vasanthbala R</div>
+                <div class="person-org">Lourdes Lifecare</div>
+                <div class="person-tags">
+                    <span class="tag mentor">Mentor</span>
+                    <span class="tag">Design and Developme...</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Karunya Abi A</div>
+                <div class="person-org">Sri Sairam engineering...</div>
+                <div class="person-tags">
+                    <span class="tag student">Student</span>
+                    <span class="tag">Machine learning and...</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Mohamed Haziq S</div>
+                <div class="person-org">SRM EASWARI ENGINEERIN...</div>
+                <div class="person-tags">
+                    <span class="tag student">Student</span>
+                    <span class="tag">I am interested in p...</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">M Aysha Thuhfa</div>
+                <div class="person-org">Sri Sairam Engineering...</div>
+                <div class="person-tags">
+                    <span class="tag student">Student</span>
+                    <span class="tag">Machine Learning and...</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">S R Prajeet</div>
+                <div class="person-org">Easwari Engineering co...</div>
+                <div class="person-tags">
+                    <span class="tag student">Student</span>
+                    <span class="tag">I am interested c ba...</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Suresh</div>
+                <div class="person-org">Indian institute of te...</div>
+                <div class="person-tags">
+                    <span class="tag student">Student</span>
+                    <span class="tag">Machine learning</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Syed Saifullah</div>
+                <div class="person-org">Kissflow</div>
+                <div class="person-tags">
+                    <span class="tag">Anything</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Devi Prasath S</div>
+                <div class="person-org">RMK College of Enginee...</div>
+                <div class="person-tags">
+                    <span class="tag student">Student</span>
+                    <span class="tag">Cloud</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Syed Jafer K</div>
+                <div class="person-org">BGSW</div>
+                <div class="person-tags">
+                    <span class="tag">AI, Python</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Mohammed Yasir</div>
+                <div class="person-org">-</div>
+                <div class="person-tags">
+                    <span class="tag">Java, React</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Praveen Kumar</div>
+                <div class="person-org">Jasmin Infotech</div>
+                <div class="person-tags">
+                    <span class="tag">JavaScript, java</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Dhivya Dharshini CS</div>
+                <div class="person-org">Easwari Engineering Co...</div>
+                <div class="person-tags">
+                    <span class="tag student">Student</span>
+                    <span class="tag mentor">Mentor</span>
+                    <span class="tag">Html, js, ai, antigr...</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Fidelis Coraro</div>
+                <div class="person-org">St Joseph college of E...</div>
+                <div class="person-tags">
+                    <span class="tag fresher">Fresher</span>
+                    <span class="tag">Java Springboot</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Raama Ganesh</div>
+                <div class="person-org">Easwari Engineering Co...</div>
+                <div class="person-tags">
+                    <span class="tag student">Student</span>
+                    <span class="tag mentor">Mentor</span>
+                    <span class="tag">Needs Idea Help</span>
+                    <span class="tag">need guiding</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Sridhar</div>
+                <div class="person-org">KF</div>
+                <div class="person-tags">
+                    <span class="tag mentor">Mentor</span>
+                    <span class="tag">Transformer</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Akash K</div>
+                <div class="person-org">Zoho</div>
+                <div class="person-tags">
+                    <span class="tag">Needs Idea Help</span>
+                    <span class="tag">React, Python</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Dhana Anjana</div>
+                <div class="person-org">Easwari Engineering Co...</div>
+                <div class="person-tags">
+                    <span class="tag student">Student</span>
+                    <span class="tag">Not yet decided</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Dhananjayan</div>
+                <div class="person-org">Kissflow</div>
+                <div class="person-tags">
+                    <span class="tag">python</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Venkatesh</div>
+                <div class="person-org">Aringar anna governmen...</div>
+                <div class="person-tags">
+                    <span class="tag fresher">Fresher</span>
+                    <span class="tag">Needs Idea Help</span>
+                    <span class="tag">Java</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Bharath k</div>
+                <div class="person-org">Scrapify Ecotech Pvt Ltd</div>
+                <div class="person-tags">
+                    <span class="tag mentor">Mentor</span>
+                    <span class="tag">networking, mentorsh...</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Sri Balaji</div>
+                <div class="person-org">Arjun vision tech solu...</div>
+                <div class="person-tags">
+                    <span class="tag mentor">Mentor</span>
+                    <span class="tag">Android</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Muhammad Suhail S</div>
+                <div class="person-org">Easwari Engineering Co...</div>
+                <div class="person-tags">
+                    <span class="tag student">Student</span>
+                    <span class="tag">Needs Idea Help</span>
+                    <span class="tag">Artificial intellige...</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">Dattathreya V</div>
+                <div class="person-org">Spi edge</div>
+                <div class="person-tags">
+                    <span class="tag">Nodejs</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">NR Sathishkumar</div>
+                <div class="person-org">Bahwancybertek</div>
+                <div class="person-tags">
+                    <span class="tag mentor">Mentor</span>
+                    <span class="tag">Devops/cloud</span>
+                </div>
+            </div>
+            <div class="person-card">
+                <div class="person-name">suchitra V</div>
+                <div class="person-org">infosys</div>
+                <div class="person-tags">
+                    <span class="tag mentor">Mentor</span>
+                    <span class="tag">https://www.linkedin...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

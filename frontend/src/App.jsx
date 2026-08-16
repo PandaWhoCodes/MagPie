@@ -1,8 +1,12 @@
-import React, { lazy, Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { lazy, Suspense, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 import { ThemeProvider } from './contexts/ThemeProvider';
+import ReactGA from 'react-ga4';
+
+// Initialize Google Analytics
+ReactGA.initialize('G-2RVY8N5G4Y');
 
 // HomePage - load immediately (first page user sees)
 import HomePage from './pages/HomePage';
@@ -40,6 +44,12 @@ const queryClient = new QueryClient({
 
 // Main app content
 function AppContent() {
+  const location = useLocation();
+
+  // Track page views on route change
+  useEffect(() => {
+    ReactGA.send({ hitType: 'pageview', page: location.pathname });
+  }, [location]);
 
   return (
     <div className="min-h-screen transition-colors duration-300">
