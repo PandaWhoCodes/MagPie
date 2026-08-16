@@ -63,6 +63,8 @@ export const registrationsApi = {
     return api.get(`/registrations/profile/autofill?${params.toString()}`);
   },
   checkIn: (eventId, email) => api.post(`/registrations/check-in/${eventId}/`, { email }),
+  checkInById: (registrationId, checkIn) =>
+    api.post(`/registrations/${registrationId}/check-in/`, { check_in: checkIn }),
 };
 
 // QR Codes API
