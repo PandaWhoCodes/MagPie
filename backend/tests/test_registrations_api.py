@@ -232,6 +232,72 @@ class TestRegistrationsAPI:
         })
         assert response.status_code == status.HTTP_404_NOT_FOUND
 
+    def test_manual_check_in_by_id(self, client, sample_event_data, sample_registration_data):
+        """Test manual check-in by registration ID"""
+        # Create event and registration
+        event_response = client.post("/api/events/", json=sample_event_data)
+        event_id = event_response.json()["id"]
+
+        registration_data = sample_registration_data.copy()
+        registration_data["event_id"] = event_id
+        create_response = client.post("/api/registrations/", json=registration_data)
+        registration_id = create_response.json()["id"]
+
+        # Check in by ID
+        response = client.post(f"/api/registrations/{registration_id}/check-in/", json={
+            "check_in": True
+        })
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert data["id"] == registration_id
+        assert data["is_checked_in"] is True
+        assert data["checked_in_at"] is not None
+
+    def test_manual_check_in_undo(self, client, sample_event_data, sample_registration_data):
+        """Test undoing a manual check-in by registration ID"""
+        # Create event and registration
+        event_response = client.post("/api/events/", json=sample_event_data)
+        event_id = event_response.json()["id"]
+
+        registration_data = sample_registration_data.copy()
+        registration_data["event_id"] = event_id
+        create_response = client.post("/api/registrations/", json=registration_data)
+        registration_id = create_response.json()["id"]
+
+        # Check in, then undo
+        client.post(f"/api/registrations/{registration_id}/check-in/", json={
+            "check_in": True
+        })
+        response = client.post(f"/api/registrations/{registration_id}/check-in/", json={
+            "check_in": False
+        })
+        assert response.status_code == status.HTTP_200_OK
+        data = response.json()
+        assert data["id"] == registration_id
+        assert data["is_checked_in"] is False
+        assert data["checked_in_at"] is None
+
+    def test_manual_check_in_nonexistent_registration(self, client):
+        """Test manual check-in for a non-existent registration"""
+        response = client.post("/api/registrations/99999/check-in/", json={
+            "check_in": True
+        })
+        assert response.status_code == status.HTTP_404_NOT_FOUND
+
+    def test_manual_check_in_missing_body(self, client, sample_event_data, sample_registration_data):
+        """Test manual check-in without check_in in body"""
+        # Create event and registration
+        event_response = client.post("/api/events/", json=sample_event_data)
+        event_id = event_response.json()["id"]
+
+        registration_data = sample_registration_data.copy()
+        registration_data["event_id"] = event_id
+        create_response = client.post("/api/registrations/", json=registration_data)
+        registration_id = create_response.json()["id"]
+
+        response = client.post(f"/api/registrations/{registration_id}/check-in/", json={})
+        assert response.status_code == status.HTTP_422_UNPROCESSABLE_ENTITY
+
     def test_duplicate_registration(self, client, sample_event_data, sample_registration_data):
         """Test that duplicate registrations are prevented"""
         # Create event

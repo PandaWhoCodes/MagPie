@@ -155,6 +155,40 @@ class RegistrationService:
         return True
 
     @staticmethod
+    async def check_in_registration_by_id(
+        registration_id: str, check_in: bool
+    ) -> Optional[RegistrationResponse]:
+        """Check in or undo check-in for a registration by ID"""
+        reg = await db.fetch_one(
+            "SELECT id FROM registrations WHERE id = ?",
+            [registration_id],
+        )
+
+        if not reg:
+            return None
+
+        if check_in:
+            await db.execute(
+                """
+                UPDATE registrations
+                SET is_checked_in = 1, checked_in_at = CURRENT_TIMESTAMP
+                WHERE id = ?
+            """,
+                [registration_id],
+            )
+        else:
+            await db.execute(
+                """
+                UPDATE registrations
+                SET is_checked_in = 0, checked_in_at = NULL
+                WHERE id = ?
+            """,
+                [registration_id],
+            )
+
+        return await RegistrationService.get_registration(registration_id)
+
+    @staticmethod
     async def is_user_registered(event_id: str, email: str) -> bool:
         """Check if user is already registered for an event"""
         reg = await db.fetch_one(
