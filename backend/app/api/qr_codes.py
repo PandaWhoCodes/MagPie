@@ -22,6 +22,21 @@ async def create_qr_code(
         )
 
 
+@router.get("/event/{event_id}")
+async def get_event_qr_codes(
+    event_id: str,
+    auth: AuthenticatedUser = Depends(clerk_auth)
+):
+    """Get all QR codes for an event (protected)"""
+    try:
+        return await QRService.get_event_qr_codes(event_id)
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to fetch QR codes: {str(e)}",
+        )
+
+
 @router.get("/{qr_id}")
 async def get_qr_code(
     qr_id: str,
@@ -42,21 +57,6 @@ async def get_qr_code(
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to fetch QR code: {str(e)}",
-        )
-
-
-@router.get("/event/{event_id}")
-async def get_event_qr_codes(
-    event_id: str,
-    auth: AuthenticatedUser = Depends(clerk_auth)
-):
-    """Get all QR codes for an event (protected)"""
-    try:
-        return await QRService.get_event_qr_codes(event_id)
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to fetch QR codes: {str(e)}",
         )
 
 
