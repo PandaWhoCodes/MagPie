@@ -22,7 +22,7 @@ async def create_qr_code(
         )
 
 
-@router.get("/event/{event_id}")
+@router.get("/event/{event_id}/")
 async def get_event_qr_codes(
     event_id: str,
     auth: AuthenticatedUser = Depends(clerk_auth)
