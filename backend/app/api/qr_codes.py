@@ -40,7 +40,6 @@ async def get_event_qr_codes(
 @router.get("/{qr_id}/")
 async def get_qr_code(
     qr_id: str,
-    auth: AuthenticatedUser = Depends(clerk_auth)
 ):
     """Get QR code details (protected)"""
     try:
